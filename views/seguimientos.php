@@ -136,47 +136,48 @@ function formatFecha(?string $fecha): string {
 <?php include 'objects/footer.php'; ?>
 
 <script>
-$(document).ready(function() {
-    $('#tabla-seguimientos').DataTable({
-        dom: `
-            <'row mb-3'
-                <'col-sm-12 col-md-6'l>
-                <'col-sm-12 col-md-6 dt-action-buttons d-flex justify-content-md-end gap-2'Bf>
-            >
-            <'row'
-                <'col-sm-12 table-responsive'tr>
-            >
-            <'row mt-3'
-                <'col-sm-12 col-md-5'i>
-                <'col-sm-12 col-md-7'p>
-            >
-        `,
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: '<i class="bi bi-file-earmark-excel-fill"></i> Excel',
-                className: 'btn btn-success btn-sm shadow-sm',
-                titleAttr: 'Exportar a Excel'
-            }
-        ],
-        language: {
-            search: "",
-            searchPlaceholder: "Buscar seguimiento...",
-            lengthMenu: "Mostrar _MENU_",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            paginate: {
-                first: "«",
-                last: "»",
-                next: "›",
-                previous: "‹"
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const tabla = document.getElementById('tabla-seguimientos');
+    if (!tabla) return;
+
+    const dataTable = new simpleDatatables.DataTable(tabla, {
+        searchable: true,
+        fixedHeight: false,
+        labels: {
+            placeholder: "Buscar seguimiento...",
+            perPage: "{select}",
+            noRows: "No hay seguimientos para mostrar",
+            info: "Mostrando {start} a {end} de {rows} registros"
         }
     });
 
-    // Input de búsqueda más compacto y moderno
-    $('.dataTables_filter input')
-        .addClass('form-control form-control-sm shadow-sm')
-        .css('width', '250px');
-});
+    const wrapper = tabla.closest('.dataTable-wrapper');
+    if (wrapper) {
+        const top = wrapper.querySelector('.dataTable-top');
+        if (top) {
+            const actions = document.createElement('div');
+            actions.className = 'd-flex align-items-center gap-2';
 
+            const exportBtn = document.createElement('button');
+            exportBtn.className = 'btn btn-success btn-sm shadow-sm';
+            exportBtn.innerHTML = '<i class="bi bi-file-earmark-arrow-down"></i> Exportar CSV';
+            exportBtn.addEventListener('click', () => {
+                dataTable.export({
+                    type: 'csv',
+                    download: true,
+                    filename: 'seguimientos'
+                });
+            });
+
+            const searchInput = top.querySelector('input[type="search"]');
+            if (searchInput) {
+                searchInput.classList.add('form-control', 'form-control-sm', 'shadow-sm');
+                searchInput.placeholder = 'Buscar seguimiento...';
+            }
+
+            actions.appendChild(exportBtn);
+            top.appendChild(actions);
+        }
+    }
+});
 </script>

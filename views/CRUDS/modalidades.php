@@ -1,8 +1,11 @@
 <?php
 require_once __DIR__ . "/../../controllers/authController.php";
 require_once __DIR__ . "/../../config/db.php";
+
+// Aseguramos que la sesión y auth funcionen
 $auth = new AuthController($conn);
 $auth->checkAuth();
+
 $modificacion_ruta = "../";
 $page_title = "Modalidades";
 include __DIR__ . "/../objects/header.php";
@@ -41,7 +44,6 @@ include __DIR__ . "/../objects/header.php";
         </table>
     </div>
 
-    <!-- Controles de paginación -->
     <nav aria-label="Paginación de modalidades" class="mt-3">
         <div class="row align-items-center">
             <div class="col-md-6">
@@ -58,8 +60,7 @@ include __DIR__ . "/../objects/header.php";
             </div>
             <div class="col-md-6">
                 <ul class="pagination justify-content-end mb-0" id="paginationControls">
-                    <!-- Los controles se generarán dinámicamente -->
-                </ul>
+                    </ul>
             </div>
         </div>
     </nav>
@@ -90,14 +91,21 @@ include __DIR__ . "/../objects/header.php";
 </div>
 
 <?php
-include __DIR__ . "/../objects/footer.php";
-
+include __DIR__ . '/../objects/footer.php';
 ?>
+
 <script>
 window.addEventListener('load', function() {
-    const modalidadModal = new bootstrap.Modal(document.getElementById('modalidadModal'));
-    
-    // Variables de paginación
+    const modalidadModalEl = document.getElementById('modalidadModal');
+    const modalidadModal = modalidadModalEl ? new bootstrap.Modal(modalidadModalEl) : null;
+    const form = document.getElementById('formModalidad');
+    const modalidadesBody = document.getElementById('modalidadesBody');
+    const paginationControls = document.getElementById('paginationControls');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const searchInput = document.getElementById('searchInput');
+    const itemsPerPageSelect = document.getElementById('itemsPerPage');
+    const modalLabel = document.getElementById('modalLabel');
+
     let currentPage = 1;
     let itemsPerPage = 10;
     let totalItems = 0;
@@ -105,270 +113,266 @@ window.addEventListener('load', function() {
     let searchTerm = '';
     let isLoading = false;
 
-    // Función para cargar modalidades con paginación
-    function cargarModalidades(page = 1, search = '') {
-        if (isLoading) return;
+    // REEMPLAZO DE dom.setHTML
+    const renderSpinner = () => {
+        modalidadesBody.innerHTML = '<tr><td colspan="3" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
+    };
+
+    const updatePaginationInfo = () => {
+        const start = ((currentPage - 1) * itemsPerPage) + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        if (paginationInfo) paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} registros`;
+    };
+
+    const renderPaginationControls = () => {
+        if (!paginationControls) return;
+        paginationControls.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const addItem = (page, label, disabled = false, active = false) => {
+            const li = document.createElement('li');
+            li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`.trim();
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.dataset.page = page;
+            link.innerHTML = label; // Usamos innerHTML para permitir entidades HTML
+            li.appendChild(link);
+            paginationControls.appendChild(li);
+        };
+
+        // CORRECCIÓN DE CARACTERES DE PAGINACIÓN
+        addItem(currentPage - 1, '&laquo; Anterior', currentPage === 1);
         
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            addItem(1, '1');
+            if (startPage > 2) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            addItem(i, String(i), false, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+            addItem(totalPages, String(totalPages));
+        }
+
+        addItem(currentPage + 1, 'Siguiente &raquo;', currentPage === totalPages);
+    };
+
+    const renderModalidades = (modalidades) => {
+        if (!modalidadesBody) return;
+        
+        // Limpiamos el contenido actual
+        modalidadesBody.innerHTML = '';
+
+        if (!modalidades.length) {
+            modalidadesBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No se encontraron modalidades</td></tr>';
+            return;
+        }
+
+        // REEMPLAZO DE dom.appendHTML por insertAdjacentHTML
+        modalidades.forEach((m) => {
+            const row = `
+                <tr>
+                    <td>${m.id_modalidad}</td>
+                    <td>${m.nombre}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm btn-editar" data-id="${m.id_modalidad}" data-nombre="${m.nombre}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Modalidad">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm btn-eliminar" data-id="${m.id_modalidad}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Modalidad">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            modalidadesBody.insertAdjacentHTML('beforeend', row);
+        });
+
+        // Inicializar tooltips de Bootstrap si existen
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    };
+
+    const showError = (message) => {
+        modalidadesBody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">${message}</td></tr>`;
+        Swal.fire({ icon: 'error', title: 'Error', text: message });
+    };
+
+    // REEMPLAZO DE dom.fetchJSON por fetch nativo
+    const cargarModalidades = async (page = 1, search = '') => {
+        if (isLoading) return;
         isLoading = true;
         currentPage = page;
         searchTerm = search;
-        
-        // Mostrar loading
-        $('#modalidadesBody').html('<tr><td colspan="3" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>');
-        
-        const params = new URLSearchParams({
-            action: 'paginated',
-            page: page,
-            limit: itemsPerPage,
-            search: search
-        });
-        
-        $.get(`/GORA/controllers/modalidadesController.php?${params}`, function(response) {
-            const data = typeof response === 'string' ? JSON.parse(response) : response;
+        renderSpinner();
+
+        const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
+        try {
+            const response = await fetch(`/GORA/controllers/modalidadesController.php?${params}`);
+            
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            
+            const data = await response.json();
             
             if (data.success) {
                 totalItems = data.total;
                 totalPages = data.totalPages;
                 currentPage = data.currentPage;
-                
                 renderModalidades(data.modalidades);
                 updatePaginationInfo();
                 renderPaginationControls();
             } else {
                 showError('Error al cargar los datos: ' + (data.message || 'Error desconocido'));
             }
-        }).fail(function(xhr) {
-            showError('Error de conexión: ' + xhr.statusText);
-        }).always(function() {
+        } catch (error) {
+            console.error(error);
+            showError('Error de conexión: ' + error.message);
+        } finally {
             isLoading = false;
-        });
-    }
-
-        // Función para renderizar la tabla de modalidades
-        function renderModalidades(modalidades) {
-            $('#modalidadesBody').empty();
-            
-            if (modalidades.length === 0) {
-                $('#modalidadesBody').html('<tr><td colspan="3" class="text-center text-muted">No se encontraron modalidades</td></tr>');
-                return;
-            }
-            
-            modalidades.forEach(m => {
-                const row = `<tr>
-                <td>${m.id_modalidad}</td>
-                <td>${m.nombre}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm btn-editar" data-modalidad='${JSON.stringify(m)}' 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Modalidad">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm btn-eliminar" data-id="${m.id_modalidad}" 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Modalidad">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </td>
-            </tr>`;
-            $('#modalidadesBody').append(row);
-        });
-        
-        // Reinicializar tooltips después de renderizar
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }
-
-    // Función para actualizar la información de paginación
-    function updatePaginationInfo() {
-        const start = ((currentPage - 1) * itemsPerPage) + 1;
-        const end = Math.min(currentPage * itemsPerPage, totalItems);
-        $('#paginationInfo').text(`Mostrando ${start}-${end} de ${totalItems} registros`);
-    }
-
-    // Función para renderizar los controles de paginación
-    function renderPaginationControls() {
-        const controls = $('#paginationControls');
-        controls.empty();
-        
-        if (totalPages <= 1) return;
-        
-        // Botón Anterior
-        const prevDisabled = currentPage === 1 ? 'disabled' : '';
-        controls.append(`<li class="page-item ${prevDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo; Anterior</a>
-        </li>`);
-        
-        // Números de página
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-        
-        if (startPage > 1) {
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
-            if (startPage > 2) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
         }
-        
-        for (let i = startPage; i <= endPage; i++) {
-            const active = i === currentPage ? 'active' : '';
-            controls.append(`<li class="page-item ${active}">
-                <a class="page-link" href="#" data-page="${i}">${i}</a>
-            </li>`);
-        }
-        
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
-        }
-        
-        // Botón Siguiente
-        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-        controls.append(`<li class="page-item ${nextDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente &raquo;</a>
-        </li>`);
-    }
+    };
 
-    // Función para mostrar errores
-    function showError(message) {
-        $('#modalidadesBody').html(`<tr><td colspan="3" class="text-center text-danger">${message}</td></tr>`);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: message
-        });
-    }
-
-    // Event Handlers
-    $('#btnNuevaModalidad').on('click', function() {
-        $('#formModalidad')[0].reset();
-        $('#id_modalidad').val('');
-        $('#modalLabel').text('Agregar Modalidad');
-        modalidadModal.show();
+    document.getElementById('btnNuevaModalidad')?.addEventListener('click', () => {
+        form?.reset();
+        const idField = document.getElementById('id_modalidad');
+        if (idField) idField.value = '';
+        if (modalLabel) modalLabel.textContent = 'Agregar Modalidad';
+        modalidadModal?.show();
     });
 
-    // Búsqueda
-    $('#btnSearch').on('click', function() {
-        const search = $('#searchInput').val().trim();
+    document.getElementById('btnSearch')?.addEventListener('click', () => {
+        const search = searchInput?.value.trim() || '';
         cargarModalidades(1, search);
     });
 
-    $('#searchInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            const search = $(this).val().trim();
+    searchInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const search = searchInput.value.trim();
             cargarModalidades(1, search);
         }
     });
 
-    $('#btnClear').on('click', function() {
-        $('#searchInput').val('');
+    document.getElementById('btnClear')?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
         cargarModalidades(1, '');
     });
 
-    // Cambio de items por página
-    $('#itemsPerPage').on('change', function() {
-        itemsPerPage = parseInt($(this).val());
+    itemsPerPageSelect?.addEventListener('change', () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value, 10) || 10;
         cargarModalidades(1, searchTerm);
     });
 
-    // Paginación
-    $(document).on('click', '.page-link', function(e) {
+    paginationControls?.addEventListener('click', (e) => {
+        const link = e.target.closest('.page-link');
+        if (!link) return;
         e.preventDefault();
-        const page = parseInt($(this).data('page'));
-        if (page && page !== currentPage && page >= 1 && page <= totalPages) {
-            cargarModalidades(page, searchTerm);
+        const page = parseInt(link.dataset.page, 10);
+        if (!page || page === currentPage || page < 1 || page > totalPages) return;
+        cargarModalidades(page, searchTerm);
+    });
+
+    document.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.btn-editar');
+        if (editBtn) {
+            document.getElementById('id_modalidad').value = editBtn.dataset.id;
+            document.getElementById('nombre').value = editBtn.dataset.nombre || '';
+            if (modalLabel) modalLabel.textContent = 'Editar Modalidad';
+            modalidadModal?.show();
+            return;
+        }
+
+        const deleteBtn = e.target.closest('.btn-eliminar');
+        if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¡No podrás revertir esta acción!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, ¡elimínalo!',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        // REEMPLAZO DE dom.postForm para eliminar
+                        const formData = new FormData();
+                        formData.append('id', id);
+                        
+                        const response = await fetch('/GORA/controllers/modalidadesController.php?action=delete', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if(data.success || data === true) { // Ajusta según lo que devuelva tu PHP
+                             Swal.fire('¡Eliminado!', 'La modalidad ha sido eliminada.', 'success');
+                             cargarModalidades(currentPage, searchTerm);
+                        } else {
+                             throw new Error(data.message || 'Error al eliminar');
+                        }
+
+                    } catch (error) {
+                        Swal.fire('Error', 'No se pudo eliminar la modalidad.', 'error');
+                    }
+                }
+            });
         }
     });
 
-    // Modal events
-    $('#modalidadModal').on('hidden.bs.modal', function() {
-        $('#formModalidad')[0].reset();
-        $('#id_modalidad').val('');
-    });
-
-    // Guardar modalidad
-    $('#btnGuardar').on('click', function() {
-        let id = $("#id_modalidad").val();
-        let url = id ? "/GORA/controllers/modalidadesController.php?action=update" : "/GORA/controllers/modalidadesController.php?action=store";
-
-        $.post(url, $('#formModalidad').serialize())
-            .done(function(response) {
-                if (response.status === 'success') {
-                    modalidadModal.hide();
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: response.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    // Recargar la página actual
-                    cargarModalidades(currentPage, searchTerm);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'No se pudo guardar la modalidad.'
-                    });
-                }
-            })
-            .fail(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Hubo un error de comunicación con el servidor.'
-                });
-            });
-    });
-
-    // Editar modalidad
-    $(document).on('click', '.btn-editar', function() {
-        const modalidad = $(this).data('modalidad');
+    // REEMPLAZO DE dom.serializeForm y dom.postForm para guardar
+    document.getElementById('btnGuardar')?.addEventListener('click', async () => {
+        const idField = document.getElementById('id_modalidad');
+        const isUpdate = idField && idField.value;
+        const url = isUpdate ? '/GORA/controllers/modalidadesController.php?action=update' : '/GORA/controllers/modalidadesController.php?action=store';
         
-        $("#id_modalidad").val(modalidad.id_modalidad);
-        $("#nombre").val(modalidad.nombre);
-        $('#modalLabel').text('Editar Modalidad');
-        modalidadModal.show();
-    });
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
 
-    // Eliminar modalidad
-    $(document).on('click', '.btn-eliminar', function() {
-        const idParaEliminar = $(this).data('id');
+            const data = await response.json();
 
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡No podrás revertir esta acción!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, ¡eliminar!',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post("/GORA/controllers/modalidadesController.php?action=delete", { id: idParaEliminar }, function(response) {
-                    if (response.status === 'success') {
-                        Swal.fire('¡Eliminado!', response.message, 'success');
-                        cargarModalidades(currentPage, searchTerm);
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
-                    }
-                }, 'json').fail(function() {
-                    Swal.fire('Error', 'Verifica tus relaciones con otras tablas.', 'error');
-                });
+            // Asumimos que el backend devuelve un JSON con success: true
+            if (response.ok) {
+                modalidadModal?.hide();
+                cargarModalidades(currentPage, searchTerm);
+                Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'La modalidad ha sido guardada correctamente.', timer: 1500, showConfirmButton: false });
+            } else {
+                 throw new Error(data.message || 'Error en el servidor');
             }
-        });
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Oops...', text: 'Error al guardar la modalidad. Revise los datos e intente de nuevo.' });
+        }
     });
 
-    // Cargar datos iniciales
-    cargarModalidades();
-    
-    // Inicializar tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    modalidadModalEl?.addEventListener('hidden.bs.modal', () => {
+        form?.reset();
     });
+
+    cargarModalidades();
 });
 </script>
-

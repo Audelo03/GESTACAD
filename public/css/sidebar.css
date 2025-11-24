@@ -2,21 +2,49 @@
    ESTILOS DEL SIDEBAR - SISTEMA GORA
    ======================================== */
 
+/* Overlay para móviles */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1039;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.show {
+  display: block;
+  opacity: 1;
+}
+
 /* Contenedor principal del sidebar */
 #app-sidebar {
   width: 260px;
-  background-color: #111827; 
-  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: radial-gradient(circle at 20% 20%, rgba(79,156,249,0.08), transparent 35%), #0f172a;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
   padding: 1.25rem !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 1040;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Barra inferior por defecto oculta */
+#mobile-bottom-nav {
+  display: none;
 }
 
 /* Contenedor principal del contenido */
 #app-content {
   margin-left: 260px;
   transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: calc(100% - 260px);
 }
 
 /* Título del sidebar */
@@ -29,6 +57,16 @@
 /* Botón para colapsar/expandir sidebar */
 #btn-toggle-sidebar {
   border-radius: 0.375rem;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Botón hamburguesa para móviles */
+#btn-mobile-menu {
+  display: none !important;
 }
 
 /* Contenedor de navegación con transición lenta */
@@ -45,33 +83,32 @@
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
-  transition: background-color 0.5s ease, color 0.5s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 48px; /* Tamaño táctil mínimo */
 }
 
 /* Iconos de los enlaces */
 #app-sidebar .nav-link i {
   font-size: 1.1rem;
-  /* Sin transiciones de transform - iconos mantienen tamaño fijo */
+  min-width: 24px;
 }
 
 /* Efecto hover en los enlaces */
 #app-sidebar .nav-link:hover {
-  background-color: #1f2937; /* Fondo sutil al pasar el mouse */
+  background-color: #1f2937;
   color: #ffffff;
 }
 
-/* Efecto hover en los iconos - Sin escalado para mantener tamaño fijo */
-
 /* Estilo del enlace activo */
 #app-sidebar .nav-link.active {
-  background-color: #3b82f6; /* Color de acento para el enlace activo */
+  background-color: #4f9cf9;
   color: #ffffff !important;
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   font-weight: 600;
-  border-left: 4px solid #1d4ed8;
+  border-left: 4px solid #3b82f6;
 }
 
-/* Icono del enlace activo - Sin escalado para mantener tamaño fijo */
+/* Icono del enlace activo */
 #app-sidebar .nav-link.active i {
   color: #ffffff !important;
 }
@@ -83,9 +120,9 @@
 
 /* Información del usuario en la parte inferior */
 .user-info {
-  margin-top: auto; /* Empuja esta sección hacia abajo */
+  margin-top: auto;
   padding-top: 1.25rem;
-  border-top: 1px solid #374151; /* Separador sutil */
+  border-top: 1px solid #374151;
 }
 
 /* Botón de salir */
@@ -95,13 +132,13 @@
 }
 
 #app-sidebar .btn-outline-light:hover {
-    background-color: #dc3545; /* Color rojo para la acción de salir */
+    background-color: #dc3545;
     border-color: #dc3545;
     color: #fff;
 }
 
 /* ========================================
-   ESTILOS DEL SIDEBAR COLAPSADO
+   ESTILOS DEL SIDEBAR COLAPSADO (Desktop)
    ======================================== */
 
 /* Sidebar colapsado */
@@ -146,10 +183,236 @@
 /* Ajustar margen del contenido cuando sidebar está colapsado */
 #app-content.collapsed {
   margin-left: 90px;
+  width: calc(100% - 90px);
   transition: margin-left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* Centrar botón de toggle cuando está colapsado */
 #app-sidebar.collapsed .d-flex.justify-content-between {
   justify-content: center !important;
+}
+
+/* ========================================
+   ESTILOS RESPONSIVOS PARA MÓVILES
+   ======================================== */
+
+@media (max-width: 991.98px) {
+  /* Ocultar el botón de colapso interno en móvil: solo usar el hamburguesa */
+  #btn-toggle-sidebar {
+    display: none !important;
+  }
+
+  /* Mostrar botón hamburguesa en móviles */
+  #btn-mobile-menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ocultar la barra superior en móvil para liberar espacio */
+  #navbar1 {
+    display: none !important;
+  }
+
+  /* Reservar espacio para la barra inferior */
+  body {
+    padding-bottom: 72px;
+  }
+
+  /* Separar ligeramente el contenido para que el botón hamburguesa no estorbe */
+  #app-content {
+    padding-top: 1rem;
+  }
+
+  /* Sidebar oculto por defecto en móviles */
+  #app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px !important;
+    max-width: 85vw;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1040;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Sidebar visible cuando tiene clase mobile-open */
+  #app-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* El sidebar nunca debe estar colapsado en móviles */
+  #app-sidebar.collapsed {
+    width: 280px !important;
+    padding: 1.25rem !important;
+    transform: translateX(-100%);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #app-sidebar.collapsed.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Mostrar texto siempre en móviles */
+  #app-sidebar.collapsed .sidebar-text,
+  #app-sidebar.collapsed .fs-5,
+  #app-sidebar.collapsed .small {
+    display: block;
+  }
+
+  /* Enlaces normales en móviles */
+  #app-sidebar.collapsed .nav-link {
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+  }
+
+  #app-sidebar.collapsed .nav-link i {
+    margin-right: 0.5rem !important;
+    font-size: 1.1rem;
+  }
+
+  /* Contenido ocupa todo el ancho en móviles */
+  #app-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  #app-content.collapsed {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Botón toggle del sidebar más grande en móviles */
+  #btn-toggle-sidebar {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1.2rem;
+  }
+
+  /* Enlaces más grandes para mejor usabilidad táctil */
+  #app-sidebar .nav-link {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    min-height: 52px;
+    font-size: 1rem;
+  }
+
+  #app-sidebar .nav-link i {
+    font-size: 1.3rem;
+    min-width: 28px;
+  }
+
+  /* Ocultar items duplicados (ya presentes en bottom nav) */
+  #app-sidebar .mobile-hidden {
+    display: none !important;
+  }
+
+  /* Deja espacio extra al final para el botón de logout móvil */
+  #app-sidebar .slow {
+    padding-bottom: 5rem;
+  }
+
+  /* Barra inferior tipo app */
+  #mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 1051;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #e5e7eb;
+    text-decoration: none;
+    font-size: 0.75rem;
+    gap: 0.15rem;
+    border: none;
+    background: none;
+    padding: 0.35rem 0;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item i {
+    font-size: 1.2rem;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item.active {
+    color: #60a5fa;
+    font-weight: 600;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item:active {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* ========================================
+   ESTILOS PARA TABLETAS
+   ======================================== */
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+  #app-sidebar {
+    width: 240px;
+  }
+
+  #app-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* ========================================
+   ESTILOS PARA PANTALLAS PEQUEÑAS (móviles pequeños)
+   ======================================== */
+
+@media (max-width: 575.98px) {
+  #app-sidebar {
+    width: 100% !important;
+    max-width: 100vw;
+  }
+
+  #btn-mobile-menu {
+    top: 0.75rem;
+    left: 0.75rem;
+    width: 44px;
+    height: 44px;
+  }
+
+  .mobile-logout-btn {
+    padding: 0.85rem 1rem;
+    font-weight: 600;
+    border-color: #ef4444;
+    color: #ef4444;
+  }
+
+  .mobile-logout-btn:hover {
+    background-color: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+  }
+
+  /* Enlaces aún más grandes en móviles pequeños */
+  #app-sidebar .nav-link {
+    padding: 1.25rem;
+    min-height: 56px;
+    font-size: 1.05rem;
+  }
+
+  #app-sidebar .nav-link i {
+    font-size: 1.4rem;
+    min-width: 32px;
+  }
 }

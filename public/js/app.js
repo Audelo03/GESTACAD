@@ -60,29 +60,128 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function initializeSidebar() {
     const toggleBtn = document.getElementById('btn-toggle-sidebar');
+    const mobileMenuBtn = document.getElementById('btn-mobile-menu');
     const sidebar = document.getElementById('app-sidebar');
     const content = document.getElementById('app-content');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const mobileMenuIcon = mobileMenuBtn ? mobileMenuBtn.querySelector('i') : null;
+    const bottomNavManage = document.getElementById('bottom-nav-manage');
     
-    if (toggleBtn && sidebar && content) {
-        toggleBtn.addEventListener('click', function() {
+    // Función para detectar si estamos en móvil
+    function isMobile() {
+        return window.innerWidth <= 991.98;
+    }
+    
+    // Función para abrir sidebar en móvil
+    function openMobileSidebar() {
+        if (sidebar) {
+            sidebar.classList.add('mobile-open');
+            if (overlay) {
+                overlay.classList.add('show');
+            }
+            // Prevenir scroll del body cuando el sidebar está abierto
+            document.body.style.overflow = 'hidden';
+        }
+        if (mobileMenuIcon) {
+            mobileMenuIcon.classList.remove('bi-list');
+            mobileMenuIcon.classList.add('bi-x');
+        }
+    }
+    
+    // Función para cerrar sidebar en móvil
+    function closeMobileSidebar() {
+        if (sidebar) {
+            sidebar.classList.remove('mobile-open');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+            // Restaurar scroll del body
+            document.body.style.overflow = '';
+        }
+        if (mobileMenuIcon) {
+            mobileMenuIcon.classList.remove('bi-x');
+            mobileMenuIcon.classList.add('bi-list');
+        }
+    }
+    
+    // Función para toggle sidebar (desktop)
+    function toggleDesktopSidebar() {
+        if (sidebar && content) {
             sidebar.classList.toggle('collapsed');
             content.classList.toggle('collapsed');
+        }
+    }
+    
+    // Event listener para botón toggle (desktop)
+    if (toggleBtn && sidebar && content) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (!isMobile()) {
+                toggleDesktopSidebar();
+            } else {
+                // En móvil, el botón interno cierra el sidebar
+                closeMobileSidebar();
+            }
         });
     }
     
-    // Limpiar tooltips cuando se hace clic en enlaces del sidebar
-    const sidebarLinks = sidebar.querySelectorAll('a[data-bs-toggle="tooltip"]');
+    // Event listener para botón hamburguesa (móvil)
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (sidebar && sidebar.classList.contains('mobile-open')) {
+                closeMobileSidebar();
+            } else {
+                openMobileSidebar();
+            }
+        });
+    }
+
+    if (bottomNavManage) {
+        bottomNavManage.addEventListener('click', function(e) {
+            e.preventDefault();
+            openMobileSidebar();
+        });
+    }
+    
+    // Cerrar sidebar al hacer clic en el overlay
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            closeMobileSidebar();
+        });
+    }
+    
+    // Cerrar sidebar al hacer clic fuera en móviles
+    if (content) {
+        content.addEventListener('click', function(e) {
+            if (isMobile() && sidebar && sidebar.classList.contains('mobile-open')) {
+                // Solo cerrar si no se hace clic en el sidebar mismo
+                if (!sidebar.contains(e.target)) {
+                    closeMobileSidebar();
+                }
+            }
+        });
+    }
+    
+    // Cerrar sidebar al hacer clic en enlaces (móvil)
+    const sidebarLinks = sidebar ? sidebar.querySelectorAll('a.nav-link') : [];
     sidebarLinks.forEach(function(link) {
-        // Limpiar al hacer clic
         link.addEventListener('click', function() {
+            // Cerrar sidebar en móvil después de un pequeño delay para permitir la navegación
+            if (isMobile()) {
+                setTimeout(function() {
+                    closeMobileSidebar();
+                }, 300);
+            }
+            
+            // Limpiar tooltips
             cleanupAllTooltips();
-            // Limpieza adicional con delay para casos edge
             setTimeout(function() {
                 cleanupAllTooltips();
             }, 100);
         });
         
-        // Limpiar al salir del elemento con el mouse
+        // Limpiar tooltips al salir del elemento
         link.addEventListener('mouseleave', function() {
             const tooltip = bootstrap.Tooltip.getInstance(link);
             if (tooltip) {
@@ -90,13 +189,41 @@ function initializeSidebar() {
             }
         });
         
-        // Limpiar al perder el foco
+        // Limpiar tooltips al perder el foco
         link.addEventListener('blur', function() {
             const tooltip = bootstrap.Tooltip.getInstance(link);
             if (tooltip) {
                 tooltip.hide();
             }
         });
+    });
+    
+    // Manejar cambio de tamaño de ventana
+    let resizeTimer;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            // Si cambiamos de móvil a desktop, asegurar que el sidebar esté en estado correcto
+            if (!isMobile()) {
+                closeMobileSidebar();
+                // En desktop, el sidebar debe estar colapsado por defecto si tiene la clase
+                if (sidebar && sidebar.classList.contains('collapsed')) {
+                    if (content) {
+                        content.classList.add('collapsed');
+                    }
+                }
+            } else {
+                // Si cambiamos a móvil, cerrar el sidebar
+                closeMobileSidebar();
+            }
+        }, 250);
+    });
+    
+    // Cerrar sidebar con tecla Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isMobile() && sidebar && sidebar.classList.contains('mobile-open')) {
+            closeMobileSidebar();
+        }
     });
 }
 

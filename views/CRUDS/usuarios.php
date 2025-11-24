@@ -1,5 +1,4 @@
 <?php
-// Remove session_start() as it's already started in index.php
 require_once __DIR__ . "/../../controllers/authController.php";
 require_once __DIR__ . "/../../config/db.php";
 
@@ -10,29 +9,29 @@ include __DIR__ . "/../objects/header.php";
 
 ?>
 
-    <div class="container mt-4">
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <button class="btn btn-success" id="btnNuevoUsuario">
-                    <i class="bi bi-plus-circle"></i> Agregar Usuario
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <button class="btn btn-success" id="btnNuevoUsuario">
+                <i class="bi bi-plus-circle"></i> Agregar Usuario
+            </button>
+        </div>
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Buscar usuarios...">
+                <button class="btn btn-outline-secondary" type="button" id="btnSearch">
+                    <i class="bi bi-search"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="btnClear">
+                    <i class="bi bi-x"></i>
                 </button>
             </div>
-            <div class="col-md-6">
-                <div class="input-group">
-                    <input type="text" class="form-control" id="searchInput" placeholder="Buscar usuarios...">
-                    <button class="btn btn-outline-secondary" type="button" id="btnSearch">
-                        <i class="bi bi-search"></i>
-                    </button>
-                    <button class="btn btn-outline-secondary" type="button" id="btnClear">
-                        <i class="bi bi-x"></i>
-                    </button>
-                </div>
-            </div>
         </div>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover" id="tablaUsuarios">
-                <thead class="table-dark">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover" id="tablaUsuarios">
+            <thead class="table-dark">
                 <tr>
                     <th>ID</th>
                     <th>Nombre Completo</th>
@@ -40,34 +39,32 @@ include __DIR__ . "/../objects/header.php";
                     <th>Nivel</th>
                     <th>Acciones</th>
                 </tr>
-                </thead>
-                <tbody id="usuariosBody"></tbody>
-            </table>
-        </div>
+            </thead>
+            <tbody id="usuariosBody"></tbody>
+        </table>
+    </div>
 
-        <!-- Controles de paginación -->
-        <nav aria-label="Paginación de usuarios" class="mt-3">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                        <label for="itemsPerPage" class="form-label me-2 mb-0">Mostrar:</label>
-                        <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto;">
-                            <option value="5">5</option>
-                            <option value="10" selected>10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                        </select>
-                        <span class="ms-2 text-muted" id="paginationInfo">Mostrando 0 de 0 registros</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <ul class="pagination justify-content-end mb-0" id="paginationControls">
-                        <!-- Los controles se generarán dinámicamente -->
-                    </ul>
+    <nav aria-label="Paginación de usuarios" class="mt-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <label for="itemsPerPage" class="form-label me-2 mb-0">Mostrar:</label>
+                    <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                    <span class="ms-2 text-muted" id="paginationInfo">Mostrando 0 de 0 registros</span>
                 </div>
             </div>
-        </nav>
-    </div>
+            <div class="col-md-6">
+                <ul class="pagination justify-content-end mb-0" id="paginationControls">
+                    </ul>
+            </div>
+        </div>
+    </nav>
+</div>
 
 <div class="modal fade" id="usuarioModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -114,367 +111,364 @@ include __DIR__ . "/../objects/header.php";
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarUsuario">Guardar</button>
             </div>
         </div>
     </div>
 </div>
-<?php
-include __DIR__ . "/../objects/footer.php";
 
-?>
+<?php include __DIR__ . "/../objects/footer.php"; ?>
+
 <script>
-// Global variables
-let currentPage = 1;
-let itemsPerPage = 10;
-let totalItems = 0;
-let totalPages = 0;
-let searchTerm = '';
-let isLoading = false;
+window.addEventListener('load', function() {
+    const usuarioModalEl = document.getElementById('usuarioModal');
+    const usuarioModal = usuarioModalEl ? new bootstrap.Modal(usuarioModalEl) : null;
+    const form = document.getElementById('formUsuario');
+    const usuariosBody = document.getElementById('usuariosBody');
+    const paginationControls = document.getElementById('paginationControls');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const searchInput = document.getElementById('searchInput');
+    const itemsPerPageSelect = document.getElementById('itemsPerPage');
+    const modalLabel = document.getElementById('modalLabel');
+    const passwordInput = document.getElementById('password');
+    const nivelSelect = document.getElementById('niveles_usuarios_id_nivel_usuario');
+    const guardarBtn = document.getElementById('btnGuardarUsuario');
 
+    let currentPage = 1;
+    let itemsPerPage = 10;
+    let totalItems = 0;
+    let totalPages = 0;
+    let searchTerm = '';
+    let isLoading = false;
 
-// Global function for loading users
-function cargarUsuarios(page = 1, search = '') {
-        if (isLoading) return;
+    // Reemplazo de dom.setHTML
+    const renderSpinner = () => {
+        usuariosBody.innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
+    };
+
+    const updatePaginationInfo = () => {
+        const start = ((currentPage - 1) * itemsPerPage) + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        if (paginationInfo) paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} registros`;
+    };
+
+    const renderPaginationControls = () => {
+        if (!paginationControls) return;
+        paginationControls.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const addItem = (page, label, disabled = false, active = false) => {
+            const li = document.createElement('li');
+            li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`.trim();
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.dataset.page = page;
+            link.innerHTML = label; // Usamos innerHTML para permitir entidades HTML
+            li.appendChild(link);
+            paginationControls.appendChild(li);
+        };
+
+        // Corrección de caracteres
+        addItem(currentPage - 1, '&laquo; Anterior', currentPage === 1);
         
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            addItem(1, '1');
+            if (startPage > 2) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            addItem(i, String(i), false, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+            addItem(totalPages, String(totalPages));
+        }
+
+        addItem(currentPage + 1, 'Siguiente &raquo;', currentPage === totalPages);
+    };
+
+    const renderUsuarios = (usuarios) => {
+        if (!usuariosBody) return;
+        
+        // Limpiamos contenido
+        usuariosBody.innerHTML = '';
+
+        // Validación para evitar error de .length en undefined
+        if (!usuarios || !Array.isArray(usuarios) || usuarios.length === 0) {
+            usuariosBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No se encontraron usuarios</td></tr>';
+            return;
+        }
+
+        // Reemplazo de dom.appendHTML
+        usuarios.forEach((u) => {
+            const nombreCompleto = `${u.nombre} ${u.apellido_paterno} ${u.apellido_materno ?? ''}`.trim();
+            const row = `
+                <tr>
+                    <td>${u.id_usuario}</td>
+                    <td>${nombreCompleto}</td>
+                    <td>${u.email}</td>
+                    <td>${u.nivel_nombre ?? ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning btn-editar" 
+                            data-id="${u.id_usuario}" 
+                            data-nombre="${u.nombre}" 
+                            data-apellido-paterno="${u.apellido_paterno}" 
+                            data-apellido-materno="${u.apellido_materno ?? ''}" 
+                            data-email="${u.email}" 
+                            data-nivel="${u.niveles_usuarios_id_nivel_usuario ?? ''}" 
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Editar Usuario">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger btn-eliminar" 
+                            data-id="${u.id_usuario}" 
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Eliminar Usuario">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            usuariosBody.insertAdjacentHTML('beforeend', row);
+        });
+
+        // Inicializar tooltips
+        if (typeof bootstrap !== 'undefined') {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        }
+    };
+
+    const showError = (message) => {
+        usuariosBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">${message}</td></tr>`;
+        Swal.fire({ icon: 'error', title: 'Error', text: message });
+    };
+
+    // Reemplazo de dom.fetchJSON
+    const cargarUsuarios = async (page = 1, search = '') => {
+        if (isLoading) return;
         isLoading = true;
         currentPage = page;
         searchTerm = search;
-        
-        // Mostrar loading
-        $('#usuariosBody').html('<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>');
-        
-        const params = new URLSearchParams({
-            action: 'paginated',
-            page: page,
-            limit: itemsPerPage,
-            search: search
-        });
-        
-        $.get(`/GORA/controllers/usuarioController.php?${params}`, function(response) {
-            const data = typeof response === 'string' ? JSON.parse(response) : response;
+        renderSpinner();
+
+        const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
+        try {
+            const response = await fetch(`/GORA/controllers/usuarioController.php?${params}`);
+            
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+
+            const data = await response.json();
             
             if (data.success) {
                 totalItems = data.total;
                 totalPages = data.totalPages;
                 currentPage = data.currentPage;
-                
-                renderUsuarios(data.usuarios);
+                // Aseguramos que se pase un array aunque la clave sea nula o diferente
+                renderUsuarios(data.usuarios || []);
                 updatePaginationInfo();
                 renderPaginationControls();
             } else {
                 showError('Error al cargar los datos: ' + (data.message || 'Error desconocido'));
             }
-        }).fail(function(xhr) {
-            showError('Error de conexión: ' + xhr.statusText);
-        }).always(function() {
+        } catch (error) {
+            console.error(error);
+            showError('Error de conexión: ' + error.message);
+        } finally {
             isLoading = false;
-        });
-}
-
-// Global function for rendering users table
-function renderUsuarios(usuarios) {
-        $('#usuariosBody').empty();
-        
-        if (usuarios.length === 0) {
-            $('#usuariosBody').html('<tr><td colspan="5" class="text-center text-muted">No se encontraron usuarios</td></tr>');
-            return;
         }
-        
-        usuarios.forEach(u => {
-            const nombreCompleto = `${u.nombre} ${u.apellido_paterno} ${u.apellido_materno ?? ''}`.trim();
-            const row = `<tr>
-                <td>${u.id_usuario}</td>
-                <td>${nombreCompleto}</td>
-                <td>${u.email}</td>
-                <td>${u.nivel_usuario ?? 'N/A'}</td>
-                <td>
-                    <button onclick='editarUsuario(${JSON.stringify(u)})' class="btn btn-sm btn-warning" 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Usuario">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button onclick="eliminarUsuario(${u.id_usuario})" class="btn btn-sm btn-danger" 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Usuario">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </td>
-            </tr>`;
-            $('#usuariosBody').append(row);
-        });
-        
-        // Reinicializar tooltips después de renderizar
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-}
+    };
 
-// Global function for updating pagination info
-function updatePaginationInfo() {
-        const start = ((currentPage - 1) * itemsPerPage) + 1;
-        const end = Math.min(currentPage * itemsPerPage, totalItems);
-        $('#paginationInfo').text(`Mostrando ${start}-${end} de ${totalItems} registros`);
-}
-
-// Global function for rendering pagination controls
-function renderPaginationControls() {
-        const controls = $('#paginationControls');
-        controls.empty();
-        
-        if (totalPages <= 1) return;
-        
-        // Botón Anterior
-        const prevDisabled = currentPage === 1 ? 'disabled' : '';
-        controls.append(`<li class="page-item ${prevDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo; Anterior</a>
-        </li>`);
-        
-        // Números de página
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-        
-        if (startPage > 1) {
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
-            if (startPage > 2) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
+    // Reemplazo de dom.fetchJSON para niveles
+    const cargarNiveles = async () => {
+        if (!nivelSelect) return;
+        try {
+            const response = await fetch('/GORA/controllers/usuarioController.php?action=getLevels');
+            
+            // Asumimos que getLevels devuelve un array directo o un objeto con data
+            let niveles = [];
+            if(response.ok) {
+                const data = await response.json();
+                // Verificamos si es array directo o viene dentro de una propiedad
+                niveles = Array.isArray(data) ? data : (data.data || []);
             }
-        }
-        
-        for (let i = startPage; i <= endPage; i++) {
-            const active = i === currentPage ? 'active' : '';
-            controls.append(`<li class="page-item ${active}">
-                <a class="page-link" href="#" data-page="${i}">${i}</a>
-            </li>`);
-        }
-        
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
-        }
-        
-        // Botón Siguiente
-        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-        controls.append(`<li class="page-item ${nextDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente &raquo;</a>
-        </li>`);
-}
 
-// Global function for showing errors
-function showError(message) {
-        $('#usuariosBody').html(`<tr><td colspan="5" class="text-center text-danger">${message}</td></tr>`);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: message
-        });
-}
+            let options = '<option value="">Seleccione un nivel</option>';
+            niveles.forEach((level) => {
+                options += `<option value="${level.id_nivel_usuario}">${level.nombre}</option>`;
+            });
+            nivelSelect.innerHTML = options;
+        } catch (error) {
+            console.error('No se pudieron cargar los niveles', error);
+        }
+    };
 
-// Global function for loading levels
-function cargarNiveles() {
-    $.get("/GORA/controllers/nivelesusuariosController.php?accion=listar", function(niveles) {
-        let options = '<option value="">Seleccione un nivel</option>';
-        niveles.forEach(n => {
-            options += `<option value="${n.id_nivel_usuario}">${n.nombre}</option>`;
-        });
-        $("#niveles_usuarios_id_nivel_usuario").html(options);
-    }, 'json');
-}
+    const resetForm = (isNew = true) => {
+        form?.reset();
+        const idField = document.getElementById('id_usuario');
+        if (idField) idField.value = '';
+        if (passwordInput) {
+            passwordInput.value = '';
+            passwordInput.required = isNew;
+        }
+        if (modalLabel) modalLabel.textContent = isNew ? 'Agregar Usuario' : 'Editar Usuario';
+        if (nivelSelect) nivelSelect.value = '';
+    };
 
-// Event listener for page load
-window.addEventListener('load', function() {
-    const usuarioModal = new bootstrap.Modal(document.getElementById('usuarioModal'));
-    
-    // Event Handlers
-    $('#btnNuevoUsuario').on('click', function() {
-        $('#formUsuario')[0].reset();
-        $('#id_usuario').val('');
-        $('#modalLabel').text('Agregar Usuario');
-        $('#password').prop('required', true);
-        
-        // Limpiar el select2
-        $('#niveles_usuarios_id_nivel_usuario').val(null).trigger('change');
-        
-        usuarioModal.show();
+    document.getElementById('btnNuevoUsuario')?.addEventListener('click', () => {
+        resetForm(true);
+        usuarioModal?.show();
     });
 
-    // Búsqueda
-    $('#btnSearch').on('click', function() {
-        const search = $('#searchInput').val().trim();
+    document.getElementById('btnSearch')?.addEventListener('click', () => {
+        const search = searchInput?.value.trim() || '';
         cargarUsuarios(1, search);
     });
 
-    $('#searchInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            const search = $(this).val().trim();
-            cargarUsuarios(1, search);
+    searchInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            cargarUsuarios(1, searchInput.value.trim());
         }
     });
 
-    $('#btnClear').on('click', function() {
-        $('#searchInput').val('');
+    document.getElementById('btnClear')?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
         cargarUsuarios(1, '');
     });
 
-    // Cambio de items por página
-    $('#itemsPerPage').on('change', function() {
-        itemsPerPage = parseInt($(this).val());
+    itemsPerPageSelect?.addEventListener('change', () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value, 10) || 10;
         cargarUsuarios(1, searchTerm);
     });
 
-    // Paginación
-    $(document).on('click', '.page-link', function(e) {
+    paginationControls?.addEventListener('click', (e) => {
+        const link = e.target.closest('.page-link');
+        if (!link) return;
         e.preventDefault();
-        const page = parseInt($(this).data('page'));
-        if (page && page !== currentPage && page >= 1 && page <= totalPages) {
-            cargarUsuarios(page, searchTerm);
+        const page = parseInt(link.dataset.page, 10);
+        if (!page || page === currentPage || page < 1 || page > totalPages) return;
+        cargarUsuarios(page, searchTerm);
+    });
+
+    document.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.btn-editar');
+        if (editBtn) {
+            resetForm(false);
+            document.getElementById('id_usuario').value = editBtn.dataset.id;
+            document.getElementById('nombre').value = editBtn.dataset.nombre || '';
+            document.getElementById('apellido_paterno').value = editBtn.dataset.apellidoPaterno || ''
+            document.getElementById('apellido_materno').value = editBtn.dataset.apellidoMaterno || ''
+            document.getElementById('email').value = editBtn.dataset.email || '';
+            if (nivelSelect) nivelSelect.value = editBtn.dataset.nivel || '';
+            if (passwordInput) passwordInput.required = false;
+            if (modalLabel) modalLabel.textContent = 'Editar Usuario';
+            usuarioModal?.show();
+            return;
+        }
+
+        const deleteBtn = e.target.closest('.btn-eliminar');
+        if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¡No podrás revertir esta acción!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        // Reemplazo de dom.postForm para eliminar
+                        const formData = new FormData();
+                        formData.append('id_usuario', id);
+
+                        const response = await fetch('/GORA/controllers/usuarioController.php?action=delete', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success || data === true) {
+                            usuarioModal?.hide();
+                            cargarUsuarios(currentPage, searchTerm);
+                            Swal.fire('¡Eliminado!', 'El usuario ha sido eliminado.', 'success');
+                        } else {
+                            throw new Error(data.message || 'Error al eliminar');
+                        }
+                    } catch (error) {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo eliminar el usuario. Verifique la consola o dependencias.' });
+                    }
+                }
+            });
         }
     });
 
-    // Modal events
-    $('#usuarioModal').on('hidden.bs.modal', function() {
-        $('#formUsuario')[0].reset();
-        $('#id_usuario').val('');
+    // Reemplazo de dom.postForm para guardar
+    const guardarUsuario = async () => {
+        const idField = document.getElementById('id_usuario');
+        const isUpdate = Boolean(idField && idField.value);
+        if (!isUpdate && passwordInput && !passwordInput.value) {
+            Swal.fire({ icon: 'error', title: 'Campo requerido', text: 'La contraseña es obligatoria para los nuevos usuarios.' });
+            return;
+        }
+
+        const url = isUpdate ? '/GORA/controllers/usuarioController.php?action=update' : '/GORA/controllers/usuarioController.php?action=store';
         
-        // Limpiar el select2
-        $('#niveles_usuarios_id_nivel_usuario').val(null).trigger('change');
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+            
+            // Verificamos success (ajusta según tu API si devuelve "status" o "success")
+            if (response.ok && data.success) {
+                Swal.fire({ icon: 'success', title: 'Éxito', text: data.message || 'Operación completada', timer: 2000, showConfirmButton: false });
+                usuarioModal?.hide();
+                form?.reset();
+                cargarUsuarios(currentPage, searchTerm);
+            } else {
+                throw new Error(data.message || 'Error en la operación');
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire({ icon: 'error', title: 'Ocurrió un error', text: error.message || 'No se pudo conectar con el servidor.' });
+        }
+    };
+
+    guardarBtn?.addEventListener('click', guardarUsuario);
+
+    usuarioModalEl?.addEventListener('hidden.bs.modal', () => {
+        resetForm(true);
     });
 
-    // Inicializar Select2 para los selects
-    function inicializarSelect2() {
-        // Select de Niveles de Usuario
-        $('#niveles_usuarios_id_nivel_usuario').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Seleccione un nivel',
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('#usuarioModal')
-        });
-    }
-
-    // Cargar datos iniciales
     cargarNiveles();
     cargarUsuarios();
-    
-    // Inicializar Select2 después de cargar los datos
-    setTimeout(inicializarSelect2, 100);
-    
-    // Inicializar tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Reinicializar Select2 cuando se abre el modal
-    $('#usuarioModal').on('shown.bs.modal', function() {
-        setTimeout(function() {
-            $('#niveles_usuarios_id_nivel_usuario').select2('destroy').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Seleccione un nivel',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#usuarioModal')
-            });
-        }, 100);
-    });
 });
-
-// Global functions
-function editarUsuario(usuario) {
-    $('#formUsuario')[0].reset();
-    $('#id_usuario').val(usuario.id_usuario);
-    $('#nombre').val(usuario.nombre);
-    $('#apellido_paterno').val(usuario.apellido_paterno);
-    $('#apellido_materno').val(usuario.apellido_materno);
-    $('#email').val(usuario.email);
-    $('#password').val('');
-    $('#password').prop('required', false);
-    $('#niveles_usuarios_id_nivel_usuario').val(usuario.niveles_usuarios_id_nivel_usuario);
-    $('#modalLabel').text('Editar Usuario');
-    $('#usuarioModal').modal('show');
-}
-
-function guardarUsuario() {
-    let id = $("#id_usuario").val();
-    if (!id && !$("#password").val()) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Campo requerido',
-            text: 'La contraseña es obligatoria para los nuevos usuarios.'
-        });
-        return; 
-    }
-
-    let datos = $("#formUsuario").serialize();
-    let url = id ? "/GORA/controllers/usuarioController.php?action=update" : "/GORA/controllers/usuarioController.php?action=store";
-
-    $.post(url, datos, function(response) {
-        let estado = response.status;
-        let mensaje = response.message;
-
-        if (estado === "ok") {
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: mensaje,
-                timer: 2000,
-                showConfirmButton: false
-            });
-            
-            $('#usuarioModal').modal('hide');
-            $('#formUsuario')[0].reset();
-            // Recargar la página actual
-            const currentPage = window.currentPage || 1;
-            const searchTerm = window.searchTerm || '';
-            cargarUsuarios(currentPage, searchTerm);
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Ocurrió un error',
-                text: mensaje 
-            });
-        }
-    }, 'json').fail(function() {
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de comunicación',
-            text: 'No se pudo conectar con el servidor. Por favor, inténtelo de nuevo.'
-        });
-    });
-}
-
-function eliminarUsuario(id) {
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "¡No podrás revertir esta acción!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, ¡eliminar!',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.post("/GORA/controllers/usuarioController.php?action=delete", { id_usuario: id }, function(response) {
-                $('#usuarioModal').modal('hide');
-                // Recargar la página actual
-                const currentPage = window.currentPage || 1;
-                const searchTerm = window.searchTerm || '';
-                cargarUsuarios(currentPage, searchTerm);
-                Swal.fire(
-                    '¡Eliminado!',
-                    'El usuario ha sido eliminado.',
-                    'success'
-                );
-            }, 'json').fail(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'No se pudo eliminar el usuario, verifica sus dependencias.'
-                });
-            });
-        }
-    });
-}
 </script>

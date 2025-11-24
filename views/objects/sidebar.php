@@ -58,10 +58,13 @@ if (!isset($modificacion_ruta)) {
 }
 ?>
 
+<!-- Overlay para móviles -->
+<div class="sidebar-overlay"></div>
+
 <nav id="app-sidebar" class="sidebar bg-dark text-white position-fixed h-100 p-3 collapsed">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <span class="fs-5 fw-bold">GORA</span>
-    <button id="btn-toggle-sidebar" class="btn btn-sm btn-outline-light btn-toggle-sidebar" >
+    <button id="btn-toggle-sidebar" class="btn btn-sm btn-outline-light btn-toggle-sidebar" aria-label="Colapsar menú">
       <i class="bi bi-x sidebar-icon-open" style="display: none;"></i>
       <i class="bi bi-list sidebar-icon-collapsed"></i>
     </button>
@@ -71,7 +74,7 @@ if (!isset($modificacion_ruta)) {
     <ul class="nav nav-pills flex-column mb-auto">
 
       <?php if ($nivel == 1): ?>
-      <li class="nav-item">
+      <li class="nav-item mobile-hidden">
         <a href="/GORA/dashboard" class="nav-link text-white <?= active(['dashboard']); ?>" 
            <?= active(['dashboard']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Panel Principal"' ?>>
           <i class="bi bi-speedometer2 me-2"></i> <span class="sidebar-text">Dashboard</span>
@@ -79,7 +82,7 @@ if (!isset($modificacion_ruta)) {
       </li>
       <?php endif; ?>
 
-      <li>
+      <li class="mobile-hidden">
         <a href="/GORA/listas" class="nav-link text-white <?= active(['listas']); ?>" 
            <?= active(['listas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Lista de Alumnos"' ?>>
           <i class="bi bi-people me-2"></i> <span class="sidebar-text">Alumnos</span>
@@ -87,7 +90,7 @@ if (!isset($modificacion_ruta)) {
       </li>
 
       <?php if ($nivel == 1): ?>
-      <li>
+      <li class="mobile-hidden">
         <a href="/GORA/estadisticas" class="nav-link text-white <?= active(['estadisticas']); ?>" 
            <?= active(['estadisticas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Estadísticas y Reportes"' ?>>
           <i class="bi bi-bar-chart-fill me-2"></i> <span class="sidebar-text">Estadísticas</span>
@@ -95,7 +98,7 @@ if (!isset($modificacion_ruta)) {
       </li>
       <?php endif; ?>
 
-      <li>
+      <li class="mobile-hidden">
         <a href="/GORA/seguimientos" class="nav-link text-white <?= active(['seguimientos']); ?>" 
            <?= active(['seguimientos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Seguimientos"' ?>>
           <i class="bi bi-journal-text me-2"></i> <span class="sidebar-text">Seguimientos</span>
@@ -159,5 +162,37 @@ if (!isset($modificacion_ruta)) {
       </li>
 
     </ul>
+
+    <!-- Botón de cerrar sesión solo en móvil -->
+    <div class="d-lg-none mt-4">
+      <a href="/GORA/logout" id="logout-link-mobile" class="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2 mobile-logout-btn">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Cerrar sesión</span>
+      </a>
+    </div>
   </div>
+</nav>
+
+<!-- Barra de navegación inferior (solo móvil) -->
+<nav id="mobile-bottom-nav" class="d-lg-none">
+  <a href="/GORA/dashboard" class="bottom-nav-item <?= active(['dashboard']) ? 'active' : '' ?>">
+    <i class="bi bi-house-door-fill"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="/GORA/listas" class="bottom-nav-item <?= active(['listas','alumnos']) ? 'active' : '' ?>">
+    <i class="bi bi-people-fill"></i>
+    <span>Alumnos</span>
+  </a>
+  <a href="/GORA/estadisticas" class="bottom-nav-item <?= active(['estadisticas']) ? 'active' : '' ?>">
+    <i class="bi bi-bar-chart-line-fill"></i>
+    <span>Estadísticas</span>
+  </a>
+  <a href="/GORA/seguimientos" class="bottom-nav-item <?= active(['seguimientos']) ? 'active' : '' ?>">
+    <i class="bi bi-journal-text"></i>
+    <span>Seguimientos</span>
+  </a>
+  <button id="bottom-nav-manage" type="button" class="bottom-nav-item">
+    <i class="bi bi-columns-gap"></i>
+    <span>Gestión</span>
+  </button>
 </nav>

@@ -1,13 +1,16 @@
 <?php
 require_once __DIR__ . "/../../controllers/authController.php";
-require_once __DIR__ . "/../../config/db.php"; // Para obtener datos para los selects
+require_once __DIR__ . "/../../config/db.php"; 
 
 $auth = new AuthController($conn);
 $auth->checkAuth();
 
+// Obtener datos para los selects
 $carreras = $conn->query("SELECT id_carrera, nombre FROM carreras ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC);
-$tutores = $conn->query("SELECT id_usuario, CONCAT(nombre, ' ', apellido_paterno) as nombre_completo FROM usuarios WHERE niveles_usuarios_id_nivel_usuario = 3 ORDER BY nombre_completo")->fetchAll(PDO::FETCH_ASSOC); // Asumiendo que 3 es el ID para tutores
+// Asumiendo que 3 es el ID para tutores, ajusta si es necesario
+$tutores = $conn->query("SELECT id_usuario, CONCAT(nombre, ' ', apellido_paterno) as nombre_completo FROM usuarios WHERE niveles_usuarios_id_nivel_usuario = 3 ORDER BY nombre_completo")->fetchAll(PDO::FETCH_ASSOC); 
 $modalidades = $conn->query("SELECT id_modalidad, nombre FROM modalidades ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC);
+
 $modificacion_ruta = "../";
 $page_title = "Grupos";
 include __DIR__ . "/../objects/header.php";
@@ -49,7 +52,6 @@ include __DIR__ . "/../objects/header.php";
         </table>
     </div>
 
-    <!-- Controles de paginación -->
     <nav aria-label="Paginación de grupos" class="mt-3">
         <div class="row align-items-center">
             <div class="col-md-6">
@@ -66,8 +68,7 @@ include __DIR__ . "/../objects/header.php";
             </div>
             <div class="col-md-6">
                 <ul class="pagination justify-content-end mb-0" id="paginationControls">
-                    <!-- Los controles se generarán dinámicamente -->
-                </ul>
+                    </ul>
             </div>
         </div>
     </nav>
@@ -129,14 +130,20 @@ include __DIR__ . "/../objects/header.php";
     </div>
 </div>
 
-<?php
-include __DIR__ . "/../objects/footer.php";
+<?php include __DIR__ . "/../objects/footer.php"; ?>
 
-?><script>
+<script>
 window.addEventListener('load', function() {
-    const grupoModal = new bootstrap.Modal(document.getElementById('grupoModal'));
-    
-    // Variables de paginación
+    const grupoModalEl = document.getElementById('grupoModal');
+    const grupoModal = grupoModalEl ? new bootstrap.Modal(grupoModalEl) : null;
+    const form = document.getElementById('formGrupo');
+    const gruposBody = document.getElementById('gruposBody');
+    const paginationControls = document.getElementById('paginationControls');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const searchInput = document.getElementById('searchInput');
+    const itemsPerPageSelect = document.getElementById('itemsPerPage');
+    const modalLabel = document.getElementById('modalLabel');
+
     let currentPage = 1;
     let itemsPerPage = 10;
     let totalItems = 0;
@@ -144,338 +151,286 @@ window.addEventListener('load', function() {
     let searchTerm = '';
     let isLoading = false;
 
-    // Función para cargar grupos con paginación
-    function cargarGrupos(page = 1, search = '') {
-        if (isLoading) return;
+    // REEMPLAZO DE dom.setHTML
+    const renderSpinner = () => {
+        gruposBody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
+    };
+
+    const updatePaginationInfo = () => {
+        const start = ((currentPage - 1) * itemsPerPage) + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        if (paginationInfo) paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} registros`;
+    };
+
+    const renderPaginationControls = () => {
+        if (!paginationControls) return;
+        paginationControls.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const addItem = (page, label, disabled = false, active = false) => {
+            const li = document.createElement('li');
+            li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`.trim();
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.dataset.page = page;
+            link.innerHTML = label; // Usamos innerHTML para permitir caracteres HTML
+            li.appendChild(link);
+            paginationControls.appendChild(li);
+        };
+
+        // CORRECCIÓN DE CARACTERES
+        addItem(currentPage - 1, '&laquo; Anterior', currentPage === 1);
         
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            addItem(1, '1');
+            if (startPage > 2) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            addItem(i, String(i), false, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+            addItem(totalPages, String(totalPages));
+        }
+
+        addItem(currentPage + 1, 'Siguiente &raquo;', currentPage === totalPages);
+    };
+
+    const renderGrupos = (grupos) => {
+        if (!gruposBody) return;
+        
+        // Limpiamos contenido previo
+        gruposBody.innerHTML = '';
+
+        if (!grupos.length) {
+            gruposBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No se encontraron grupos</td></tr>';
+            return;
+        }
+
+        // REEMPLAZO DE dom.appendHTML
+        grupos.forEach((g) => {
+            const tutorNombre = g.tutor_nombre ? `${g.tutor_nombre} ${g.tutor_apellido_paterno || ''}`.trim() : 'N/A';
+            const row = `
+                <tr>
+                    <td>${g.id_grupo}</td>
+                    <td>${g.nombre}</td>
+                    <td>${tutorNombre}</td>
+                    <td>${g.carrera_nombre ?? ''}</td>
+                    <td>${g.modalidad_nombre ?? ''}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm btn-editar" 
+                            data-id="${g.id_grupo}" 
+                            data-nombre="${g.nombre}" 
+                            data-tutor="${g.usuarios_id_usuario_tutor ?? ''}" 
+                            data-carrera="${g.carreras_id_carrera ?? ''}" 
+                            data-modalidad="${g.modalidades_id_modalidad ?? ''}" 
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Editar Grupo">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm btn-eliminar" 
+                            data-id="${g.id_grupo}" 
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Eliminar Grupo">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            gruposBody.insertAdjacentHTML('beforeend', row);
+        });
+
+        if (typeof bootstrap !== 'undefined') {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        }
+    };
+
+    const showError = (message) => {
+        gruposBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${message}</td></tr>`;
+        Swal.fire({ icon: 'error', title: 'Error', text: message });
+    };
+
+    // REEMPLAZO DE dom.fetchJSON
+    const cargarGrupos = async (page = 1, search = '') => {
+        if (isLoading) return;
         isLoading = true;
         currentPage = page;
         searchTerm = search;
+        renderSpinner();
+
+        const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
         
-        // Mostrar loading
-        $('#gruposBody').html('<tr><td colspan="6" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>');
-        
-        const params = new URLSearchParams({
-            action: 'paginated',
-            page: page,
-            limit: itemsPerPage,
-            search: search
-        });
-        
-        $.get(`/GORA/controllers/gruposController.php?${params}`, function(response) {
-            const data = typeof response === 'string' ? JSON.parse(response) : response;
+        try {
+            const response = await fetch(`/GORA/controllers/gruposController.php?${params}`);
+            
+            if(!response.ok) throw new Error('Error en la respuesta del servidor');
+
+            const data = await response.json();
             
             if (data.success) {
                 totalItems = data.total;
                 totalPages = data.totalPages;
                 currentPage = data.currentPage;
-                
                 renderGrupos(data.grupos);
                 updatePaginationInfo();
                 renderPaginationControls();
             } else {
                 showError('Error al cargar los datos: ' + (data.message || 'Error desconocido'));
             }
-        }).fail(function(xhr) {
-            showError('Error de conexión: ' + xhr.statusText);
-        }).always(function() {
+        } catch (error) {
+            console.error(error);
+            showError('Error de conexión: ' + error.message);
+        } finally {
             isLoading = false;
-        });
-    }
-
-        // Función para renderizar la tabla de grupos
-        function renderGrupos(grupos) {
-            $('#gruposBody').empty();
-            
-            if (grupos.length === 0) {
-                $('#gruposBody').html('<tr><td colspan="6" class="text-center text-muted">No se encontraron grupos</td></tr>');
-                return;
-            }
-            
-            grupos.forEach(g => {
-                const row = `<tr>
-                <td>${g.id_grupo}</td>
-                <td>${g.nombre}</td>
-                <td>${g.tutor_nombre ?? 'N/A'}</td>
-                <td>${g.carrera_nombre ?? 'N/A'}</td>
-                <td>${g.modalidad_nombre ?? 'N/A'}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm btn-editar" data-grupo='${JSON.stringify(g)}' 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Grupo">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm btn-eliminar" data-id="${g.id_grupo}" 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Grupo">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </td>
-            </tr>`;
-            $('#gruposBody').append(row);
-        });
-        
-        // Reinicializar tooltips después de renderizar
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }
-
-    // Función para actualizar la información de paginación
-    function updatePaginationInfo() {
-        const start = ((currentPage - 1) * itemsPerPage) + 1;
-        const end = Math.min(currentPage * itemsPerPage, totalItems);
-        $('#paginationInfo').text(`Mostrando ${start}-${end} de ${totalItems} registros`);
-    }
-
-    // Función para renderizar los controles de paginación
-    function renderPaginationControls() {
-        const controls = $('#paginationControls');
-        controls.empty();
-        
-        if (totalPages <= 1) return;
-        
-        // Botón Anterior
-        const prevDisabled = currentPage === 1 ? 'disabled' : '';
-        controls.append(`<li class="page-item ${prevDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo; Anterior</a>
-        </li>`);
-        
-        // Números de página
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-        
-        if (startPage > 1) {
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
-            if (startPage > 2) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
         }
-        
-        for (let i = startPage; i <= endPage; i++) {
-            const active = i === currentPage ? 'active' : '';
-            controls.append(`<li class="page-item ${active}">
-                <a class="page-link" href="#" data-page="${i}">${i}</a>
-            </li>`);
-        }
-        
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
-        }
-        
-        // Botón Siguiente
-        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-        controls.append(`<li class="page-item ${nextDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente &raquo;</a>
-        </li>`);
-    }
+    };
 
-    // Función para mostrar errores
-    function showError(message) {
-        $('#gruposBody').html(`<tr><td colspan="6" class="text-center text-danger">${message}</td></tr>`);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: message
-        });
-    }
-
-    // Event Handlers
-    $('#btnNuevoGrupo').on('click', function() {
-        $('#formGrupo')[0].reset();
-        $('#id_grupo').val('');
-        $('#modalLabel').text('Agregar Grupo');
-        grupoModal.show();
+    document.getElementById('btnNuevoGrupo')?.addEventListener('click', () => {
+        form?.reset();
+        const idField = document.getElementById('id_grupo');
+        if (idField) idField.value = '';
+        if (modalLabel) modalLabel.textContent = 'Agregar Grupo';
+        grupoModal?.show();
     });
 
-    // Búsqueda
-    $('#btnSearch').on('click', function() {
-        const search = $('#searchInput').val().trim();
+    document.getElementById('btnSearch')?.addEventListener('click', () => {
+        const search = searchInput?.value.trim() || '';
         cargarGrupos(1, search);
     });
 
-    $('#searchInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            const search = $(this).val().trim();
+    searchInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const search = searchInput.value.trim();
             cargarGrupos(1, search);
         }
     });
 
-    $('#btnClear').on('click', function() {
-        $('#searchInput').val('');
+    document.getElementById('btnClear')?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
         cargarGrupos(1, '');
     });
 
-    // Cambio de items por página
-    $('#itemsPerPage').on('change', function() {
-        itemsPerPage = parseInt($(this).val());
+    itemsPerPageSelect?.addEventListener('change', () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value, 10) || 10;
         cargarGrupos(1, searchTerm);
     });
 
-    // Paginación
-    $(document).on('click', '.page-link', function(e) {
+    paginationControls?.addEventListener('click', (e) => {
+        const link = e.target.closest('.page-link');
+        if (!link) return;
         e.preventDefault();
-        const page = parseInt($(this).data('page'));
-        if (page && page !== currentPage && page >= 1 && page <= totalPages) {
-            cargarGrupos(page, searchTerm);
+        const page = parseInt(link.dataset.page, 10);
+        if (!page || page === currentPage || page < 1 || page > totalPages) return;
+        cargarGrupos(page, searchTerm);
+    });
+
+    document.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.btn-editar');
+        if (editBtn) {
+            document.getElementById('id_grupo').value = editBtn.dataset.id;
+            document.getElementById('nombre').value = editBtn.dataset.nombre || '';
+            document.getElementById('usuarios_id_usuario_tutor').value = editBtn.dataset.tutor || '';
+            document.getElementById('carreras_id_carrera').value = editBtn.dataset.carrera || '';
+            document.getElementById('modalidades_id_modalidad').value = editBtn.dataset.modalidad || '';
+            
+            if (modalLabel) modalLabel.textContent = 'Editar Grupo';
+            grupoModal?.show();
+            return;
+        }
+
+        const deleteBtn = e.target.closest('.btn-eliminar');
+        if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: '¡No podrás revertir esta acción!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, ¡elimínalo!',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        // REEMPLAZO DE dom.postForm para eliminar
+                        const formData = new FormData();
+                        formData.append('id', id);
+
+                        const response = await fetch('/GORA/controllers/gruposController.php?action=delete', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const data = await response.json();
+
+                        if(data.success || data === true) {
+                            Swal.fire('¡Eliminado!', 'El grupo ha sido eliminado.', 'success');
+                            cargarGrupos(currentPage, searchTerm);
+                        } else {
+                            throw new Error(data.message || 'Error al eliminar');
+                        }
+                    } catch (error) {
+                        Swal.fire('Error', 'No se pudo eliminar el grupo.', 'error');
+                    }
+                }
+            });
         }
     });
 
-    // Modal events
-    $('#grupoModal').on('hidden.bs.modal', function() {
-        $('#formGrupo')[0].reset();
-        $('#id_grupo').val('');
-    });
-
-    // Guardar grupo
-    $('#btnGuardar').on('click', function() {
-        let id = $("#id_grupo").val();
-        let url = id ? "/GORA/controllers/gruposController.php?action=update" : "/GORA/controllers/gruposController.php?action=store";
+    // REEMPLAZO DE dom.postForm para guardar
+    document.getElementById('btnGuardar')?.addEventListener('click', async () => {
+        const idField = document.getElementById('id_grupo');
+        const isUpdate = idField && idField.value;
+        const url = isUpdate ? '/GORA/controllers/gruposController.php?action=update' : '/GORA/controllers/gruposController.php?action=store';
         
-        $.post(url, $('#formGrupo').serialize())
-            .done(function(response) {
-                if (response.status === 'success') {
-                    grupoModal.hide();
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: response.message,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    // Recargar la página actual
-                    cargarGrupos(currentPage, searchTerm);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'No se pudo guardar el grupo.'
-                    });
-                }
-            })
-            .fail(function() {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Hubo un error de comunicación con el servidor.'
-                });
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
             });
-    });
 
-    // Editar grupo
-    $(document).on('click', '.btn-editar', function() {
-        const grupo = $(this).data('grupo');
-        
-        $("#id_grupo").val(grupo.id_grupo);
-        $("#nombre").val(grupo.nombre);
-        $("#usuarios_id_usuario_tutor").val(grupo.usuarios_id_usuario_tutor);
-        $("#carreras_id_carrera").val(grupo.carreras_id_carrera);
-        $("#modalidades_id_modalidad").val(grupo.modalidades_id_modalidad);
-        $('#modalLabel').text('Editar Grupo');
-        grupoModal.show();
-    });
+            const data = await response.json();
 
-    // Eliminar grupo
-    $(document).on('click', '.btn-eliminar', function() {
-        const idParaEliminar = $(this).data('id');
-
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡No podrás revertir esta acción!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, ¡eliminar!',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post("/GORA/controllers/gruposController.php?action=delete", { id: idParaEliminar }, function(response) {
-                    if (response.status === 'success') {
-                        Swal.fire('¡Eliminado!', response.message, 'success');
-                        cargarGrupos(currentPage, searchTerm);
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
-                    }
-                }, 'json').fail(function() {
-                    Swal.fire('Error de Conexión', 'No se pudo comunicar con el servidor.', 'error');
-                });
+            if (response.ok) {
+                grupoModal?.hide();
+                cargarGrupos(currentPage, searchTerm);
+                Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'El grupo ha sido guardado correctamente.', timer: 1500, showConfirmButton: false });
+            } else {
+                throw new Error(data.message || 'Error del servidor');
             }
-        });
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Oops...', text: 'Error al guardar el grupo. Revise los datos e intente de nuevo.' });
+        }
     });
 
-    // Inicializar Select2 para los selects
-    function inicializarSelect2() {
-        // Select de Tutores
-        $('#usuarios_id_usuario_tutor').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Seleccione un tutor',
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('#grupoModal')
-        });
+    grupoModalEl?.addEventListener('hidden.bs.modal', () => {
+        form?.reset();
+    });
 
-        // Select de Carreras
-        $('#carreras_id_carrera').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Seleccione una carrera',
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('#grupoModal')
-        });
-
-        // Select de Modalidades
-        $('#modalidades_id_modalidad').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Seleccione una modalidad',
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('#grupoModal')
-        });
-    }
-
-    // Cargar datos iniciales
     cargarGrupos();
-    
-    // Inicializar Select2 después de cargar los datos
-    setTimeout(inicializarSelect2, 100);
-    
-    // Inicializar tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Reinicializar Select2 cuando se abre el modal
-    $('#grupoModal').on('shown.bs.modal', function() {
-        setTimeout(function() {
-            $('#usuarios_id_usuario_tutor').select2('destroy').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Seleccione un tutor',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#grupoModal')
-            });
-            
-            $('#carreras_id_carrera').select2('destroy').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Seleccione una carrera',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#grupoModal')
-            });
-            
-            $('#modalidades_id_modalidad').select2('destroy').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Seleccione una modalidad',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#grupoModal')
-            });
-        }, 100);
-    });
 });
 </script>
-

@@ -22,32 +22,16 @@
         initTooltips();
         });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleButton = document.getElementById('btn-toggle-sidebar');
-    const sidebar = document.getElementById('app-sidebar');
-    const content = document.getElementById('app-content');
-
-    if (toggleButton && sidebar && content) {
-            toggleButton.addEventListener('click', function() {
-  
-            sidebar.classList.toggle('collapsed');
-        
-            
-            content.classList.toggle('collapsed');
-        });
-    }
-});
-</script>
+<!-- El código del sidebar ahora está en app.js -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.0/dist/umd/simple-datatables.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const logoutLink = document.getElementById('logout-link');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', function(event) {
+    const attachLogoutHandler = (linkEl) => {
+        if (!linkEl) return;
+        linkEl.addEventListener('click', function(event) {
             event.preventDefault();
             Swal.fire({
                 title: '¿Estás seguro?',
@@ -60,22 +44,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = logoutLink.href;
+                    window.location.href = linkEl.href;
                 }
             });
         });
-    }
+    };
+
+    attachLogoutHandler(document.getElementById('logout-link'));
+    attachLogoutHandler(document.getElementById('logout-link-mobile'));
 });
 </script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 

@@ -102,13 +102,20 @@ include __DIR__ . "/../objects/header.php";
         </div>
     </div>
 </div>
-<?php include __DIR__ . "/../objects/footer.php";?>
 
+<?php include __DIR__ . "/../objects/footer.php";?>
 <script>
 window.addEventListener('load', function() {
-    const carreraModal = new bootstrap.Modal(document.getElementById('carreraModal'));
-    
-    // Variables de paginación
+    const carreraModalEl = document.getElementById('carreraModal');
+    const carreraModal = carreraModalEl ? new bootstrap.Modal(carreraModalEl) : null;
+    const form = document.getElementById('formCarrera');
+    const carrerasBody = document.getElementById('carrerasBody');
+    const paginationControls = document.getElementById('paginationControls');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const searchInput = document.getElementById('searchInput');
+    const itemsPerPageSelect = document.getElementById('itemsPerPage');
+    const modalLabel = document.getElementById('modalLabel');
+
     let currentPage = 1;
     let itemsPerPage = 10;
     let totalItems = 0;
@@ -116,291 +123,234 @@ window.addEventListener('load', function() {
     let searchTerm = '';
     let isLoading = false;
 
-    // Función para cargar carreras con paginación
-    function cargarCarreras(page = 1, search = '') {
+    const renderSpinner = () => {
+        dom.setHTML(carrerasBody, '<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>');
+    };
+
+    const updatePaginationInfo = () => {
+        const start = ((currentPage - 1) * itemsPerPage) + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        if (paginationInfo) {
+            paginationInfo.textContent = `Mostrando ${start}-${end} de ${totalItems} registros`;
+        }
+    };
+
+    const renderPaginationControls = () => {
+        if (!paginationControls) return;
+        paginationControls.innerHTML = '';
+        if (totalPages <= 1) return;
+
+        const addItem = (page, label, disabled = false, active = false) => {
+            const li = document.createElement('li');
+            li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`.trim();
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.dataset.page = page;
+            link.textContent = label;
+            li.appendChild(link);
+            paginationControls.appendChild(li);
+        };
+
+        addItem(currentPage - 1, '� Anterior', currentPage === 1);
+
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, currentPage + 2);
+
+        if (startPage > 1) {
+            addItem(1, '1');
+            if (startPage > 2) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            addItem(i, String(i), false, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                const dots = document.createElement('li');
+                dots.className = 'page-item disabled';
+                dots.innerHTML = '<span class="page-link">...</span>';
+                paginationControls.appendChild(dots);
+            }
+            addItem(totalPages, String(totalPages));
+        }
+
+        addItem(currentPage + 1, 'Siguiente �', currentPage === totalPages);
+    };
+
+    const renderCarreras = (carreras) => {
+        if (!carrerasBody) return;
+        if (!carreras.length) {
+            dom.setHTML(carrerasBody, '<tr><td colspan="5" class="text-center text-muted">No se encontraron carreras</td></tr>');
+            return;
+        }
+
+        carrerasBody.innerHTML = '';
+        carreras.forEach((c) => {
+            const coordinadorNombre = c.coordinador_nombre ? `${c.coordinador_nombre} ${c.coordinador_apellido_paterno || ''}`.trim() : 'N/A';
+            const row = `
+                <tr>
+                    <td>${c.id_carrera}</td>
+                    <td>${c.nombre}</td>
+                    <td>${coordinadorNombre}</td>
+                    <td>${c.fecha_creacion}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm btn-editar" data-id="${c.id_carrera}" data-nombre="${c.nombre}" data-coordinador="${c.coordinador_id ?? ''}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Carrera">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm btn-eliminar" data-id="${c.id_carrera}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Carrera">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            dom.appendHTML(carrerasBody, row);
+        });
+
+        if (typeof initTooltips === 'function') {
+            initTooltips();
+        }
+    };
+
+    const showError = (message) => {
+        dom.setHTML(carrerasBody, `<tr><td colspan="5" class="text-center text-danger">${message}</td></tr>`);
+        Swal.fire({ icon: 'error', title: 'Error', text: message });
+    };
+
+    const cargarCarreras = async (page = 1, search = '') => {
         if (isLoading) return;
-        
         isLoading = true;
         currentPage = page;
         searchTerm = search;
-        
-        // Mostrar loading
-        $('#carrerasBody').html('<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>');
-        
-        const params = new URLSearchParams({
-            action: 'paginated',
-            page: page,
-            limit: itemsPerPage,
-            search: search
-        });
-        
-        $.get(`/GORA/controllers/carrerasController.php?${params}`, function(response) {
-            const data = typeof response === 'string' ? JSON.parse(response) : response;
-            
+        renderSpinner();
+
+        const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
+
+        try {
+            const data = await dom.fetchJSON(`/GORA/controllers/carrerasController.php?${params}`);
             if (data.success) {
                 totalItems = data.total;
                 totalPages = data.totalPages;
                 currentPage = data.currentPage;
-                
                 renderCarreras(data.carreras);
                 updatePaginationInfo();
                 renderPaginationControls();
             } else {
                 showError('Error al cargar los datos: ' + (data.message || 'Error desconocido'));
             }
-        }).fail(function(xhr) {
-            showError('Error de conexión: ' + xhr.statusText);
-        }).always(function() {
+        } catch (error) {
+            showError('Error de conexi�n: ' + error.message);
+        } finally {
             isLoading = false;
-        });
-    }
-
-        // Función para renderizar la tabla de carreras
-        function renderCarreras(carreras) {
-            $('#carrerasBody').empty();
-            
-            if (carreras.length === 0) {
-                $('#carrerasBody').html('<tr><td colspan="5" class="text-center text-muted">No se encontraron carreras</td></tr>');
-                return;
-            }
-            
-            carreras.forEach(c => {
-                const coordinadorNombre = c.coordinador_nombre ? `${c.coordinador_nombre} ${c.coordinador_apellido_paterno}` : 'N/A';
-                const row = `<tr>
-                <td>${c.id_carrera}</td>
-                <td>${c.nombre}</td>
-                <td>${coordinadorNombre}</td>
-                <td>${c.fecha_creacion}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm btn-editar" data-id='${JSON.stringify(c)}' 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Carrera">
-                        <i class="bi bi-pencil-square"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm btn-eliminar" data-id="${c.id_carrera}" 
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Carrera">
-                        <i class="bi bi-trash-fill"></i>
-                    </button>
-                </td>
-            </tr>`;
-            $('#carrerasBody').append(row);
-        });
-        
-        // Reinicializar tooltips después de renderizar
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    }
-
-    // Función para actualizar la información de paginación
-    function updatePaginationInfo() {
-        const start = ((currentPage - 1) * itemsPerPage) + 1;
-        const end = Math.min(currentPage * itemsPerPage, totalItems);
-        $('#paginationInfo').text(`Mostrando ${start}-${end} de ${totalItems} registros`);
-    }
-
-    // Función para renderizar los controles de paginación
-    function renderPaginationControls() {
-        const controls = $('#paginationControls');
-        controls.empty();
-        
-        if (totalPages <= 1) return;
-        
-        // Botón Anterior
-        const prevDisabled = currentPage === 1 ? 'disabled' : '';
-        controls.append(`<li class="page-item ${prevDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage - 1}">&laquo; Anterior</a>
-        </li>`);
-        
-        // Números de página
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-        
-        if (startPage > 1) {
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`);
-            if (startPage > 2) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
         }
-        
-        for (let i = startPage; i <= endPage; i++) {
-            const active = i === currentPage ? 'active' : '';
-            controls.append(`<li class="page-item ${active}">
-                <a class="page-link" href="#" data-page="${i}">${i}</a>
-            </li>`);
-        }
-        
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                controls.append(`<li class="page-item disabled"><span class="page-link">...</span></li>`);
-            }
-            controls.append(`<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`);
-        }
-        
-        // Botón Siguiente
-        const nextDisabled = currentPage === totalPages ? 'disabled' : '';
-        controls.append(`<li class="page-item ${nextDisabled}">
-            <a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente &raquo;</a>
-        </li>`);
-    }
+    };
 
-    // Función para mostrar errores
-    function showError(message) {
-        $('#carrerasBody').html(`<tr><td colspan="5" class="text-center text-danger">${message}</td></tr>`);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: message
-        });
-    }
-
-    // Event Handlers
-    $('#btnNuevaCarrera').on('click', function() {
-        $('#formCarrera')[0].reset();
-        $('#id_carrera').val('');
-        $('#modalLabel').text('Agregar Carrera');
-        carreraModal.show();
+    document.getElementById('btnNuevaCarrera')?.addEventListener('click', () => {
+        form?.reset();
+        const idField = document.getElementById('id_carrera');
+        if (idField) idField.value = '';
+        if (modalLabel) modalLabel.textContent = 'Agregar Carrera';
+        carreraModal?.show();
     });
 
-    // Búsqueda
-    $('#btnSearch').on('click', function() {
-        const search = $('#searchInput').val().trim();
+    document.getElementById('btnSearch')?.addEventListener('click', () => {
+        const search = searchInput?.value.trim() || '';
         cargarCarreras(1, search);
     });
 
-    $('#searchInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter key
-            const search = $(this).val().trim();
+    searchInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const search = searchInput.value.trim();
             cargarCarreras(1, search);
         }
     });
 
-    $('#btnClear').on('click', function() {
-        $('#searchInput').val('');
+    document.getElementById('btnClear')?.addEventListener('click', () => {
+        if (searchInput) searchInput.value = '';
         cargarCarreras(1, '');
     });
 
-    // Cambio de items por página
-    $('#itemsPerPage').on('change', function() {
-        itemsPerPage = parseInt($(this).val());
+    itemsPerPageSelect?.addEventListener('change', () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value, 10) || 10;
         cargarCarreras(1, searchTerm);
     });
 
-    // Paginación
-    $(document).on('click', '.page-link', function(e) {
+    paginationControls?.addEventListener('click', (e) => {
+        const link = e.target.closest('.page-link');
+        if (!link) return;
         e.preventDefault();
-        const page = parseInt($(this).data('page'));
-        if (page && page !== currentPage && page >= 1 && page <= totalPages) {
-            cargarCarreras(page, searchTerm);
+        const page = parseInt(link.dataset.page, 10);
+        if (!page || page === currentPage || page < 1 || page > totalPages) return;
+        cargarCarreras(page, searchTerm);
+    });
+
+    document.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('.btn-editar');
+        if (editBtn) {
+            const id = editBtn.dataset.id;
+            const nombre = editBtn.dataset.nombre || '';
+            const coordinador = editBtn.dataset.coordinador || '';
+            document.getElementById('id_carrera').value = id;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('coordinador_id').value = coordinador;
+            if (modalLabel) modalLabel.textContent = 'Editar Carrera';
+            carreraModal?.show();
+            return;
+        }
+
+        const deleteBtn = e.target.closest('.btn-eliminar');
+        if (deleteBtn) {
+            const id = deleteBtn.dataset.id;
+            Swal.fire({
+                title: '�Est�s seguro?',
+                text: '�No podr�s revertir esta acci�n!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'S�, �elim�nalo!',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await dom.postForm('/GORA/controllers/carrerasController.php?action=delete', { id });
+                        Swal.fire('�Eliminado!', 'La carrera ha sido eliminada.', 'success');
+                        cargarCarreras(currentPage, searchTerm);
+                    } catch (error) {
+                        Swal.fire('Error', 'No se pudo eliminar la carrera.', 'error');
+                    }
+                }
+            });
         }
     });
 
-    // Modal events
-    $('#carreraModal').on('hidden.bs.modal', function() {
-        $('#formCarrera')[0].reset();
-        $('#id_carrera').val('');
-    });
-
-    // Guardar carrera
-    $('#btnGuardar').on('click', function() {
-        let id = $("#id_carrera").val();
-        let url = id ? "/GORA/controllers/carrerasController.php?action=update" : "/GORA/controllers/carrerasController.php?action=store";
-        
-        $.post(url, $('#formCarrera').serialize(), function() {
-            carreraModal.hide();
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: 'La carrera se ha guardado correctamente.',
-                timer: 1500,
-                showConfirmButton: false
-            });
-            // Recargar la página actual
+    document.getElementById('btnGuardar')?.addEventListener('click', async () => {
+        const idField = document.getElementById('id_carrera');
+        const isUpdate = idField && idField.value;
+        const url = isUpdate ? '/GORA/controllers/carrerasController.php?action=update' : '/GORA/controllers/carrerasController.php?action=store';
+        const formData = dom.serializeForm(form);
+        try {
+            await dom.postForm(url, formData);
+            carreraModal?.hide();
             cargarCarreras(currentPage, searchTerm);
-        }).fail(function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Hubo un error al guardar la carrera.'
-            });
-        });
+            Swal.fire({ icon: 'success', title: '�Guardado!', text: 'La carrera ha sido guardada correctamente.', timer: 1500, showConfirmButton: false });
+        } catch (error) {
+            Swal.fire({ icon: 'error', title: 'Oops...', text: 'Error al guardar la carrera. Revise los datos e intente de nuevo.' });
+        }
     });
 
-    // Editar carrera
-    $(document).on('click', '.btn-editar', function() {
-        const carrera = $(this).data('id');
-        $("#id_carrera").val(carrera.id_carrera);
-        $("#nombre").val(carrera.nombre);
-        $("#coordinador_id").val(carrera.coordinador_id);
-        $('#modalLabel').text('Editar Carrera');
-        carreraModal.show();
+    carreraModalEl?.addEventListener('hidden.bs.modal', () => {
+        form?.reset();
+        const idField = document.getElementById('id_carrera');
+        if (idField) idField.value = '';
     });
 
-    // Eliminar carrera
-    $(document).on('click', '.btn-eliminar', function() {
-        const idParaEliminar = $(this).data('id');
-        
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: "¡No podrás revertir esta acción!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, ¡eliminar!',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post("/GORA/controllers/carrerasController.php?action=delete", { id: idParaEliminar }, function(response) {
-                    if (response.status === 'success') {
-                        Swal.fire('¡Eliminada!', response.message, 'success');
-                        cargarCarreras(currentPage, searchTerm);
-                    } else {
-                        Swal.fire('Error', response.message, 'error');
-                    }
-                }, 'json').fail(function() {
-                    Swal.fire('Error de Conexión', 'No se pudo comunicar con el servidor. Inténtalo de nuevo.', 'error');
-                });
-            }
-        });
-    });
-
-    // Inicializar Select2 para los selects
-    function inicializarSelect2() {
-        // Select de Coordinadores
-        $('#coordinador_id').select2({
-            theme: 'bootstrap-5',
-            placeholder: 'Seleccione un coordinador',
-            allowClear: true,
-            width: '100%',
-            dropdownParent: $('#carreraModal')
-        });
-    }
-
-    // Cargar datos iniciales
     cargarCarreras();
-    
-    // Inicializar Select2 después de cargar los datos
-    setTimeout(inicializarSelect2, 100);
-    
-    // Inicializar tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Reinicializar Select2 cuando se abre el modal
-    $('#carreraModal').on('shown.bs.modal', function() {
-        setTimeout(function() {
-            $('#coordinador_id').select2('destroy').select2({
-                theme: 'bootstrap-5',
-                placeholder: 'Seleccione un coordinador',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#carreraModal')
-            });
-        }, 100);
-    });
 });
 </script>
-

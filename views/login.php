@@ -76,22 +76,124 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
-      .form-signin {
-        max-width: 400px;
-        padding: 2rem;
+      :root {
+        --login-bg: linear-gradient(160deg, #0f172a 0%, #111827 35%, #0b1323 100%);
+        --login-card: #0f172a;
+        --login-accent: #4f9cf9;
+        --login-text: #e5e7eb;
+        --login-muted: #9ca3af;
       }
       html, body {
         height: 100%;
       }
-      .bg-image {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.3;
-        z-index: -1;
+      body.login-page {
+        background: var(--login-bg);
+        color: var(--login-text);
+        padding: 1.5rem 0;
+      }
+      .form-signin {
+        max-width: 420px;
+        padding: 2.25rem 2rem;
+        background: var(--login-card);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .login-brand {
+        color: var(--login-accent);
+        letter-spacing: 0.5px;
+        font-weight: 800;
+      }
+      .login-title {
+        color: var(--login-text);
+        font-weight: 700;
+      }
+      .login-footer {
+        color: var(--login-muted);
+        font-size: 0.9rem;
+      }
+      .form-floating > label {
+        color: var(--login-muted);
+        font-weight: 500;
+      }
+      .form-floating .form-control {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--login-text);
+        padding-right: 3.2rem;
+        position: relative;
+        z-index: 1;
+      }
+      .form-floating .form-control:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--login-accent);
+        box-shadow: 0 0 0 0.2rem rgba(79, 156, 249, 0.2);
+        color: var(--login-text);
+      }
+      .login-submit {
+        background: linear-gradient(135deg, #4f9cf9, #3b82f6);
+        color: #fff;
+        font-weight: 700;
+        border: none;
+        box-shadow: 0 10px 25px rgba(79, 156, 249, 0.35);
+      }
+      .login-submit:hover {
+        opacity: 0.95;
+      }
+      .password-toggle {
+        right: 0.6rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        width: 36px;
+        height: 36px;
+        color: var(--login-muted);
+        z-index: 3;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+      }
+      .password-toggle:focus {
+        outline: none;
+        box-shadow: none;
+      }
+      .password-toggle i {
+        pointer-events: none;
+        font-size: 1.05rem;
+      }
+      .login-card .form-floating {
+        border-radius: 0.75rem;
+        overflow: hidden;
+      }
+      .photo-placeholder {
+        width: 70px;
+        height: 70px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      @media (max-width: 575.98px) {
+        body.login-page {
+          padding: 1rem 0.75rem;
+        }
+        .form-signin {
+          padding: 1.5rem 1.25rem;
+          border-radius: 1.25rem;
+        }
+        .form-floating .form-control {
+          padding-left: 2.9rem;
+          padding-right: 3rem;
+        }
+        .form-floating > label {
+          padding-left: 2.9rem;
+        }
+        .login-title {
+          margin-top: 0.5rem;
+        }
       }
     </style>
     <link href="/GORA/public/css/theme.css" rel="stylesheet">
@@ -113,10 +215,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <p class="h3 mb-3 font-weight-bold login-brand">GORA</p>
                 <div class="login-photo-placeholder mb-3">
                     <img src="/GORA/public/images/logo.png" alt="Logo GORA" class="login-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                    <div class="photo-placeholder" style="display: none;">
-                        <i class="bi bi-image" style="font-size: 2.5rem; color: var(--bs-warning);"></i>
-                        <small class="text-muted mt-2">Logo GORA</small>
-                    </div>
+                    
                 </div>
                 <h2 class="h5 mb-4 fw-normal login-title">Iniciar Sesión</h2>
             </div>
@@ -147,10 +246,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                        aria-describedby="passwordHelp">
                 <label for="floatingPassword"><i class="bi bi-key-fill me-2"></i>Contraseña</label>
                 <button type="button" 
-                        class="btn btn-link position-absolute top-50 end-0 translate-middle-y pe-3 password-toggle" 
+                        class="password-toggle position-absolute" 
                         id="togglePassword" 
-                        aria-label="Mostrar/ocultar contraseña"
-                        style="border: none; background: none; z-index: 10;">
+                        aria-label="Mostrar/ocultar contraseña">
                     <i class="bi bi-eye" id="toggleIcon"></i>
                 </button>
                 <div class="invalid-feedback" id="passwordError"></div>
