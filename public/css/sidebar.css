@@ -24,15 +24,34 @@
 /* Contenedor principal del sidebar */
 #app-sidebar {
   width: 260px;
-  background: radial-gradient(circle at 20% 20%, rgba(79,156,249,0.08), transparent 35%), #0f172a;
+  background: radial-gradient(circle at 20% 20%, rgba(79, 156, 249, 0.08), transparent 35%), #0f172a;
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
   padding: 1.25rem !important;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
+  /* Permitir scroll en desktop */
   z-index: 1040;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Estilo de scrollbar específico para el sidebar */
+#app-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+#app-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#app-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+#app-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* Barra inferior por defecto oculta */
@@ -84,7 +103,8 @@
   display: flex;
   align-items: center;
   transition: background-color 0.3s ease, color 0.3s ease;
-  min-height: 48px; /* Tamaño táctil mínimo */
+  min-height: 48px;
+  /* Tamaño táctil mínimo */
 }
 
 /* Iconos de los enlaces */
@@ -127,14 +147,14 @@
 
 /* Botón de salir */
 #app-sidebar .btn-outline-light {
-    border-color: #4b5563;
-    color: #d1d5db;
+  border-color: #4b5563;
+  color: #d1d5db;
 }
 
 #app-sidebar .btn-outline-light:hover {
-    background-color: #dc3545;
-    border-color: #dc3545;
-    color: #fff;
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
 }
 
 /* ========================================
@@ -144,7 +164,7 @@
 /* Sidebar colapsado */
 #app-sidebar.collapsed {
   width: 90px;
-  padding: 1.25rem 0.5rem !important; 
+  padding: 1.25rem 0.5rem !important;
 }
 
 /* Ocultar texto cuando está colapsado */
@@ -197,6 +217,7 @@
    ======================================== */
 
 @media (max-width: 991.98px) {
+
   /* Ocultar el botón de colapso interno en móvil: solo usar el hamburguesa */
   #btn-toggle-sidebar {
     display: none !important;
@@ -208,7 +229,7 @@
     align-items: center;
     justify-content: center;
   }
-  
+
   /* Ocultar la barra superior en móvil para liberar espacio */
   #navbar1 {
     display: none !important;
