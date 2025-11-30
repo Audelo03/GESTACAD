@@ -272,7 +272,7 @@ window.addEventListener('load', function() {
 
         const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
         try {
-            const response = await fetch(`/GORA/controllers/usuarioController.php?${params}`);
+            const response = await fetch(`/GESTACAD/controllers/usuarioController.php?${params}`);
             
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
 
@@ -301,7 +301,7 @@ window.addEventListener('load', function() {
     const cargarNiveles = async () => {
         if (!nivelSelect) return;
         try {
-            const response = await fetch('/GORA/controllers/usuarioController.php?action=getLevels');
+            const response = await fetch('/GESTACAD/controllers/usuarioController.php?action=getLevels');
             
             // Asumimos que getLevels devuelve un array directo o un objeto con data
             let niveles = [];
@@ -404,7 +404,7 @@ window.addEventListener('load', function() {
                         const formData = new FormData();
                         formData.append('id_usuario', id);
 
-                        const response = await fetch('/GORA/controllers/usuarioController.php?action=delete', {
+                        const response = await fetch('/GESTACAD/controllers/usuarioController.php?action=delete', {
                             method: 'POST',
                             body: formData
                         });
@@ -435,7 +435,7 @@ window.addEventListener('load', function() {
             return;
         }
 
-        const url = isUpdate ? '/GORA/controllers/usuarioController.php?action=update' : '/GORA/controllers/usuarioController.php?action=store';
+        const url = isUpdate ? '/GESTACAD/controllers/usuarioController.php?action=update' : '/GESTACAD/controllers/usuarioController.php?action=store';
         
         const formData = new FormData(form);
 

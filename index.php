@@ -56,7 +56,7 @@ $viewMap = [
     'dashboard' => 'views/dashboard.php',
     'profile' => 'views/profile.php',
     'logout' => 'views/logout.php',
-    
+
     // CRUDs de gestión
     'alumnos' => 'views/CRUDS/alumnos.php',
     'usuarios' => 'views/CRUDS/usuarios.php',
@@ -64,7 +64,7 @@ $viewMap = [
     'grupos' => 'views/CRUDS/grupos.php',
     'modalidades' => 'views/CRUDS/modalidades.php',
     'tipo-seguimiento' => 'views/CRUDS/tipo_seguimiento.php',
-    
+
     // Páginas de funcionalidad
     'alumnos-paginados' => 'views/alumnos_paginados.php',
     'alumnos_paginados' => 'views/alumnos_paginados.php',
@@ -72,7 +72,7 @@ $viewMap = [
     'estadisticas' => 'views/estadisticas.php',
     'listas' => 'views/listas.php',
     'seguimientos' => 'views/seguimientos.php',
-    
+
     // Gestión de seguimientos
     'crear-seguimiento' => 'views/crear_seguimiento.php',
     'crear_seguimiento' => 'views/crear_seguimiento.php',
@@ -80,11 +80,28 @@ $viewMap = [
     'editar_seguimiento' => 'views/editar_seguimiento.php',
     'ver-seguimientos' => 'views/ver_seguimientos.php',
     'ver_seguimientos' => 'views/ver_seguimientos.php',
-    
+
     // Gestión de listas
     'gestionar-listas' => 'views/gestionar_listas.php',
     'gestionar_listas' => 'views/gestionar_listas.php',
-    'guardar_asistencia' => 'views/guardar_asistencia.php'
+    'guardar_asistencia' => 'views/guardar_asistencia.php',
+
+    // Estructura Académica
+    'divisiones' => 'views/CRUDS/divisiones.php',
+    'periodos' => 'views/CRUDS/periodos.php',
+    'asignaturas' => 'views/CRUDS/asignaturas.php',
+
+    // Gestión de Clases
+    'clases' => 'views/CRUDS/clases.php',
+    'inscripciones' => 'views/CRUDS/inscripciones.php',
+
+    // Tutorías y Seguimiento
+    'tutorias' => 'views/tutorias/dashboard.php',
+    'tutorias/pat' => 'views/tutorias/pat.php',
+    'tutorias/canalizacion' => 'views/tutorias/canalizacion.php',
+
+    // Becas
+    'becas' => 'views/CRUDS/becas.php'
 ];
 
 // ========================================
@@ -114,5 +131,5 @@ if (file_exists($viewFile)) {
 http_response_code(404);
 echo "<h1>404 - Página No Encontrada</h1>";
 echo "<p>La página que solicitaste no pudo ser encontrada.</p>";
-echo "<a href='/GORA/'>Ir al Inicio</a>";
+echo "<a href='/GESTACAD/'>Ir al Inicio</a>";
 ?>

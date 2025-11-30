@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
   
-    fetch('/GORA/estadisticas?modo=componente')
+    fetch('/GESTACAD/estadisticas?modo=componente')
         .then(response => response.text())
         .then(html => {
             document.getElementById('estadisticas-container').innerHTML = html;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     // Cargar la lista de alumnos (añadimos ?modo=componente)
-    fetch('/GORA/listas?modo=componente')
+    fetch('/GESTACAD/listas?modo=componente')
         .then(response => response.text())
         .then(html => {
             document.getElementById('lista-alumnos-container').innerHTML = html;

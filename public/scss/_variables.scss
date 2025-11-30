@@ -1,57 +1,159 @@
-// Paleta de colores tema Oscuro Moderno y Amigable
-$color-negro: #0f1419;          // Casi negro suave
-$color-negro-2: #1a1f2e;        // Base oscuro suave
-$color-grafito: #232937;        // Superficie oscura suave
-$color-gris-700: #2d3441;       // Oscuro medio (bordes y líneas)
-$color-gris-600: #3a4254;       // Oscuro medio
-$color-gris-500: #6b7280;       // Gris de texto secundario
-$color-gris-400: #9ca3af;       // Gris medio texto
-$color-gris-300: #d1d5db;       // Gris claro texto
-$color-gris-200: #e5e7eb;       // Gris muy claro (texto principal)
-$color-gris-100: #f3f4f6;       // Casi blanco
+// Variables CSS (Custom Properties) para theming dinámico
+:root {
+    // --- TEMA CLARO (Mejorado con paleta moderna) ---
+    // Fondos - Paleta suave y limpia
+    --bg-body: #f5f7fa; // Gris azulado muy claro
+    --bg-body-rgb: 245, 247, 250;
 
-$color-primario: #4f9cf9;        // Azul cielo moderno y amigable
-$color-primario-oscuro: #3b82f6; // Azul más intenso
-$color-primario-claro: #60a5fa;  // Azul claro brillante
+    --bg-surface-1: #ffffff; // Blanco puro para tarjetas
+    --bg-surface-1-rgb: 255, 255, 255;
 
-// Estado
-$color-exito: #10b981;           // Verde esmeralda suave
-$color-peligro: #ef4444;         // Rojo coral suave
-$color-aviso: #f59e0b;           // Ámbar cálido
-$color-info: #06b6d4;            // Cian brillante
+    --bg-surface-2: #fafbfc; // Gris casi blanco
+    --bg-surface-2-rgb: 250, 251, 252;
 
-// Colores secundarios
-$color-acento: #f97316;          // Naranja cálido y amigable
-$color-acento-claro: #fb923c;    // Naranja claro
-$color-plata: #94a3b8;           // Plata elegante
-$color-beige-light: #3a3f4a;      // Beige claro cálido para fondos suaves
+    --bg-surface-3: #e4e7eb; // Gris claro para bordes
 
-// Textos y superficies (semánticos)
-$text-color: #ffffff;                // Texto principal sobre fondo oscuro
-$text-color-muted: #d4dae3;          // Texto secundario
-$text-on-primary: #0b0b0b;           // Texto sobre dorado
-$surface-0: $color-negro;            // Fondo base
-$surface-1: $color-negro-2;          // Superficie principal
-$surface-2: $color-grafito;          // Superficie elevada
-$surface-border: rgba(255,255,255,.08);
+    // Textos - Alto contraste y legibilidad
+    --text-main: #1a202c; // Gris carbón oscuro
+    --text-secondary: #4a5568; // Gris medio
+    --text-muted: #718096; // Gris claro
+    --text-on-primary: #ffffff;
 
-// Tablas y listas (mejor legibilidad)
-$table-bg: $surface-1;
-$table-text: $text-color;
-$table-head-bg: linear-gradient(180deg, $surface-1, $surface-2);
+    // Color primario - Azul vibrante y moderno
+    --color-primary: #3b82f6; // Azul brillante
+    --color-primary-dark: #2563eb; // Azul más oscuro
+    --color-primary-light: #60a5fa; // Azul claro
+    --color-primary-rgb: 59, 130, 246;
+
+    // Colores de estado - Vibrantes y claros
+    --color-success: #10b981; // Verde esmeralda
+    --color-success-dark: #059669;
+    --color-success-light: #34d399;
+
+    --color-danger: #ef4444; // Rojo coral
+    --color-danger-dark: #dc2626;
+    --color-danger-light: #f87171;
+
+    --color-warning: #f59e0b; // Ámbar dorado
+    --color-warning-dark: #d97706;
+    --color-warning-light: #fbbf24;
+
+    --color-info: #06b6d4; // Cian brillante
+    --color-info-dark: #0891b2;
+    --color-info-light: #22d3ee;
+
+    --color-accent: #f97316; // Naranja vibrante
+    --color-accent-light: #fb923c;
+    --color-accent-dark: #ea580c;
+
+    // Bordes y sombras
+    --border-color: rgba(0, 0, 0, 0.08);
+    --shadow-color: rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="dark"] {
+    // --- TEMA OSCURO (Paleta profunda y vibrante) ---
+    // Fondos - Tonos oscuros con profundidad
+    --bg-body: #0a0e1a; // Azul oscuro casi negro
+    --bg-body-rgb: 10, 14, 26;
+
+    --bg-surface-1: #111827; // Gris azulado oscuro
+    --bg-surface-1-rgb: 17, 24, 39;
+
+    --bg-surface-2: #1f2937; // Gris medio oscuro
+    --bg-surface-2-rgb: 31, 41, 55;
+
+    --bg-surface-3: #374151; // Gris medio
+
+    // Textos - Alto contraste para modo oscuro
+    --text-main: #f9fafb; // Blanco casi puro
+    --text-secondary: #d1d5db; // Gris muy claro
+    --text-muted: #9ca3af; // Gris medio claro
+    --text-on-primary: #ffffff;
+
+    // Color primario - Azul eléctrico brillante
+    --color-primary: #60a5fa; // Azul brillante (más claro para dark mode)
+    --color-primary-dark: #3b82f6;
+    --color-primary-light: #93c5fd;
+    --color-primary-rgb: 96, 165, 250;
+
+    // Colores de estado - Más brillantes para dark mode
+    --color-success: #34d399; // Verde menta brillante
+    --color-success-dark: #10b981;
+    --color-success-light: #6ee7b7;
+
+    --color-danger: #f87171; // Rojo coral brillante
+    --color-danger-dark: #ef4444;
+    --color-danger-light: #fca5a5;
+
+    --color-warning: #fbbf24; // Amarillo dorado brillante
+    --color-warning-dark: #f59e0b;
+    --color-warning-light: #fcd34d;
+
+    --color-info: #22d3ee; // Cian neón
+    --color-info-dark: #06b6d4;
+    --color-info-light: #67e8f9;
+
+    --color-accent: #fb923c; // Naranja brillante
+    --color-accent-light: #fdba74;
+    --color-accent-dark: #f97316;
+
+    // Bordes y sombras
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+// Mapeo de variables SCSS a variables CSS para compatibilidad
+$color-negro: var(--bg-body);
+$color-negro-2: var(--bg-surface-1);
+$color-grafito: var(--bg-surface-2);
+$color-gris-700: var(--bg-surface-3);
+$color-gris-600: var(--bg-surface-3);
+$color-gris-500: var(--text-muted);
+$color-gris-400: var(--text-muted);
+$color-gris-300: var(--text-secondary);
+$color-gris-200: var(--text-main);
+$color-gris-100: var(--text-main);
+
+// Colores constantes (HEX) para compatibilidad con funciones SASS
+$color-primario: #4f9cf9;
+$color-primario-oscuro: #3b82f6;
+$color-primario-claro: #60a5fa;
+
+$color-exito: #10b981;
+$color-peligro: #ef4444;
+$color-aviso: #f59e0b;
+$color-info: #06b6d4;
+
+$color-acento: #f97316;
+$color-acento-claro: #fb923c;
+
+$text-color: var(--text-main);
+$text-color-muted: var(--text-secondary);
+$text-on-primary: var(--text-on-primary);
+
+$surface-0: var(--bg-body);
+$surface-1: var(--bg-surface-1);
+$surface-2: var(--bg-surface-2);
+$surface-border: var(--border-color);
+
+// Tablas
+$table-bg: var(--bg-surface-1);
+$table-text: var(--text-main);
+$table-head-bg: linear-gradient(180deg, var(--bg-surface-1), var(--bg-surface-2));
 $table-head-text: $color-primario;
 $table-row-hover: rgba($color-primario, .06);
 
-// Listas de alumnos (UI específica)
+// Alumnos UI
 $alumnos-badge-bg: rgba($color-primario, .18);
 $alumnos-badge-color: $color-primario;
-$alumnos-input-bg: $surface-2;
+$alumnos-input-bg: var(--bg-surface-2);
 $alumnos-input-icon-bg: $color-primario;
-$alumnos-input-icon-color: $text-on-primary;
-$alumnos-card-bg: $surface-1;
-$alumnos-card-border: $surface-border;
-$alumnos-row-hover: rgba($color-primario,.08);
-$alumnos-pagination-active-bg: rgba($color-primario,.18);
+$alumnos-input-icon-color: var(--text-on-primary);
+$alumnos-card-bg: var(--bg-surface-1);
+$alumnos-card-border: var(--border-color);
+$alumnos-row-hover: rgba($color-primario, .08);
+$alumnos-pagination-active-bg: rgba($color-primario, .18);
 $alumnos-pagination-active-border: $color-primario;
 $alumnos-pagination-color: $color-primario;
 
@@ -61,20 +163,16 @@ $radio-base: .5rem;
 $radio-sm: .375rem;
 $radio-lg: .75rem;
 
-// Sombras mejoradas
-$shadow-sm: 0 1px 3px rgba(0, 0, 0, .2), 0 1px 2px rgba(0, 0, 0, .1);
-$shadow-md: 0 4px 6px rgba(0, 0, 0, .3), 0 2px 4px rgba(0, 0, 0, .2);
-$shadow-lg: 0 10px 15px rgba(0, 0, 0, .4), 0 4px 6px rgba(0, 0, 0, .3);
-$shadow-xl: 0 20px 25px rgba(0, 0, 0, .5), 0 10px 10px rgba(0, 0, 0, .3);
+// Sombras
+$shadow-sm: 0 1px 3px var(--shadow-color), 0 1px 2px var(--shadow-color);
+$shadow-md: 0 4px 6px var(--shadow-color), 0 2px 4px var(--shadow-color);
+$shadow-lg: 0 10px 15px var(--shadow-color), 0 4px 6px var(--shadow-color);
+$shadow-xl: 0 20px 25px var(--shadow-color), 0 10px 10px var(--shadow-color);
 
-// Z-index capa de overlay
 $z-overlay: 1040;
 
-// Breakpoints
 $bp-sm: 576px;
 $bp-md: 768px;
 $bp-lg: 992px;
 $bp-xl: 1200px;
 $bp-xxl: 1400px;
-
-

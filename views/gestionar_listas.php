@@ -10,7 +10,7 @@ $auth->checkAuth();
 
 $id_grupo = isset($_GET['id_grupo']) ? (int)$_GET['id_grupo'] : 0;
 if ($id_grupo === 0) {
-    header('Location: /GORA/dashboard');
+    header('Location: /GESTACAD/dashboard');
     exit();
 }
 

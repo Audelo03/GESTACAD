@@ -1,6 +1,6 @@
 <?php
 /**
- * VERIFICACIÓN DE AUTENTICACIÓN Y PERMISOS - GORA
+ * VERIFICACIÓN DE AUTENTICACIÓN Y PERMISOS - GESTACAD
  * 
  * Este archivo verifica que el usuario esté autenticado y tenga
  * los permisos necesarios para acceder a la página solicitada.
@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Verificar si el usuario está autenticado
 if (!isset($_SESSION['usuario_id'])) {
-    header("Location: /GORA/login");
+    header("Location: /GESTACAD/login");
     exit(); 
 }
 
@@ -61,13 +61,13 @@ if (isset($page_permissions[$currentPage])) {
     // Verificar si el nivel del usuario está permitido para esta página
     if (!in_array($userLevel, $allowedLevels)) {
         $_SESSION['error_message'] = "No tienes los permisos necesarios para acceder a esta página.";
-        header("Location: /GORA/login");
+        header("Location: /GESTACAD/login");
         exit();
     }
 } else {
     // Si la página no está definida en permisos, denegar acceso
     $_SESSION['error_message'] = "Acceso denegado a recurso no definido.";
-    header("Location: /GORA/login");
+    header("Location: /GESTACAD/login");
     exit();
 }
 

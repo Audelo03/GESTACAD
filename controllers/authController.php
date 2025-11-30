@@ -47,7 +47,7 @@ class AuthController {
     public function logout() {
         session_unset();
         session_destroy();
-        header("Location: /GORA/login");
+        header("Location: /GESTACAD/login");
         exit;
     }
 
@@ -57,7 +57,7 @@ class AuthController {
      */
     public function checkAuth() {
         if (!isset($_SESSION["usuario_id"])) {
-            header("Location: /GORA/login");
+            header("Location: /GESTACAD/login");
             exit;
         }
     }

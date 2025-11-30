@@ -3,6 +3,6 @@
 session_unset();
 session_destroy();
 
-header("Location: /GORA/login");
+header("Location: /GESTACAD/login");
 exit;
 ?>

@@ -1,11 +1,11 @@
 {
-    "name": "diego/gora",
-    "description": "Sistema de gestión académica GORA",
+    "name": "diego/gestacad",
+    "description": "Sistema de gestión académica GESTACAD",
     "type": "project",
     "license": "proprietary",
     "autoload": {
         "psr-4": {
-            "Diego\\Gora\\": "src/"
+            "Diego\\Gestacad\\": "src/"
         }
     },
     "authors": [

@@ -14,7 +14,7 @@ $auth->checkAuth();
 
 $id_seguimiento = filter_input(INPUT_GET, 'id_seguimiento', FILTER_VALIDATE_INT);
 if (!$id_seguimiento) {
-    header("Location: /GORA/listas?error=invalid_id");
+    header("Location: /GESTACAD/listas?error=invalid_id");
     exit;
 }
 
@@ -22,7 +22,7 @@ $seguimientoController = new SeguimientoController($conn);
 $seguimiento = $seguimientoController->obtenerPorId($id_seguimiento);
 
 if (!$seguimiento) {
-    header("Location: /GORA/listas?error=seguimiento_not_found");
+    header("Location: /GESTACAD/listas?error=seguimiento_not_found");
     exit;
 }
 
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         );
 
         if ($resultado) {
-            header("Location: /GORA/ver_seguimientos.php?id_alumno=$id_alumno&success=edited");
+            header("Location: /GESTACAD/ver_seguimientos.php?id_alumno=$id_alumno&success=edited");
             exit;
         } else {
             $errors['general'] = "Hubo un error al actualizar el seguimiento.";

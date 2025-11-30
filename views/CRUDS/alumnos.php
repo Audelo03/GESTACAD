@@ -280,7 +280,7 @@ window.addEventListener('load', function() {
         });
 
         try {
-            const response = await fetch(`/GORA/controllers/alumnoController.php?${params}`);
+            const response = await fetch(`/GESTACAD/controllers/alumnoController.php?${params}`);
             
             if(!response.ok) throw new Error('Error en la respuesta del servidor');
             
@@ -350,7 +350,7 @@ window.addEventListener('load', function() {
         if (editBtn) {
             const id = editBtn.dataset.id;
             try {
-                const response = await fetch(`/GORA/controllers/alumnoController.php?action=show&id=${id}`);
+                const response = await fetch(`/GESTACAD/controllers/alumnoController.php?action=show&id=${id}`);
                 const alumno = await response.json();
                 
                 if(!alumno) throw new Error("No se recibieron datos");
@@ -391,7 +391,7 @@ window.addEventListener('load', function() {
                         const formData = new FormData();
                         formData.append('id', id);
 
-                        const response = await fetch(`/GORA/controllers/alumnoController.php?action=delete`, {
+                        const response = await fetch(`/GESTACAD/controllers/alumnoController.php?action=delete`, {
                             method: 'POST',
                             body: formData
                         });
@@ -415,7 +415,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnGuardar')?.addEventListener('click', async () => {
         const idField = document.getElementById('id_alumno');
         const isUpdate = idField && idField.value;
-        const url = isUpdate ? `/GORA/controllers/alumnoController.php?action=update` : `/GORA/controllers/alumnoController.php?action=store`;
+        const url = isUpdate ? `/GESTACAD/controllers/alumnoController.php?action=update` : `/GESTACAD/controllers/alumnoController.php?action=store`;
         
         const formData = new FormData(form);
 

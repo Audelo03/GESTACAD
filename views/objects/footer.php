@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 id_grupo: id_grupo,
                 page: currentPage
             });
-            const url = `/GORA/alumnos-paginados?${params.toString()}`;
+            const url = `/GESTACAD/alumnos-paginados?${params.toString()}`;
 
             try {
                 // Realizar la petición con fetch

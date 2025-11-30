@@ -232,7 +232,7 @@ window.addEventListener('load', function() {
         const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
 
         try {
-            const data = await dom.fetchJSON(`/GORA/controllers/carrerasController.php?${params}`);
+            const data = await dom.fetchJSON(`/GESTACAD/controllers/carrerasController.php?${params}`);
             if (data.success) {
                 totalItems = data.total;
                 totalPages = data.totalPages;
@@ -319,7 +319,7 @@ window.addEventListener('load', function() {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        await dom.postForm('/GORA/controllers/carrerasController.php?action=delete', { id });
+                        await dom.postForm('/GESTACAD/controllers/carrerasController.php?action=delete', { id });
                         Swal.fire('¡Eliminado!', 'La carrera ha sido eliminada.', 'success');
                         cargarCarreras(currentPage, searchTerm);
                     } catch (error) {
@@ -333,7 +333,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnGuardar')?.addEventListener('click', async () => {
         const idField = document.getElementById('id_carrera');
         const isUpdate = idField && idField.value;
-        const url = isUpdate ? '/GORA/controllers/carrerasController.php?action=update' : '/GORA/controllers/carrerasController.php?action=store';
+        const url = isUpdate ? '/GESTACAD/controllers/carrerasController.php?action=update' : '/GESTACAD/controllers/carrerasController.php?action=store';
         const formData = dom.serializeForm(form);
         try {
             await dom.postForm(url, formData);

@@ -12,7 +12,7 @@
         <h1 class="display-1 text-danger">404</h1>
         <h2 class="mb-4">Página no encontrada</h2>
         <p class="lead mb-4">La página que buscas no existe o ha sido movida.</p>
-        <a href="/GORA/" class="btn btn-primary">
+        <a href="/GESTACAD/" class="btn btn-primary">
             <i class="bi bi-house-fill me-2"></i>Volver al inicio
         </a>
     </div>

@@ -14,7 +14,7 @@ $auth->checkAuth();
 
 $id_alumno = filter_input(INPUT_GET, 'id_alumno', FILTER_VALIDATE_INT);
 if (!$id_alumno) {
-    header("Location: /GORA/listas?error=invalid_id");
+    header("Location: /GESTACAD/listas?error=invalid_id");
     exit;
 }
 
@@ -22,7 +22,7 @@ $alumnoController = new AlumnoController($conn);
 $alumno = $alumnoController->obtenerAlumnoPorId($id_alumno);
 
 if (!$alumno) {
-    header("Location: /GORA/listas?error=alumno_not_found");
+    header("Location: /GESTACAD/listas?error=alumno_not_found");
     exit;
 }
 
@@ -33,16 +33,22 @@ $seguimientoModel = new Seguimiento($conn);
 $seguimientos = $seguimientoModel->getByAlumno($id_alumno);
 
 
-function getEstatus(int $estatus): string {
+function getEstatus(int $estatus): string
+{
     switch ($estatus) {
-        case 1: return '<span class="badge bg-success">Abierto</span>';
-        case 2: return '<span class="badge bg-warning text-dark">En Progreso</span>';
-        case 3: return '<span class="badge bg-secondary">Cerrado</span>';
-        default: return '<span class="badge bg-light text-dark">Desconocido</span>';
+        case 1:
+            return '<span class="badge bg-success">Abierto</span>';
+        case 2:
+            return '<span class="badge bg-warning text-dark">En Progreso</span>';
+        case 3:
+            return '<span class="badge bg-secondary">Cerrado</span>';
+        default:
+            return '<span class="badge bg-light text-dark">Desconocido</span>';
     }
 }
 
-function formatFecha(?string $fecha): string {
+function formatFecha(?string $fecha): string
+{
     if (empty($fecha)) {
         return '<span class="text-muted">No definida</span>';
     }
@@ -62,11 +68,8 @@ function formatFecha(?string $fecha): string {
                     </h4>
                     <p class="mb-0">Matrícula: <?= htmlspecialchars($alumno['matricula']) ?></p>
                 </div>
-                <a href="crear_seguimiento.php?id_alumno=<?= $id_alumno ?>" 
-                   class="btn btn-primary" 
-                   data-bs-toggle="tooltip" 
-                   data-bs-placement="top" 
-                   title="Crear Nuevo Seguimiento">
+                <a href="crear_seguimiento.php?id_alumno=<?= $id_alumno ?>" class="btn btn-primary"
+                    data-bs-toggle="tooltip" data-bs-placement="top" title="Crear Nuevo Seguimiento">
                     <i class="bi bi-plus-circle"></i>
                 </a>
             </div>
@@ -74,7 +77,7 @@ function formatFecha(?string $fecha): string {
             <?php if (isset($_GET['success']) && $_GET['success'] === 'created'): ?>
                 <div class="alert alert-success">Seguimiento creado exitosamente.</div>
             <?php endif; ?>
-             <?php if (isset($_GET['success']) && $_GET['success'] === 'edited'): ?>
+            <?php if (isset($_GET['success']) && $_GET['success'] === 'edited'): ?>
                 <div class="alert alert-success">Seguimiento editado exitosamente.</div>
             <?php endif; ?>
 
@@ -94,7 +97,8 @@ function formatFecha(?string $fecha): string {
                                         <th scope="col">Estatus</th>
                                         <th scope="col">Fecha Creación</th>
                                         <th scope="col">Fecha Compromiso</th>
-                                        <th scope="col">Acciones</th> </tr>
+                                        <th scope="col">Acciones</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($seguimientos as $seguimiento): ?>
@@ -105,15 +109,13 @@ function formatFecha(?string $fecha): string {
                                                     <?= htmlspecialchars($seguimiento['tipo_seguimiento_nombre'] ?? 'No asignado') ?>
                                                 </span>
                                             </td>
-                                            <td><?= getEstatus((int)$seguimiento['estatus']) ?></td>
+                                            <td><?= getEstatus((int) $seguimiento['estatus']) ?></td>
                                             <td><?= formatFecha($seguimiento['fecha_creacion']) ?></td>
                                             <td><?= formatFecha($seguimiento['fecha_compromiso']) ?></td>
                                             <td>
-                                                <a href="editar_seguimiento.php?id_seguimiento=<?= $seguimiento['id_seguimiento'] ?>" 
-                                                   class="btn btn-sm btn-warning" 
-                                                   data-bs-toggle="tooltip" 
-                                                   data-bs-placement="top" 
-                                                   title="Editar Seguimiento">
+                                                <a href="editar_seguimiento.php?id_seguimiento=<?= $seguimiento['id_seguimiento'] ?>"
+                                                    class="btn btn-sm btn-warning" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Editar Seguimiento">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
                                             </td>
@@ -127,11 +129,8 @@ function formatFecha(?string $fecha): string {
             </div>
 
             <div class="mt-4 text-end">
-                <a href="listas.php" 
-                   class="btn btn-outline-secondary" 
-                   data-bs-toggle="tooltip" 
-                   data-bs-placement="top" 
-                   title="Volver a la Lista de Alumnos">
+                <a href="listas.php" class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="Volver a la Lista de Alumnos">
                     <i class="bi bi-arrow-left"></i>Volver a la Lista
                 </a>
             </div>

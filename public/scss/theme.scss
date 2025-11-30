@@ -7,7 +7,8 @@
 @use 'pages/estadisticas';
 
 // Reset básico y tipografía
-html, body {
+html,
+body {
 	background-color: $color-negro-2;
 	color: $text-color;
 	font-family: $font-family-base;
@@ -22,15 +23,19 @@ html, body {
 	0% {
 		transform: translateX(0) translateY(0);
 	}
+
 	25% {
 		transform: translateX(10px) translateY(-5px);
 	}
+
 	50% {
 		transform: translateX(-5px) translateY(10px);
 	}
+
 	75% {
 		transform: translateX(-10px) translateY(-5px);
 	}
+
 	100% {
 		transform: translateX(0) translateY(0);
 	}
@@ -40,6 +45,7 @@ html, body {
 	0% {
 		transform: rotate(0deg);
 	}
+
 	100% {
 		transform: rotate(360deg);
 	}
@@ -53,17 +59,16 @@ body::before {
 	left: -50%;
 	width: 200%;
 	height: 200%;
-	background: 
+	background:
 		radial-gradient(circle at 20% 80%, rgba($color-primario, 0.08) 0%, transparent 50%),
 		radial-gradient(circle at 80% 20%, rgba($color-primario, 0.06) 0%, transparent 50%),
 		radial-gradient(circle at 40% 40%, rgba($color-primario, 0.04) 0%, transparent 50%),
-		linear-gradient(45deg, 
-			rgba($color-negro, 0.9) 0%, 
-			rgba($color-negro-2, 0.95) 25%, 
-			rgba($color-grafito, 0.8) 50%, 
-			rgba($color-negro-2, 0.95) 75%, 
-			rgba($color-negro, 0.9) 100%
-		);
+		linear-gradient(45deg,
+			rgba(var(--bg-body-rgb), 0.9) 0%,
+			rgba(var(--bg-surface-1-rgb), 0.95) 25%,
+			rgba(var(--bg-surface-2-rgb), 0.8) 50%,
+			rgba(var(--bg-surface-1-rgb), 0.95) 75%,
+			rgba(var(--bg-body-rgb), 0.9) 100%);
 	background-size: 400px 400px, 600px 600px, 300px 300px, 100% 100%;
 	animation: backgroundMove 60s ease-in-out infinite, backgroundRotate 120s linear infinite;
 	z-index: -1;
@@ -77,108 +82,155 @@ body::after {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: 
-		repeating-linear-gradient(
-			45deg,
+	background:
+		repeating-linear-gradient(45deg,
 			transparent,
 			transparent 2px,
 			rgba($color-primario, 0.03) 2px,
-			rgba($color-primario, 0.03) 4px
-		),
-		repeating-linear-gradient(
-			-45deg,
+			rgba($color-primario, 0.03) 4px),
+		repeating-linear-gradient(-45deg,
 			transparent,
 			transparent 2px,
 			rgba($color-primario, 0.02) 2px,
-			rgba($color-primario, 0.02) 4px
-		);
+			rgba($color-primario, 0.02) 4px);
 	animation: backgroundMove 80s ease-in-out infinite reverse;
 	z-index: -1;
 	opacity: 0.5;
 }
 
 
-a { color: $color-primario; text-decoration: none; }
-a:hover { color: $color-primario-claro; }
+a {
+	color: $color-primario;
+	text-decoration: none;
+}
+
+a:hover {
+	color: $color-primario-claro;
+}
 
 // Utilidades
-.text-primary { @include text-primary; }
-.bg-primary { background-color: $color-primario !important; }
-.border-primary { border-color: $color-primario !important; }
+.text-primary {
+	@include text-primary;
+}
+
+.bg-primary {
+	background-color: $color-primario !important;
+}
+
+.border-primary {
+	border-color: $color-primario !important;
+}
+
 .btn-primary-custom {
 	background-color: $color-primario;
 	border-color: $color-primario-oscuro;
 	color: #fff;
 	@include hover-brighten(10%);
-	&:focus { @include focus-ring($color-primario); }
+
+	&:focus {
+		@include focus-ring($color-primario);
+	}
 }
 
 // Navbar
 #navbar1.navbar {
 	background-color: $color-negro-2 !important;
-	border-bottom: 1px solid rgba(255,255,255,.08) !important;
-	.navbar-brand { color: $text-color; }
-	.navbar-brand.small { font-size: .9rem; letter-spacing: .2px; }
+	border-bottom: 1px solid rgba(255, 255, 255, .08) !important;
+
+	.navbar-brand {
+		color: $text-color;
+	}
+
+	.navbar-brand.small {
+		font-size: .9rem;
+		letter-spacing: .2px;
+	}
+
 	.navbar-brand.breadcrumb-brand {
 		display: inline-flex;
 		align-items: center;
 		gap: .25rem;
-		.brand-page { letter-spacing: .4px; }
+
+		.brand-page {
+			letter-spacing: .4px;
+		}
 	}
-	.nav-link { color: $text-color; }
-	.nav-link:hover { color: $color-primario; }
+
+	.nav-link {
+		color: $text-color;
+	}
+
+	.nav-link:hover {
+		color: $color-primario;
+	}
+
 	.dropdown-menu {
 		background-color: $color-negro-2;
-		border: 1px solid rgba(255,255,255,.08);
+		border: 1px solid rgba(255, 255, 255, .08);
 		box-shadow: $shadow-lg;
-		.dropdown-item { color: $text-color; }
-		.dropdown-item:hover { background-color: $color-gris-700; color: $color-primario; }
+
+		.dropdown-item {
+			color: $text-color;
+		}
+
+		.dropdown-item:hover {
+			background-color: $color-gris-700;
+			color: $color-primario;
+		}
 	}
 }
 
-.dashboard-grid{
+.dashboard-grid {
 	background-color: $color-negro-2;
 }
 
-.stats-dashboard{
+.stats-dashboard {
 	background-color: $color-negro-2;
 
-	.widget-content{
+	.widget-content {
 		background-color: $color-negro-2;
 	}
 
-	.widget-title{
+	.widget-title {
 		background-color: $color-negro-2;
 	}
 }
 
-.container-fluid{
+.container-fluid {
 	background-color: $color-negro-2;
 }
 
 // Sidebar
 #app-sidebar.sidebar {
 	background: linear-gradient(180deg, $color-negro-2 0%, $color-grafito 100%);
-	border-right: 1px solid rgba(255,255,255,.08);
+	border-right: 1px solid rgba(255, 255, 255, .08);
 	box-shadow: $shadow-md;
+
 	.nav-link {
 		border-radius: $radio-sm;
 		transition: all 0.3s ease;
+
 		&.active {
 			background: linear-gradient(135deg, rgba($color-primario, .2), rgba($color-acento, .15));
 			color: $color-primario !important;
 			border-left: 3px solid $color-primario;
 		}
-		&:hover { 
-			background: rgba($color-primario,.08); 
-			color: $color-primario; 
+
+		&:hover {
+			background: rgba($color-primario, .08);
+			color: $color-primario;
 			transform: translateX(2px);
 		}
 	}
+
 	.btn-outline-light {
 		border-color: $color-gris-500;
 		color: $color-gris-200;
-		&:hover { border-color: $color-primario; color: $color-primario; }
+
+		&:hover {
+			border-color: $color-primario;
+			color: $color-primario;
+		}
 	}
 }
 
@@ -188,16 +240,32 @@ a:hover { color: $color-primario-claro; }
 }
 
 // Tarjetas y contenedores
-.card, .shadow-box, .content-surface { @include card-surface; }
-.card { color: $text-color; }
+.card,
+.shadow-box,
+.content-surface {
+	@include card-surface;
+}
+
+.card {
+	color: $text-color;
+}
 
 // Formularios
-.form-control, .form-select {
+.form-control,
+.form-select {
 	background-color: $color-grafito;
 	border: 1px solid $color-gris-600;
 	color: $text-color;
-	&::placeholder { color: $color-gris-500; }
-	&:focus { @include focus-ring($color-primario); background-color: $color-gris-700; color: $color-gris-100; }
+
+	&::placeholder {
+		color: $color-gris-500;
+	}
+
+	&:focus {
+		@include focus-ring($color-primario);
+		background-color: $color-gris-700;
+		color: $color-gris-100;
+	}
 }
 
 // Estados deshabilitados: similar a selects pero un poco más claro
@@ -213,8 +281,15 @@ input[type="date"].form-control:disabled {
 .form-check-input {
 	background-color: $color-grafito;
 	border-color: $color-gris-600;
-	&:checked { background-color: $color-primario; border-color: $color-primario; }
-	&:focus { @include focus-ring($color-primario); }
+
+	&:checked {
+		background-color: $color-primario;
+		border-color: $color-primario;
+	}
+
+	&:focus {
+		@include focus-ring($color-primario);
+	}
 }
 
 // Botones
@@ -223,450 +298,46 @@ input[type="date"].form-control:disabled {
 	border-color: $color-primario-oscuro !important;
 	color: #fff !important;
 	@include hover-brighten(8%);
-	&:focus { @include focus-ring($color-primario); }
-}
 
-.btn-success {
-	background-color: $color-exito !important;
-	border-color: darken($color-exito, 10%) !important;
-	color: #fff !important;
-}
-
-.btn-info {
-	background-color: $color-info !important;
-	border-color: darken($color-info, 10%) !important;
-	color: #fff !important;
-}
-
-.btn-warning {
-	background-color: $color-aviso !important;
-	border-color: darken($color-aviso, 10%) !important;
-	color: #000 !important;
-}
-
-.btn-danger {
-	background-color: $color-peligro !important;
-	border-color: darken($color-peligro, 10%) !important;
-	color: #fff !important;
-}
-
-.btn-secondary {
-	background-color: $color-gris-600 !important;
-	border-color: $color-gris-500 !important;
-	color: #fff !important;
-}
-
-.btn-outline-primary, .btn-outline-secondary {
-	border-color: $color-primario !important;
-	color: $color-primario !important;
-	&:hover { background-color: $color-primario !important; color: #fff !important; }
-}
-
-// Recolor utilitario para primarios
-.text-primary { color: $color-primario !important; }
-.bg-primary { background-color: $color-primario !important; color: #fff !important; }
-.border-primary { border-color: $color-primario !important; }
-
-// Recolor de fondo claro hacia beige para secciones específicas
-.bg-light { background-color: $color-beige-light !important; color: #0b0b0b !important; }
-.bg-light  { color: $color-gris-500 !important; }
-
-.encabezado-nombre{
-	color: $color-primario !important;
-}
-
-// Tablas (DataTables) - Patrón Uniforme
-table.dataTable, .table {
-	color: $text-color;
-	background-color: $color-negro-2;
-	border-color: $color-gris-600;
-	border-radius: 0.5rem;
-	overflow: hidden;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	
-	> :not(caption) > * > * { background-color: transparent; }
-	
-	// Encabezados uniformes
-	thead {
-		background: linear-gradient(180deg, $color-negro-2, $color-grafito);
-		th { 
-			color: $color-primario; 
-			border-bottom-color: $color-gris-600; 
-			font-weight: 600;
-			font-size: 0.875rem;
-			padding: 1rem 0.75rem;
-			text-transform: uppercase;
-			letter-spacing: 0.025em;
-		}
-	}
-	
-	// Filas del cuerpo
-	tbody {
-		tr { 
-			border-color: $color-gris-600;
-			transition: all 0.2s ease;
-		}
-		tr:hover { 
-			background-color: rgba($color-primario,.08);
-			transform: translateY(-1px);
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-		}
-		td {
-			padding: 0.75rem;
-			vertical-align: middle;
-			border-top: 1px solid rgba($color-gris-600, 0.3);
-		}
-	}
-	
-	// Texto uniforme
-	th, td { 
-		color: $text-color !important;
-		border-color: rgba($color-gris-600, 0.3);
-	}
-	
-	// Franjas de tabla mejoradas
-	&.table-striped > tbody > tr:nth-of-type(odd) { 
-		background-color: rgba(255,255,255,.02); 
-	}
-	
-	// Hover mejorado
-	&.table-hover > tbody > tr:hover { 
-		background-color: rgba($color-primario,.08); 
-	}
-	
-	// Bordes redondeados para la primera y última fila
-	tbody tr:first-child td {
-		border-top: none;
-	}
-	
-	// Botones en tablas
-	.btn {
-		margin: 0 0.125rem;
-		transition: all 0.2s ease;
-		
-		&:hover {
-			transform: translateY(-1px);
-			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-		}
-	}
-}
-
-// Uniformizar clases de encabezados de tablas
-.table-light thead {
-	background: linear-gradient(180deg, $color-negro-2, $color-grafito) !important;
-	th {
-		color: $color-primario !important;
-		border-bottom-color: $color-gris-600 !important;
-		font-weight: 600 !important;
-		font-size: 0.875rem !important;
-		padding: 1rem 0.75rem !important;
-		text-transform: uppercase !important;
-		letter-spacing: 0.025em !important;
-		text-align: center !important;
-	}
-}
-
-.table-dark thead {
-	background: linear-gradient(180deg, $color-negro-2, $color-grafito) !important;
-	th {
-		color: $color-primario !important;
-		border-bottom-color: $color-gris-600 !important;
-		font-weight: 600 !important;
-		font-size: 0.875rem !important;
-		padding: 1rem 0.75rem !important;
-		text-transform: uppercase !important;
-		letter-spacing: 0.025em !important;
-		text-align: center !important;
-	}
-}
-
-// Centrar solo encabezados en todas las tablas
-table thead th {
-	text-align: center !important;
-}
-
-// Centrar solo botones de acción en la última columna
-table tbody td:last-child {
-	text-align: center !important;
-}
-
-// Estilos específicos para botones de acción en tablas
-table tbody td .btn {
-	margin: 0 0.125rem;
-	display: inline-block;
-}
-
-.text-dark, .text-body { color: $text-color !important; }
-.text-muted { color: $text-color-muted !important; }
-
-// Contenedores de tablas uniformes
-.table-responsive {
-	border-radius: 0.5rem;
-	overflow: hidden;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-	
-	.table {
-		margin-bottom: 0;
-		border-radius: 0;
-		box-shadow: none;
-	}
-}
-
-// DataTables wrapper uniforme
-.dataTables_wrapper {
-	.dataTables_length,
-	.dataTables_filter,
-	.dataTables_info,
-	.dataTables_paginate {
-		color: $text-color;
-		margin: 0.5rem 0;
-	}
-	
-	.dataTables_filter input {
-		background-color: $surface-2;
-		border: 1px solid $color-gris-600;
-		color: $text-color;
-		border-radius: 0.375rem;
-		padding: 0.5rem 0.75rem;
-		
-		&:focus {
-			border-color: $color-primario;
-			box-shadow: 0 0 0 0.2rem rgba($color-primario, 0.25);
-		}
-	}
-	
-	.dataTables_length select {
-		background-color: $surface-2;
-		border: 1px solid $color-gris-600;
-		color: $text-color;
-		border-radius: 0.375rem;
-		padding: 0.25rem 0.5rem;
-	}
-	
-	.dataTables_paginate .paginate_button {
-		color: $color-primario !important;
-		border: 1px solid transparent;
-		border-radius: 0.375rem;
-		padding: 0.5rem 0.75rem;
-		margin: 0 0.125rem;
-		transition: all 0.2s ease;
-		
-		&:hover {
-			background: rgba($color-primario,.1) !important;
-			border-color: rgba($color-primario,.3) !important;
-			transform: translateY(-1px);
-		}
-		
-		&.current, &.current:hover { 
-			background: rgba($color-primario,.15) !important; 
-			border: 1px solid $color-primario !important; 
-			color: $color-primario !important;
-		}
-		
-		&.disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-		}
-	}
-}
-
-// Cambia el color del botón de acordeón cuando está activo (abierto)
-.accordion-button:not(.collapsed) {
-	background-color: rgba($color-primario, 0.15) !important;
-	color: $color-primario !important;
-	box-shadow: none;
-}
-
-// Cambia el color al hacer hover sobre el botón de acordeón
-.accordion-button:hover {
-	background-color: rgba($color-primario, 0.10) !important;
-	color: $color-primario !important;
-}
-
-.btn-toggle-sidebar{
-	background-color: $color-primario-oscuro;
-	transition: all 0.3s ease;
-	border: 1px solid rgba($color-primario, 0.3);
-	
-	&:hover {
-		outline: 1px solid $color-primario !important;
-		background-color: $color-primario !important;
-		transform: scale(1.05);
-	}
-	
-	// Estilos cuando el sidebar está abierto
-	.sidebar-icon-open {
-		display: inline-block;
-		transition: all 0.3s ease;
-	}
-	
-	.sidebar-icon-collapsed {
-		display: none;
-		transition: all 0.3s ease;
-	}
-}
-
-// Estilos cuando el sidebar está colapsado
-#app-sidebar.collapsed {
-	.btn-toggle-sidebar {
-		background: linear-gradient(135deg, rgba($color-primario, 0.2), rgba($color-primario, 0.1));
-		border-color: rgba($color-primario, 0.5);
-		
-		&:hover {
-			background: linear-gradient(135deg, rgba($color-primario, 0.4), rgba($color-primario, 0.3));
-			border-color: $color-primario;
-		}
-		
-		.sidebar-icon-open {
-			display: none;
-		}
-		
-		.sidebar-icon-collapsed {
-			display: inline-block;
-		}
-	}
-}
-
-// Estilos cuando el sidebar está expandido (sin clase collapsed)
-#app-sidebar:not(.collapsed) .btn-toggle-sidebar {
-	background: linear-gradient(135deg, $color-primario, $color-primario-oscuro) !important;
-	border-color: $color-primario !important;
-	color: $text-on-primary !important;
-	
-	&:hover {
-		background: linear-gradient(135deg, $color-primario-claro, $color-primario) !important;
-		transform: scale(1.05);
-	}
-	
-	.sidebar-icon-open {
-		display: inline-block !important;
-	}
-	
-	.sidebar-icon-collapsed {
-		display: none !important;
-	}
-}
-
-// Estilos cuando el sidebar está expandido (con clase expanded)
-#app-sidebar.expanded .btn-toggle-sidebar {
-	background: linear-gradient(135deg, $color-primario, $color-primario-oscuro) !important;
-	border-color: $color-primario !important;
-	color: $text-on-primary !important;
-	
-	&:hover {
-		background: linear-gradient(135deg, $color-primario-claro, $color-primario) !important;
-		transform: scale(1.05);
-	}
-	
-	.sidebar-icon-open {
-		display: inline-block !important;
-	}
-	
-	.sidebar-icon-collapsed {
-		display: none !important;
-	}
-}
-
-
-
-// Cambia el color de las flechitas de los acordeones a blanco
-.accordion-button::after {
-	filter: brightness(0) invert(1); // Convierte la flecha a blanco
-}
-
-// Opcional: cambia el color del icono cuando está abierto
-.accordion-button:not(.collapsed)::after {
-	filter: brightness(0) invert(1); // Mantiene blanco cuando está abierto
-}
-
-
-// Badges y etiquetas
-.badge.bg-primary {
-	background: linear-gradient(135deg, $color-primario, $color-primario-oscuro) !important;
-	color: #fff !important;
-}
-.badge.bg-info {
-	background: $color-info !important;
-	color: #fff !important;
-}
-
-.badge.bg-secondary {
-	background: $color-gris-600 !important;
-	color: #fff !important;
-}
-
-.badge.bg-success {
-	background: $color-exito !important;
-	color: #fff !important;
-}
-
-.badge.bg-danger {
-	background: $color-peligro !important;
-	color: #fff !important;
-}
-
-.badge.bg-warning {
-	background: $color-aviso !important;
-	color: #fff !important;
-}
-
-// Modales y popovers
-.modal-content { 
-	@include card-surface; 
-	box-shadow: $shadow-xl;
-}
-.modal-header { border-bottom: 1px solid rgba(255,255,255,.08); }
-.modal-footer { border-top: 1px solid rgba(255,255,255,.08); }
-
-// Alertas
-.alert {
-	&.alert-primary {
-		background-color: rgba($color-primario, .12);
-		border-color: $color-primario;
-		color: $color-primario-claro;
-	}
-	&.alert-success {
-		background-color: rgba($color-exito, .12);
-		border-color: $color-exito;
-		color: lighten($color-exito, 20%);
-	}
-	&.alert-danger {
-		background-color: rgba($color-peligro, .12);
-		border-color: $color-peligro;
-		color: lighten($color-peligro, 20%);
-	}
-	&.alert-warning {
-		background-color: rgba($color-aviso, .12);
-		border-color: $color-aviso;
-		color: lighten($color-aviso, 20%);
-	}
-}
-
-// Select2
-.select2-container--bootstrap-5 .select2-selection {
 	background-color: $color-grafito;
 	border-color: $color-gris-600;
 	color: $text-color;
-	&:focus { @include focus-ring($color-primario); }
+
+	&:focus {
+		@include focus-ring($color-primario);
+	}
 }
 
 // Ajustes de texto/placeholder y dropdown para Select2 (tema oscuro)
-.select2-container--bootstrap-5 .select2-selection .select2-selection__rendered { color: $text-color !important; }
-.select2-container--bootstrap-5 .select2-selection .select2-selection__placeholder { color: $text-color-muted !important; }
-.select2-container--bootstrap-5 .select2-selection .select2-selection__clear { color: $text-color-muted !important; }
+.select2-container--bootstrap-5 .select2-selection .select2-selection__rendered {
+	color: $text-color !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection .select2-selection__placeholder {
+	color: $text-color-muted !important;
+}
+
+.select2-container--bootstrap-5 .select2-selection .select2-selection__clear {
+	color: $text-color-muted !important;
+}
 
 .select2-container--bootstrap-5 .select2-dropdown {
 	background-color: $surface-1 !important;
 	color: $text-color !important;
 	border: 1px solid $surface-border !important;
 }
-.select2-container--bootstrap-5 .select2-results__option { color: $text-color !important; }
-.select2-container--bootstrap-5 .select2-results__option--selected {
-	background-color: rgba($color-primario,.2) !important;
+
+.select2-container--bootstrap-5 .select2-results__option {
 	color: $text-color !important;
 }
+
+.select2-container--bootstrap-5 .select2-results__option--selected {
+	background-color: rgba($color-primario, .2) !important;
+	color: $text-color !important;
+}
+
 .select2-container--bootstrap-5 .select2-results__option--highlighted {
-	background-color: rgba($color-primario,.35) !important;
+	background-color: rgba($color-primario, .35) !important;
 	color: #fff !important;
 }
 
@@ -675,21 +346,28 @@ table tbody td .btn {
 	background-color: $color-grafito;
 	border-color: $color-gris-600;
 }
+
 .select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice {
-	background-color: rgba($color-primario,.15) !important;
+	background-color: rgba($color-primario, .15) !important;
 	border: 1px solid $color-primario !important;
 	color: $text-color !important;
 }
-.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove { color: $text-color-muted !important; }
+
+.select2-container--bootstrap-5 .select2-selection--multiple .select2-selection__choice__remove {
+	color: $text-color-muted !important;
+}
 
 // Mejoras adicionales
 .card-header {
 	background: linear-gradient(135deg, rgba($color-primario, .08), rgba($color-acento, .05));
-	border-bottom: 1px solid rgba(255,255,255,.08);
+	border-bottom: 1px solid rgba(255, 255, 255, .08);
 }
 
 // Efectos de hover mejorados
-.btn, .card, .form-control, .form-select {
+.btn,
+.card,
+.form-control,
+.form-select {
 	transition: all 0.3s ease;
 }
 
@@ -705,6 +383,7 @@ table tbody td .btn {
 ::-webkit-scrollbar-thumb {
 	background: $color-gris-600;
 	border-radius: 4px;
+
 	&:hover {
 		background: $color-primario;
 	}
@@ -715,32 +394,33 @@ table tbody td .btn {
 // ========================================
 
 @media (max-width: 991.98px) {
+
 	// Navbar más compacta en móviles
 	#navbar1.navbar {
 		padding: 0.5rem 1rem;
 		min-height: 56px;
-		
+
 		.navbar-brand {
 			font-size: 0.85rem;
 		}
-		
+
 		.navbar-toggler {
 			padding: 0.375rem 0.5rem;
 			font-size: 1rem;
-			border: 1px solid rgba(255,255,255,.1);
+			border: 1px solid rgba(255, 255, 255, .1);
 		}
-		
+
 		.nav-link {
 			padding: 0.75rem 1rem;
 			min-height: 44px;
 			display: flex;
 			align-items: center;
 		}
-		
+
 		.dropdown-menu {
 			min-width: 200px;
 		}
-		
+
 		.dropdown-item {
 			padding: 0.75rem 1rem;
 			min-height: 44px;
@@ -748,7 +428,7 @@ table tbody td .btn {
 			align-items: center;
 		}
 	}
-	
+
 	// Botones más grandes y táctiles en móviles
 	.btn {
 		min-height: 44px;
@@ -758,118 +438,121 @@ table tbody td .btn {
 		align-items: center;
 		justify-content: center;
 	}
-	
+
 	.btn-sm {
 		min-height: 40px;
 		padding: 0.5rem 1rem;
 		font-size: 0.9rem;
 	}
-	
+
 	// Formularios más amigables en móviles
-	.form-control, .form-select {
+	.form-control,
+	.form-select {
 		min-height: 48px;
 		font-size: 16px; // Previene zoom en iOS
 		padding: 0.75rem 1rem;
 	}
-	
-	.form-floating > label {
+
+	.form-floating>label {
 		padding: 0.75rem 1rem;
 		font-size: 1rem;
 	}
-	
-	.form-floating > .form-control {
+
+	.form-floating>.form-control {
 		padding-top: 1.625rem;
 		padding-bottom: 0.625rem;
 		min-height: 3.5rem;
 	}
-	
+
 	// Tablas más responsivas
 	.table-responsive {
 		border-radius: 0.5rem;
 		overflow-x: auto;
 		-webkit-overflow-scrolling: touch;
-		
+
 		.table {
 			font-size: 0.9rem;
-			
-			th, td {
+
+			th,
+			td {
 				padding: 0.75rem 0.5rem;
 				white-space: nowrap;
 			}
 		}
 	}
-	
+
 	// Cards más compactas
 	.card {
 		margin-bottom: 1rem;
-		
+
 		.card-header {
 			padding: 0.75rem 1rem;
 			font-size: 1rem;
 		}
-		
+
 		.card-body {
 			padding: 1rem;
 		}
 	}
-	
+
 	// Modales más amigables en móviles
 	.modal-dialog {
 		margin: 0.5rem;
 		max-width: calc(100% - 1rem);
 	}
-	
+
 	.modal-content {
 		border-radius: 0.5rem;
 	}
-	
+
 	.modal-header {
 		padding: 1rem;
 	}
-	
+
 	.modal-body {
 		padding: 1rem;
 	}
-	
+
 	.modal-footer {
 		padding: 1rem;
 		flex-wrap: wrap;
 		gap: 0.5rem;
-		
+
 		.btn {
 			flex: 1;
 			min-width: 120px;
 		}
 	}
-	
+
 	// Alertas más compactas
 	.alert {
 		padding: 0.75rem 1rem;
 		font-size: 0.95rem;
 		margin-bottom: 1rem;
 	}
-	
+
 	// DataTables más responsivos
 	.dataTables_wrapper {
+
 		.dataTables_length,
 		.dataTables_filter {
 			margin-bottom: 1rem;
 		}
-		
+
 		.dataTables_filter input {
 			width: 100% !important;
 			max-width: 100%;
 			min-height: 44px;
 		}
-		
+
 		.dataTables_length select {
 			min-height: 44px;
 			padding: 0.5rem;
 		}
-		
+
 		.dataTables_paginate {
 			margin-top: 1rem;
-			
+
 			.paginate_button {
 				padding: 0.5rem 0.75rem;
 				min-height: 44px;
@@ -877,22 +560,22 @@ table tbody td .btn {
 			}
 		}
 	}
-	
+
 	// Contenedores más compactos
 	.container-fluid {
 		padding-left: 1rem;
 		padding-right: 1rem;
 	}
-	
+
 	// Mejor espaciado en móviles
 	.mb-3 {
 		margin-bottom: 1rem !important;
 	}
-	
+
 	.mt-3 {
 		margin-top: 1rem !important;
 	}
-	
+
 	.py-4 {
 		padding-top: 1rem !important;
 		padding-bottom: 1rem !important;
@@ -901,6 +584,7 @@ table tbody td .btn {
 
 // Estilos para móviles muy pequeños
 @media (max-width: 575.98px) {
+
 	// Botones aún más grandes
 	.btn {
 		min-height: 48px;
@@ -909,38 +593,40 @@ table tbody td .btn {
 		width: 100%;
 		margin-bottom: 0.5rem;
 	}
-	
+
 	.btn-sm {
 		min-height: 44px;
 		padding: 0.625rem 1.25rem;
 	}
-	
+
 	// Formularios más grandes
-	.form-control, .form-select {
+	.form-control,
+	.form-select {
 		min-height: 52px;
 		font-size: 16px;
 		padding: 0.875rem 1.125rem;
 	}
-	
+
 	// Tablas más compactas
 	.table {
 		font-size: 0.85rem;
-		
-		th, td {
+
+		th,
+		td {
 			padding: 0.5rem 0.375rem;
 		}
 	}
-	
+
 	// Cards más compactas
 	.card-header {
 		padding: 0.625rem 0.875rem;
 		font-size: 0.95rem;
 	}
-	
+
 	.card-body {
 		padding: 0.875rem;
 	}
-	
+
 	// Modales a pantalla completa en móviles muy pequeños
 	.modal-dialog {
 		margin: 0;
@@ -949,29 +635,29 @@ table tbody td .btn {
 		display: flex;
 		align-items: stretch;
 	}
-	
+
 	.modal-content {
 		border-radius: 0;
 		height: 100%;
 		display: flex;
 		flex-direction: column;
 	}
-	
+
 	.modal-body {
 		flex: 1;
 		overflow-y: auto;
 	}
-	
+
 	// Contenedores sin padding lateral
 	.container-fluid {
 		padding-left: 0.75rem;
 		padding-right: 0.75rem;
 	}
-	
+
 	// Navbar más compacta
 	#navbar1.navbar {
 		padding: 0.5rem 0.75rem;
-		
+
 		.navbar-brand {
 			font-size: 0.8rem;
 		}
@@ -980,6 +666,7 @@ table tbody td .btn {
 
 // Prevenir zoom en inputs en iOS
 @media screen and (max-width: 991.98px) {
+
 	input[type="text"],
 	input[type="email"],
 	input[type="password"],
@@ -992,5 +679,3 @@ table tbody td .btn {
 		font-size: 16px !important;
 	}
 }
-
-

@@ -6,37 +6,48 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-class AlumnoController {
+class AlumnoController
+{
     public $alumno;
 
-    public function __construct($conn) {
+    public function __construct($conn)
+    {
         $this->alumno = new Alumno($conn);
     }
 
     // --- MÉTODOS CRUD ---
-    public function index() {
+    public function index()
+    {
         echo json_encode($this->alumno->getAll());
     }
 
-    public function paginated() {
+    public function listarAlumnos()
+    {
+        echo json_encode($this->alumno->getAll());
+    }
+
+    public function paginated()
+    {
         try {
-            $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+            $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+            $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
             $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-            
+
             // Validar parámetros
-            if ($page < 1) $page = 1;
-            if ($limit < 1 || $limit > 100) $limit = 10;
-            
+            if ($page < 1)
+                $page = 1;
+            if ($limit < 1 || $limit > 100)
+                $limit = 10;
+
             $offset = ($page - 1) * $limit;
-            
+
             // Obtener total de registros
             $total = $this->alumno->countAll($search);
             $totalPages = ceil($total / $limit);
-            
+
             // Obtener alumnos paginados
             $alumnos = $this->alumno->getAllPaginated($offset, $limit, $search);
-            
+
             echo json_encode([
                 'success' => true,
                 'alumnos' => $alumnos,
@@ -45,7 +56,7 @@ class AlumnoController {
                 'currentPage' => $page,
                 'limit' => $limit
             ]);
-            
+
         } catch (Exception $e) {
             error_log("Error en paginated: " . $e->getMessage());
             echo json_encode([
@@ -56,14 +67,16 @@ class AlumnoController {
         }
     }
 
-    public function show() {
+    public function show()
+    {
         if (isset($_GET['id']))
             echo json_encode($this->alumno->getById($_GET['id']));
-        else 
+        else
             echo json_encode(["error" => "ID no proporcionado"]);
     }
-    
-    public function update(){
+
+    public function update()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_alumno'])) {
             $id = $_POST['id_alumno'];
             $data = [
@@ -86,7 +99,8 @@ class AlumnoController {
         }
     }
 
-    public function store() {
+    public function store()
+    {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = [
                 'matricula' => $_POST['matricula'],
@@ -108,7 +122,8 @@ class AlumnoController {
         }
     }
 
-    public function delete() {
+    public function delete()
+    {
         // Es mejor delegar la lógica de la consulta al modelo.
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             if ($this->alumno->delete($_POST['id'])) {
@@ -122,7 +137,8 @@ class AlumnoController {
     }
 
     // --- MÉTODOS DE PAGINACIÓN Y BÚSQUEDA ---
-    public function contarTotalCarreras($terminoBusqueda) {
+    public function contarTotalCarreras($terminoBusqueda)
+    {
         $sql = "SELECT COUNT(DISTINCT c.id_carrera) 
                 FROM carreras c
                 LEFT JOIN alumnos a ON a.carreras_id_carrera = c.id_carrera
@@ -131,10 +147,11 @@ class AlumnoController {
         $stmt = $this->alumno->conn->prepare($sql);
         $stmt->bindValue(':termino', '%' . $terminoBusqueda . '%');
         $stmt->execute();
-        return (int)$stmt->fetchColumn();
+        return (int) $stmt->fetchColumn();
     }
 
-    public function obtenerCarrerasPaginadas($terminoBusqueda, $offset, $limit) {
+    public function obtenerCarrerasPaginadas($terminoBusqueda, $offset, $limit)
+    {
         $sql = "SELECT DISTINCT c.* FROM carreras c
                 LEFT JOIN alumnos a ON a.carreras_id_carrera = c.id_carrera
                 LEFT JOIN grupos g ON g.carreras_id_carrera = c.id_carrera
@@ -147,8 +164,9 @@ class AlumnoController {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    public function contarTotalGruposPorCarrera($idCarrera, $terminoBusqueda) {
+
+    public function contarTotalGruposPorCarrera($idCarrera, $terminoBusqueda)
+    {
         $sql = "SELECT COUNT(DISTINCT g.id_grupo) FROM grupos g
                 LEFT JOIN alumnos a ON a.grupos_id_grupo = g.id_grupo
                 WHERE g.carreras_id_carrera = :idCarrera AND (LOWER(g.nombre) LIKE LOWER(:termino) OR LOWER(a.nombre) LIKE LOWER(:termino) OR LOWER(a.apellido_paterno) LIKE LOWER(:termino) OR LOWER(a.apellido_materno) LIKE LOWER(:termino) OR LOWER(a.matricula) LIKE LOWER(:termino))";
@@ -156,10 +174,11 @@ class AlumnoController {
         $stmt->bindParam(':idCarrera', $idCarrera, PDO::PARAM_INT);
         $stmt->bindValue(':termino', '%' . $terminoBusqueda . '%');
         $stmt->execute();
-        return (int)$stmt->fetchColumn();
+        return (int) $stmt->fetchColumn();
     }
 
-    public function contarTotalAlumnosPorGrupo($id_grupo, $terminoBusqueda = '') {
+    public function contarTotalAlumnosPorGrupo($id_grupo, $terminoBusqueda = '')
+    {
         $sql = "SELECT COUNT(id_alumno) FROM alumnos WHERE grupos_id_grupo = :id_grupo";
         if (!empty($terminoBusqueda)) {
             $sql .= " AND (LOWER(nombre) LIKE LOWER(:termino) OR LOWER(apellido_paterno) LIKE LOWER(:termino) OR LOWER(apellido_materno) LIKE LOWER(:termino) OR LOWER(matricula) LIKE LOWER(:termino))";
@@ -170,10 +189,11 @@ class AlumnoController {
             $stmt->bindValue(':termino', '%' . $terminoBusqueda . '%');
         }
         $stmt->execute();
-        return (int)$stmt->fetchColumn();
+        return (int) $stmt->fetchColumn();
     }
-    
-    public function obtenerAlumnosPaginadosPorGrupo($id_grupo, $offset, $limit, $terminoBusqueda = '') {
+
+    public function obtenerAlumnosPaginadosPorGrupo($id_grupo, $offset, $limit, $terminoBusqueda = '')
+    {
         $sql = "SELECT * FROM alumnos WHERE grupos_id_grupo = :id_grupo";
         if (!empty($terminoBusqueda)) {
             $sql .= " AND (LOWER(nombre) LIKE LOWER(:termino) OR LOWER(apellido_paterno) LIKE LOWER(:termino) OR LOWER(apellido_materno) LIKE LOWER(:termino) OR LOWER(matricula) LIKE LOWER(:termino))";
@@ -189,8 +209,9 @@ class AlumnoController {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    public function obtenerGruposPaginadosPorCarrera($idCarrera, $terminoBusqueda, $offset, $limit) {
+
+    public function obtenerGruposPaginadosPorCarrera($idCarrera, $terminoBusqueda, $offset, $limit)
+    {
         $sql = "SELECT DISTINCT g.id_grupo, g.nombre FROM grupos g
                 LEFT JOIN alumnos a ON a.grupos_id_grupo = g.id_grupo
                 WHERE g.carreras_id_carrera = :idCarrera AND (LOWER(g.nombre) LIKE LOWER(:termino) OR LOWER(a.nombre) LIKE LOWER(:termino) OR LOWER(a.apellido_paterno) LIKE LOWER(:termino) OR LOWER(a.apellido_materno) LIKE LOWER(:termino) OR LOWER(a.matricula) LIKE LOWER(:termino))
@@ -203,8 +224,9 @@ class AlumnoController {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
-    public function contarTotalGruposPorTutor($idUsuario, $terminoBusqueda) {
+
+    public function contarTotalGruposPorTutor($idUsuario, $terminoBusqueda)
+    {
         $sql = "SELECT COUNT(DISTINCT g.id_grupo) FROM grupos g
                 LEFT JOIN alumnos a ON a.grupos_id_grupo = g.id_grupo
                 WHERE g.usuarios_id_usuario_tutor = :idUsuario AND (LOWER(g.nombre) LIKE LOWER(:termino) OR LOWER(a.nombre) LIKE LOWER(:termino) OR LOWER(a.apellido_paterno) LIKE LOWER(:termino) OR LOWER(a.apellido_materno) LIKE LOWER(:termino) OR LOWER(a.matricula) LIKE LOWER(:termino))";
@@ -212,10 +234,11 @@ class AlumnoController {
         $stmt->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
         $stmt->bindValue(':termino', '%' . $terminoBusqueda . '%');
         $stmt->execute();
-        return (int)$stmt->fetchColumn();
+        return (int) $stmt->fetchColumn();
     }
-    
-    public function obtenerGruposPaginadosPorTutor($idUsuario, $terminoBusqueda, $offset, $limit) {
+
+    public function obtenerGruposPaginadosPorTutor($idUsuario, $terminoBusqueda, $offset, $limit)
+    {
         $sql = "SELECT DISTINCT g.id_grupo, g.nombre FROM grupos g
                 LEFT JOIN alumnos a ON a.grupos_id_grupo = g.id_grupo
                 WHERE g.usuarios_id_usuario_tutor = :idUsuario AND (LOWER(g.nombre) LIKE LOWER(:termino) OR LOWER(a.nombre) LIKE LOWER(:termino) OR LOWER(a.apellido_paterno) LIKE LOWER(:termino) OR LOWER(a.apellido_materno) LIKE LOWER(:termino) OR LOWER(a.matricula) LIKE LOWER(:termino))
@@ -229,8 +252,9 @@ class AlumnoController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function renderizarListaAlumnosPaginados($id_grupo, $pagina) {
-        $alumnosPorPagina = 5; 
+    public function renderizarListaAlumnosPaginados($id_grupo, $pagina)
+    {
+        $alumnosPorPagina = 5;
         $offset = ($pagina - 1) * $alumnosPorPagina;
         $alumnos = $this->obtenerAlumnosPaginadosPorGrupo($id_grupo, $offset, $alumnosPorPagina);
 
@@ -247,8 +271,12 @@ class AlumnoController {
                         <span><?= htmlspecialchars($a['nombre'] . ' ' . $a['apellido_paterno'] . ' ' . ($a['apellido_materno'] ?? '')) ?></span>
                     </div>
                     <div class="btn-group" role="group" aria-label="Acciones de alumno">
-                        <a href="crear_seguimiento.php?id_alumno=<?= htmlspecialchars($a['id_alumno']) ?>" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Crear nuevo seguimiento"><i class="bi bi-journal-plus"></i></a>
-                        <a href="ver_seguimientos.php?id_alumno=<?= htmlspecialchars($a['id_alumno']) ?>" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver seguimientos del alumno"><i class="bi bi-card-list"></i></a>
+                        <a href="crear_seguimiento.php?id_alumno=<?= htmlspecialchars($a['id_alumno']) ?>"
+                            class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Crear nuevo seguimiento"><i
+                                class="bi bi-journal-plus"></i></a>
+                        <a href="ver_seguimientos.php?id_alumno=<?= htmlspecialchars($a['id_alumno']) ?>"
+                            class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver seguimientos del alumno"><i
+                                class="bi bi-card-list"></i></a>
                     </div>
                 </li>
                 <?php
@@ -262,15 +290,16 @@ class AlumnoController {
      * [REFACTORIZADO] Método que renderiza la lista de alumnos para un conjunto de grupos.
      * Ahora obtiene todos los datos necesarios en pocas consultas antes de empezar a renderizar.
      */
-    public function listarAlumnosPorIdsDeGrupos($grupos_ids, $conn, $modo = false, string $parentUid = "root", $terminoBusqueda = ''): bool|string {
+    public function listarAlumnosPorIdsDeGrupos($grupos_ids, $conn, $modo = false, string $parentUid = "root", $terminoBusqueda = ''): bool|string
+    {
         if (empty($grupos_ids)) {
             return '';
         }
-    
+
         ob_start();
         $raw_group_ids = array_column($grupos_ids, 'id_grupo');
         $alumnosPorPagina = 5;
-    
+
         $placeholders = implode(',', array_fill(0, count($raw_group_ids), '?'));
         $sql_info = "SELECT g.id_grupo, g.nombre AS nombre_grupo, c.nombre AS nombre_carrera
                      FROM grupos g
@@ -282,9 +311,9 @@ class AlumnoController {
         while ($row = $stmt_info->fetch(PDO::FETCH_ASSOC)) {
             $info_grupos[$row['id_grupo']] = $row;
         }
-    
+
         $alumnos_todos = $this->alumno->listByGroupIds($raw_group_ids, $terminoBusqueda);
-        
+
         // Agrupamos los alumnos por su ID de grupo en un array de PHP.
         $alumnos_por_grupo = [];
         foreach ($alumnos_todos as $alumno) {
@@ -294,120 +323,140 @@ class AlumnoController {
         // (Opcional, solo para modo acordeón) PASO 2.B: Contar alumnos por grupo en UNA SOLA CONSULTA.
         $totalAlumnosPorGrupo = [];
         if ($modo === false) {
-             $sql_counts = "SELECT grupos_id_grupo, COUNT(id_alumno) as total 
+            $sql_counts = "SELECT grupos_id_grupo, COUNT(id_alumno) as total 
                             FROM alumnos 
                             WHERE grupos_id_grupo IN ($placeholders)
                             GROUP BY grupos_id_grupo";
             $stmt_counts = $conn->prepare($sql_counts);
             $stmt_counts->execute($raw_group_ids);
-            while($row = $stmt_counts->fetch(PDO::FETCH_ASSOC)){
+            while ($row = $stmt_counts->fetch(PDO::FETCH_ASSOC)) {
                 $totalAlumnosPorGrupo[$row['grupos_id_grupo']] = $row['total'];
             }
         }
-        
+
         // PASO 3: Iterar y renderizar el HTML SIN hacer más consultas a la base de datos.
-        if ($modo === true):?>
+        if ($modo === true): ?>
             <ul class="list-group shadow-sm rounded-3 mb-3">
-            <?php foreach ($raw_group_ids as $id_grupo):
-                $info = $info_grupos[$id_grupo] ?? null;
-                if (!$info) continue;
+                <?php foreach ($raw_group_ids as $id_grupo):
+                    $info = $info_grupos[$id_grupo] ?? null;
+                    if (!$info)
+                        continue;
 
-                $grupo_nombre = $info['nombre_grupo'];
-                $carrera_nombre = $info['nombre_carrera'];
-                $alumnos = array_slice($alumnos_por_grupo[$id_grupo] ?? [], 0, $alumnosPorPagina);
+                    $grupo_nombre = $info['nombre_grupo'];
+                    $carrera_nombre = $info['nombre_carrera'];
+                    $alumnos = array_slice($alumnos_por_grupo[$id_grupo] ?? [], 0, $alumnosPorPagina);
 
-                if (!empty($alumnos)):
-                    foreach ($alumnos as $a): ?>
-                    <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center py-3">
-                        <div>
-                            <strong class="d-block text-dark fs-5"><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></strong>
-                            <small class="text-muted">
-                                <i class="bi bi-mortarboard" title="Carrera"></i> <?= htmlspecialchars($carrera_nombre) ?>
-                                <span class="mx-2 text-secondary">|</span>
-                                <i class="bi bi-people" title="Grupo"></i> <?= htmlspecialchars($grupo_nombre) ?>
-                            </small>
-                        </div>
-                        <div class="btn-group mt-2 mt-md-0" role="group">
-                            <a href="crear_seguimiento.php?id_alumno=<?= $a['id_alumno'] ?>" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Crear seguimiento"><i class="bi bi-journal-plus"></i></a>
-                            <a href="ver_seguimientos.php?id_alumno=<?= $a['id_alumno'] ?>" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver seguimientos"><i class="bi bi-card-list"></i></a>
-                        </div>
-                    </li>
-                    <?php endforeach;
-                endif;
-            endforeach; ?>
+                    if (!empty($alumnos)):
+                        foreach ($alumnos as $a): ?>
+                            <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center py-3">
+                                <div>
+                                    <strong
+                                        class="d-block text-dark fs-5"><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></strong>
+                                    <small class="text-muted">
+                                        <i class="bi bi-mortarboard" title="Carrera"></i> <?= htmlspecialchars($carrera_nombre) ?>
+                                        <span class="mx-2 text-secondary">|</span>
+                                        <i class="bi bi-people" title="Grupo"></i> <?= htmlspecialchars($grupo_nombre) ?>
+                                    </small>
+                                </div>
+                                <div class="btn-group mt-2 mt-md-0" role="group">
+                                    <a href="crear_seguimiento.php?id_alumno=<?= $a['id_alumno'] ?>" class="btn btn-sm btn-outline-success"
+                                        data-bs-toggle="tooltip" title="Crear seguimiento"><i class="bi bi-journal-plus"></i></a>
+                                    <a href="ver_seguimientos.php?id_alumno=<?= $a['id_alumno'] ?>" class="btn btn-sm btn-outline-primary"
+                                        data-bs-toggle="tooltip" title="Ver seguimientos"><i class="bi bi-card-list"></i></a>
+                                </div>
+                            </li>
+                        <?php endforeach;
+                    endif;
+                endforeach; ?>
             </ul>
         <?php else: ?>
             <div class="accordion" id="accordion_<?= htmlspecialchars($parentUid) ?>">
-            <?php foreach ($raw_group_ids as $id_grupo):
-                $info = $info_grupos[$id_grupo] ?? null;
-                if (!$info) continue;
-                
-                $grupo_nombre = $info['nombre_grupo'];
-                $alumnos = array_slice($alumnos_por_grupo[$id_grupo] ?? [], 0, $alumnosPorPagina);
-                $totalAlumnos = $totalAlumnosPorGrupo[$id_grupo] ?? 0;
-                $totalPagesAlumnos = ceil($totalAlumnos / $alumnosPorPagina);
-                $grupoUid = "grupo_" . $id_grupo . "_" . uniqid();
-            ?>
-                <div class="accordion-item shadow-sm rounded-3 mb-2 border-0">
-                    <h2 class="accordion-header" id="heading_<?= htmlspecialchars($grupoUid) ?>">
-                        <button class="accordion-button collapsed bg-light fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_<?= htmlspecialchars($grupoUid) ?>">
-                            <i class="bi bi-people-fill me-2 text-primary"></i><span class="text-muted"> Grupo: <?= htmlspecialchars($grupo_nombre) ?></span>
-                            <span class="badge bg-primary ms-2"><?= $totalAlumnos ?> alumnos</span>
-                        </button>
-                    </h2>
-                    <div id="collapse_<?= htmlspecialchars($grupoUid) ?>" class="accordion-collapse collapse" data-bs-parent="#accordion_<?= htmlspecialchars($parentUid) ?>">
-                        <div class="accordion-body">
-                            <div class="d-flex mb-3 gap-2">
-                                <a href="gestionar_listas.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>" class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" title="Gestionar Listas"><i class="bi bi-pencil-square"></i></a>
-                                <a href="asistencia.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>&fecha=<?= urlencode(date('Y-m-d')) ?>" class="btn btn-outline-success btn-sm" data-bs-toggle="tooltip" title="Tomar Asistencia"><i class="bi bi-list-check"></i></a>
-                            </div>
-                            <div id="lista-alumnos-<?= htmlspecialchars($id_grupo) ?>">
-                                <?php if (empty($alumnos)): ?>
-                                    <div class="alert alert-secondary py-2 mb-0"><i class="bi bi-info-circle me-1"></i> No hay alumnos en este grupo.</div>
-                                <?php else: ?>
-                                    <ul class="list-group list-group-flush">
-                                        <?php foreach ($alumnos as $a): ?>
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="bi bi-person-circle text-muted fs-5 me-2"></i>
-                                                <span><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></span>
-                                            </div>
-                                            <div class="btn-group" role="group">
-                                                <a href="crear_seguimiento.php?id_alumno=<?= $a['id_alumno'] ?>" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Crear seguimiento"><i class="bi bi-journal-plus"></i></a>
-                                                <a href="ver_seguimientos.php?id_alumno=<?= $a['id_alumno'] ?>" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Ver seguimientos"><i class="bi bi-card-list"></i></a>
-                                            </div>
-                                        </li>
-                                        <?php endforeach; ?>
-                                    </ul>
+                <?php foreach ($raw_group_ids as $id_grupo):
+                    $info = $info_grupos[$id_grupo] ?? null;
+                    if (!$info)
+                        continue;
+
+                    $grupo_nombre = $info['nombre_grupo'];
+                    $alumnos = array_slice($alumnos_por_grupo[$id_grupo] ?? [], 0, $alumnosPorPagina);
+                    $totalAlumnos = $totalAlumnosPorGrupo[$id_grupo] ?? 0;
+                    $totalPagesAlumnos = ceil($totalAlumnos / $alumnosPorPagina);
+                    $grupoUid = "grupo_" . $id_grupo . "_" . uniqid();
+                    ?>
+                    <div class="accordion-item shadow-sm rounded-3 mb-2 border-0">
+                        <h2 class="accordion-header" id="heading_<?= htmlspecialchars($grupoUid) ?>">
+                            <button class="accordion-button collapsed bg-light fw-bold" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapse_<?= htmlspecialchars($grupoUid) ?>">
+                                <i class="bi bi-people-fill me-2 text-primary"></i><span class="text-muted"> Grupo:
+                                    <?= htmlspecialchars($grupo_nombre) ?></span>
+                                <span class="badge bg-primary ms-2"><?= $totalAlumnos ?> alumnos</span>
+                            </button>
+                        </h2>
+                        <div id="collapse_<?= htmlspecialchars($grupoUid) ?>" class="accordion-collapse collapse"
+                            data-bs-parent="#accordion_<?= htmlspecialchars($parentUid) ?>">
+                            <div class="accordion-body">
+                                <div class="d-flex mb-3 gap-2">
+                                    <a href="gestionar_listas.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
+                                        class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" title="Gestionar Listas"><i
+                                            class="bi bi-pencil-square"></i></a>
+                                    <a href="asistencia.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>&fecha=<?= urlencode(date('Y-m-d')) ?>"
+                                        class="btn btn-outline-success btn-sm" data-bs-toggle="tooltip" title="Tomar Asistencia"><i
+                                            class="bi bi-list-check"></i></a>
+                                </div>
+                                <div id="lista-alumnos-<?= htmlspecialchars($id_grupo) ?>">
+                                    <?php if (empty($alumnos)): ?>
+                                        <div class="alert alert-secondary py-2 mb-0"><i class="bi bi-info-circle me-1"></i> No hay alumnos
+                                            en este grupo.</div>
+                                    <?php else: ?>
+                                        <ul class="list-group list-group-flush">
+                                            <?php foreach ($alumnos as $a): ?>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="bi bi-person-circle text-muted fs-5 me-2"></i>
+                                                        <span><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></span>
+                                                    </div>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="crear_seguimiento.php?id_alumno=<?= $a['id_alumno'] ?>"
+                                                            class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip"
+                                                            title="Crear seguimiento"><i class="bi bi-journal-plus"></i></a>
+                                                        <a href="ver_seguimientos.php?id_alumno=<?= $a['id_alumno'] ?>"
+                                                            class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
+                                                            title="Ver seguimientos"><i class="bi bi-card-list"></i></a>
+                                                    </div>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($totalPagesAlumnos > 1): ?>
+                                    <nav aria-label="Paginación de alumnos" class="mt-3">
+                                        <ul class="pagination pagination-sm justify-content-end" data-id-grupo="<?= $id_grupo ?>"
+                                            data-total-pages="<?= $totalPagesAlumnos ?>" data-current-page="1">
+                                            <li class="page-item disabled" data-role="prev"><a class="page-link" href="#">&laquo;</a></li>
+                                            <li class="page-item active" data-role="page-indicator"><span class="page-link">1 de
+                                                    <?= $totalPagesAlumnos ?></span></li>
+                                            <li class="page-item" data-role="next"><a class="page-link" href="#">&raquo;</a></li>
+                                        </ul>
+                                    </nav>
                                 <?php endif; ?>
                             </div>
-                            <?php if ($totalPagesAlumnos > 1): ?>
-                            <nav aria-label="Paginación de alumnos" class="mt-3">
-                                <ul class="pagination pagination-sm justify-content-end" data-id-grupo="<?= $id_grupo ?>" data-total-pages="<?= $totalPagesAlumnos ?>" data-current-page="1">
-                                    <li class="page-item disabled" data-role="prev"><a class="page-link" href="#">&laquo;</a></li>
-                                    <li class="page-item active" data-role="page-indicator"><span class="page-link">1 de <?= $totalPagesAlumnos ?></span></li>
-                                    <li class="page-item" data-role="next"><a class="page-link" href="#">&raquo;</a></li>
-                                </ul>
-                            </nav>
-                            <?php endif; ?>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
             </div>
         <?php endif;
         return ob_get_clean();
     }
-    
+
     // --- Resto de la clase sin cambios ---
-    
-    public function renderizarAcordeonCarrera($dataCarrera, $conn, $auth, $modo = false,$terminoBusqueda = '') {
+
+    public function renderizarAcordeonCarrera($dataCarrera, $conn, $auth, $modo = false, $terminoBusqueda = '')
+    {
         ob_start();
 
         $carreraid = $dataCarrera["id_carrera"];
         $nombre_carrera = $dataCarrera["nombre"];
         $carreraUid = "carrera_" . $carreraid;
-        
+
         // Esta consulta ahora solo se usa para obtener la lista de IDs, es eficiente.
         $grupos_ids = $auth->usuario->getGruposIdByCarreraIdFiltered($carreraid, $terminoBusqueda);
 
@@ -421,7 +470,8 @@ class AlumnoController {
             <div class="accordion mb-3" id="<?= $carreraUid ?>">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading_<?= $carreraUid ?>">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_<?= $carreraUid ?>">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapse_<?= $carreraUid ?>">
                             <i class="bi bi-mortarboard-fill me-2"></i> Carrera: <?= htmlspecialchars($nombre_carrera) ?>
                         </button>
                     </h2>
@@ -443,7 +493,8 @@ class AlumnoController {
         return ob_get_clean();
     }
 
-    public function getNombreGrupo($id_grupo) {
+    public function getNombreGrupo($id_grupo)
+    {
         $sql = "SELECT nombre FROM grupos WHERE id_grupo = :id_grupo";
         $stmt = $this->alumno->conn->prepare($sql);
         $stmt->bindParam(':id_grupo', $id_grupo, PDO::PARAM_INT);
@@ -452,7 +503,8 @@ class AlumnoController {
         return $result ? $result['nombre'] : null;
     }
 
-    public function getAlumnosByGrupo($id_grupo) {
+    public function getAlumnosByGrupo($id_grupo)
+    {
         $query = "SELECT a.id_alumno, a.matricula, CONCAT(a.nombre, ' ', a.apellido_paterno, ' ', a.apellido_materno) as nombre_completo, g.nombre as nombre_grupo
                   FROM alumnos a
                   JOIN grupos g ON a.grupos_id_grupo = g.id_grupo
@@ -464,7 +516,8 @@ class AlumnoController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerAlumnoPorId($idAlumno) {
+    public function obtenerAlumnoPorId($idAlumno)
+    {
         $sql = "SELECT * FROM alumnos WHERE id_alumno = :id_alumno";
         $stmt = $this->alumno->conn->prepare($sql);
         $stmt->bindParam(':id_alumno', $idAlumno, PDO::PARAM_INT);

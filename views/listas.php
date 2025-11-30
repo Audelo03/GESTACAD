@@ -79,7 +79,7 @@ $nombre = $_SESSION['usuario_nombre'] . ' ' . $_SESSION['usuario_apellido_patern
         contenedorAlumnos.innerHTML = `<div class="d-flex justify-content-center p-5"><div class="spinner-border" role="status"><span class="visually-hidden">Cargando...</span></div></div>`;
         try {
             console.log(modo_lista);
-            const response = await fetch(`/GORA/alumnos-paginados?page=${page}&termino=${encodeURIComponent(termino)}&modo=${modo_lista}`);
+            const response = await fetch(`/GESTACAD/alumnos-paginados?page=${page}&termino=${encodeURIComponent(termino)}&modo=${modo_lista}`);
             if (!response.ok) throw new Error('Error en la respuesta del servidor.');
             const data = await response.json();
             contenedorAlumnos.innerHTML = data.html;

@@ -225,7 +225,7 @@ window.addEventListener('load', function() {
 
         const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
         try {
-            const response = await fetch(`/GORA/controllers/modalidadesController.php?${params}`);
+            const response = await fetch(`/GESTACAD/controllers/modalidadesController.php?${params}`);
             
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
             
@@ -318,7 +318,7 @@ window.addEventListener('load', function() {
                         const formData = new FormData();
                         formData.append('id', id);
                         
-                        const response = await fetch('/GORA/controllers/modalidadesController.php?action=delete', {
+                        const response = await fetch('/GESTACAD/controllers/modalidadesController.php?action=delete', {
                             method: 'POST',
                             body: formData
                         });
@@ -344,7 +344,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnGuardar')?.addEventListener('click', async () => {
         const idField = document.getElementById('id_modalidad');
         const isUpdate = idField && idField.value;
-        const url = isUpdate ? '/GORA/controllers/modalidadesController.php?action=update' : '/GORA/controllers/modalidadesController.php?action=store';
+        const url = isUpdate ? '/GESTACAD/controllers/modalidadesController.php?action=update' : '/GESTACAD/controllers/modalidadesController.php?action=store';
         
         const formData = new FormData(form);
         

@@ -220,7 +220,7 @@ window.addEventListener('load', function() {
 
         const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
         try {
-            const response = await fetch(`/GORA/controllers/tipoSeguimientoController.php?${params}`);
+            const response = await fetch(`/GESTACAD/controllers/tipoSeguimientoController.php?${params}`);
             
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
 
@@ -319,7 +319,7 @@ window.addEventListener('load', function() {
                         const formData = new FormData();
                         formData.append('id', id);
 
-                        const response = await fetch('/GORA/controllers/tipoSeguimientoController.php?action=delete', {
+                        const response = await fetch('/GESTACAD/controllers/tipoSeguimientoController.php?action=delete', {
                             method: 'POST',
                             body: formData
                         });
@@ -343,7 +343,7 @@ window.addEventListener('load', function() {
     document.getElementById('btnGuardar')?.addEventListener('click', async () => {
         const idField = document.getElementById('id_tipo_seguimiento');
         const isUpdate = idField && idField.value;
-        const url = isUpdate ? '/GORA/controllers/tipoSeguimientoController.php?action=update' : '/GORA/controllers/tipoSeguimientoController.php?action=store';
+        const url = isUpdate ? '/GESTACAD/controllers/tipoSeguimientoController.php?action=update' : '/GESTACAD/controllers/tipoSeguimientoController.php?action=store';
         
         const formData = new FormData(form);
 
