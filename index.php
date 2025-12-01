@@ -87,6 +87,8 @@ $viewMap = [
     'guardar_asistencia' => 'views/guardar_asistencia.php',
     'ver-alumnos-grupo' => 'views/ver_alumnos_grupo.php',
     'ver_alumnos_grupo' => 'views/ver_alumnos_grupo.php',
+    'marcar-asistencia' => 'views/marcar_asistencia.php',
+    'marcar_asistencia' => 'views/marcar_asistencia.php',
 
     // Estructura Académica
     'divisiones' => 'views/CRUDS/divisiones.php',
