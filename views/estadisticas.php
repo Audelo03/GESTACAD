@@ -19,8 +19,8 @@ $datos = $estadisticasController->obtenerEstadisticas();
 <div class="container-fluid stats-dashboard" style="max-width: 100%; overflow-x: hidden;">
 
     <!-- Métricas Principales -->
-    <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
+    <div class="row mb-3 mb-md-4">
+        <div class="col-12 col-sm-6 col-lg-3 mb-3 mb-sm-3">
             <div class="card metric-card h-100">
                 <div class="card-body d-flex align-items-center">
                     <div class="flex-grow-1">
@@ -31,13 +31,13 @@ $datos = $estadisticasController->obtenerEstadisticas();
                             <?php echo $datos['estadisticas_generales']['alumnos_activos']; ?> activos
                         </div>
                     </div>
-                    <div class="ms-3">
+                    <div class="ms-2 ms-md-3 d-none d-sm-block">
                         <i class="bi bi-people-fill metric-icon"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-12 col-sm-6 col-lg-3 mb-3 mb-sm-3">
             <div class="card metric-card h-100">
                 <div class="card-body d-flex align-items-center">
                     <div class="flex-grow-1">
@@ -48,13 +48,13 @@ $datos = $estadisticasController->obtenerEstadisticas();
                             <?php echo $datos['estadisticas_generales']['total_grupos']; ?> grupos
                         </div>
                     </div>
-                    <div class="ms-3">
+                    <div class="ms-2 ms-md-3 d-none d-sm-block">
                         <i class="bi bi-mortarboard-fill metric-icon"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-3">
+        <div class="col-12 col-sm-6 col-lg-3 mb-3 mb-sm-3">
             <div class="card metric-card h-100">
                 <div class="card-body d-flex align-items-center">
                     <div class="flex-grow-1">
@@ -67,82 +67,214 @@ $datos = $estadisticasController->obtenerEstadisticas();
                             abiertos
                         </div>
                     </div>
-                    <div class="ms-3">
+                    <div class="ms-2 ms-md-3 d-none d-sm-block">
                         <i class="bi bi-person-check-fill metric-icon"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-3">
-            <div class="card metric-card h-100">
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <div class="metric-value"><?php echo $datos['tasa_asistencia']; ?>%</div>
-                        <div class="metric-label">Tasa de Asistencia</div>
-                        <div class="metric-sublabel">
-                            <i class="bi bi-calendar-event me-1"></i>
-                            <?php echo $datos['estadisticas_generales']['asistencias_hoy']; ?> asistencias hoy
-                        </div>
-                    </div>
-                    <div class="ms-3">
-                        <i class="bi bi-calendar-check-fill metric-icon"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Actividad Reciente y Tasa de Asistencia -->
-    <div class="row mb-4">
-        <div class="col-lg-4 col-md-6 mb-3">
+    <!-- Actividad Reciente -->
+    <div class="row mb-3 mb-md-4">
+        <div class="col-12 col-md-6 col-lg-4 mb-3">
             <div class="card metric-card h-100">
                 <div class="card-header chart-header">
                     Actividad Reciente
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
-                        <div class="col-6">
-                            <div class="metric-value" style="font-size: 1.8rem;">
-                                <?php echo $datos['estadisticas_generales']['asistencias_semana']; ?></div>
-                            <small class="metric-sublabel">Asistencias semana</small>
-                        </div>
-                        <div class="col-6">
-                            <div class="metric-value" style="font-size: 1.8rem;">
+                        <div class="col-12">
+                            <div class="metric-value metric-value-activity">
                                 <?php echo $datos['estadisticas_generales']['seguimientos_mes']; ?></div>
-                            <small class="metric-sublabel">Seguimientos mes</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-8 col-md-6 mb-3">
-            <div class="card metric-card h-100">
-                <div class="card-header chart-header">
-                    Progreso de Asistencia General
-                </div>
-                <div class="card-body d-flex align-items-center">
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="metric-label">Tasa actual</span>
-                            <span class="metric-value"
-                                style="font-size: 2rem;"><?php echo $datos['tasa_asistencia']; ?>%</span>
-                        </div>
-                        <div class="enhanced-progress">
-                            <div class="progress-bar" style="width: <?php echo $datos['tasa_asistencia']; ?>%;"
-                                aria-valuenow="<?php echo $datos['tasa_asistencia']; ?>" aria-valuemin="0"
-                                aria-valuemax="100">
-                                <?php echo $datos['tasa_asistencia']; ?>%
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <small class="metric-sublabel">0%</small>
-                            <small class="metric-sublabel">100%</small>
+                            <small class="metric-sublabel">Seguimientos este mes</small>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 3 && !empty($datos['resumen_ejecutivo_tutor'])): ?>
+    <!-- SECCIÓN ESPECÍFICA PARA TUTORES -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="mb-3"><i class="bi bi-person-badge me-2"></i>Panel del Tutor</h3>
+        </div>
+    </div>
+
+    <!-- Métricas del Tutor -->
+    <div class="row mb-4">
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+            <div class="card metric-card h-100">
+                <div class="card-body text-center">
+                    <div class="metric-value" style="font-size: 1.5rem;">
+                        <?php echo $datos['resumen_ejecutivo_tutor']['total_grupos']; ?>
+                    </div>
+                    <div class="metric-label" style="font-size: 0.75rem;">Grupos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+            <div class="card metric-card h-100">
+                <div class="card-body text-center">
+                    <div class="metric-value" style="font-size: 1.5rem;">
+                        <?php echo $datos['resumen_ejecutivo_tutor']['total_alumnos']; ?>
+                    </div>
+                    <div class="metric-label" style="font-size: 0.75rem;">Alumnos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+            <div class="card metric-card h-100">
+                <div class="card-body text-center">
+                    <div class="metric-value" style="font-size: 1.5rem;">
+                        <?php echo $datos['resumen_ejecutivo_tutor']['tutorias_grupales_mes']; ?>
+                    </div>
+                    <div class="metric-label" style="font-size: 0.75rem;">Tutorías Grupales (mes)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+            <div class="card metric-card h-100">
+                <div class="card-body text-center">
+                    <div class="metric-value" style="font-size: 1.5rem;">
+                        <?php echo $datos['resumen_ejecutivo_tutor']['tutorias_individuales_mes']; ?>
+                    </div>
+                    <div class="metric-label" style="font-size: 0.75rem;">Tutorías Individuales (mes)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+            <div class="card metric-card h-100">
+                <div class="card-body text-center">
+                    <div class="metric-value" style="font-size: 1.5rem; color: #ef4444;">
+                        <?php echo $datos['resumen_ejecutivo_tutor']['seguimientos_abiertos']; ?>
+                    </div>
+                    <div class="metric-label" style="font-size: 0.75rem;">Seguimientos Abiertos</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3">
+            <div class="card metric-card h-100">
+                <div class="card-body text-center">
+                    <div class="metric-value" style="font-size: 1.5rem; color: #f59e0b;">
+                        <?php echo $datos['resumen_ejecutivo_tutor']['alumnos_riesgo']; ?>
+                    </div>
+                    <div class="metric-label" style="font-size: 0.75rem;">Alumnos en Riesgo</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Tablas de información para tutores -->
+    <?php if (!empty($datos['alumnos_seguimientos_abiertos'])): ?>
+    <div class="row mb-4">
+        <div class="col-12 col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Alumnos con Seguimientos Abiertos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>Grupo</th>
+                                    <th>Seguimientos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($datos['alumnos_seguimientos_abiertos'] as $alumno): ?>
+                                <tr>
+                                    <td data-label="Alumno"><?php echo htmlspecialchars($alumno['nombre_completo']); ?></td>
+                                    <td data-label="Grupo"><?php echo htmlspecialchars($alumno['grupo']); ?></td>
+                                    <td data-label="Seguimientos"><span class="badge bg-warning"><?php echo $alumno['seguimientos_abiertos']; ?></span></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <?php if (!empty($datos['alumnos_riesgo_desercion'])): ?>
+        <div class="col-12 col-lg-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-shield-exclamation me-2"></i>Alumnos con Riesgo de Deserción</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>Grupo</th>
+                                    <th>Nivel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($datos['alumnos_riesgo_desercion'] as $alumno): 
+                                    $badgeClass = $alumno['nivel_riesgo'] == 'ALTO' ? 'bg-danger' : ($alumno['nivel_riesgo'] == 'MEDIO' ? 'bg-warning' : 'bg-info');
+                                ?>
+                                <tr>
+                                    <td data-label="Alumno"><?php echo htmlspecialchars($alumno['nombre_completo']); ?></td>
+                                    <td data-label="Grupo"><?php echo htmlspecialchars($alumno['grupo']); ?></td>
+                                    <td data-label="Nivel"><span class="badge <?php echo $badgeClass; ?>"><?php echo htmlspecialchars($alumno['nivel_riesgo']); ?></span></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!empty($datos['canalizaciones_pendientes'])): ?>
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-send me-2"></i>Canalizaciones Pendientes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Alumno</th>
+                                    <th>Grupo</th>
+                                    <th>Área</th>
+                                    <th>Observación</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($datos['canalizaciones_pendientes'] as $canalizacion): ?>
+                                <tr>
+                                    <td data-label="Alumno"><?php echo htmlspecialchars($canalizacion['nombre_alumno']); ?></td>
+                                    <td data-label="Grupo"><?php echo htmlspecialchars($canalizacion['grupo']); ?></td>
+                                    <td data-label="Área"><?php echo htmlspecialchars($canalizacion['area']); ?></td>
+                                    <td data-label="Observación"><?php echo htmlspecialchars(substr($canalizacion['observacion'], 0, 50)) . '...'; ?></td>
+                                    <td data-label="Fecha"><?php echo date('d/m/Y', strtotime($canalizacion['fecha_solicitud'])); ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    <?php endif; ?>
 
     <!-- BOTONES DE EXPORTACIÓN -->
 
@@ -161,6 +293,7 @@ $datos = $estadisticasController->obtenerEstadisticas();
             </div>
         </div>
 
+        <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
         <div class="chart-widget">
             <div class="widget-content">
                 <div class="widget-title">
@@ -171,6 +304,7 @@ $datos = $estadisticasController->obtenerEstadisticas();
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="chart-widget">
             <div class="widget-content">
@@ -197,18 +331,6 @@ $datos = $estadisticasController->obtenerEstadisticas();
 
     <!-- Grid de Gráficas Temporales -->
     <div class="dashboard-grid">
-        <div class="chart-widget half-grid">
-            <div class="widget-content">
-                <div class="widget-title">
-                    Asistencia Mensual
-                    <span class="subtitle">últimos 12 meses</span>
-                </div>
-                <div class="widget-chart">
-                    <canvas id="asistenciaPorMesChart"></canvas>
-                </div>
-            </div>
-        </div>
-
         <div class="chart-widget half-grid">
             <div class="widget-content">
                 <div class="widget-title">
@@ -404,12 +526,12 @@ $datos = $estadisticasController->obtenerEstadisticas();
     // Nuevos datos
     const usuariosPorNivel = <?php echo json_encode($datos['usuarios_por_nivel']); ?>;
     const alumnosPorGrupo = <?php echo json_encode($datos['alumnos_por_grupo']); ?>;
-    const asistenciaPorMes = <?php echo json_encode($datos['asistencia_por_mes']); ?>;
     const seguimientosPorMes = <?php echo json_encode($datos['seguimientos_por_mes']); ?>;
     const productividadTutores = <?php echo json_encode($datos['productividad_tutores']); ?>;
     const alumnosPorAnioIngreso = <?php echo json_encode($datos['alumnos_por_anio_ingreso']); ?>;
     const carrerasMasPopulares = <?php echo json_encode($datos['carreras_mas_populares']); ?>;
     const modalidadesMasUtilizadas = <?php echo json_encode($datos['modalidades_mas_utilizadas']); ?>;
+
 
     // --- FUNCIÓN DE EXPORTACIÓN GLOBAL A CSV/EXCEL ---
     function exportarTodoA_CSV(nombreArchivo) {
@@ -436,9 +558,10 @@ $datos = $estadisticasController->obtenerEstadisticas();
         procesarDataSet('Grupos por Modalidad', gruposPorModalidad, ['Modalidad', 'Total de Grupos']);
 
         // Nuevos datos
+        <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
         procesarDataSet('Usuarios por Nivel', usuariosPorNivel, ['Nivel de Usuario', 'Total']);
+        <?php endif; ?>
         procesarDataSet('Alumnos por Grupo', alumnosPorGrupo, ['Grupo', 'Carrera', 'Total de Alumnos']);
-        procesarDataSet('Asistencia por Mes', asistenciaPorMes, ['Mes', 'Total Registros', 'Asistencias', 'Faltas', 'Porcentaje Asistencia']);
         procesarDataSet('Seguimientos por Mes', seguimientosPorMes, ['Mes', 'Total Seguimientos', 'Abiertos', 'En Progreso', 'Cerrados']);
         procesarDataSet('Productividad de Tutores', productividadTutores, ['Tutor', 'Grupos Asignados', 'Alumnos Tutoreados', 'Seguimientos Realizados', 'Promedio por Alumno']);
         procesarDataSet('Alumnos por Año de Ingreso', alumnosPorAnioIngreso, ['Año de Ingreso', 'Total Alumnos', 'Activos', 'Egresados', 'Bajas']);
@@ -483,10 +606,11 @@ $datos = $estadisticasController->obtenerEstadisticas();
 
         const chartsToExport = [
             { id: 'alumnosPorEstatusChart', title: 'Distribución de Alumnos por Estatus' },
+            <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
             { id: 'usuariosPorNivelChart', title: 'Usuarios por Nivel' },
+            <?php endif; ?>
             { id: 'seguimientosPorEstatusChart', title: 'Seguimientos por Estatus' },
             { id: 'seguimientosPorTipoChart', title: 'Seguimientos por Tipo' },
-            { id: 'asistenciaPorMesChart', title: 'Asistencia por Mes' },
             { id: 'seguimientosPorMesChart', title: 'Seguimientos por Mes' },
             { id: 'carrerasMasPopularesChart', title: 'Carreras Más Populares' },
             { id: 'modalidadesMasUtilizadasChart', title: 'Modalidades Más Utilizadas' },
@@ -686,6 +810,7 @@ $datos = $estadisticasController->obtenerEstadisticas();
                         'Total': (val) => Number(val)
                     }
                 },
+                <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
                 'usuarios_por_nivel': {
                     titulo: 'Usuarios por Nivel de Acceso',
                     descripcion: 'Distribución de usuarios según su nivel de permisos',
@@ -694,6 +819,7 @@ $datos = $estadisticasController->obtenerEstadisticas();
                         'Total': (val) => Number(val)
                     }
                 },
+                <?php endif; ?>
                 'seguimientos_por_estatus': {
                     titulo: 'Seguimientos por Estatus',
                     descripcion: 'Estado actual de todos los seguimientos académicos',
@@ -732,17 +858,6 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     cabeceras: ['Grupo', 'Carrera', 'Total'],
                     formatoEspecial: {
                         'Total': (val) => Number(val)
-                    }
-                },
-                'asistencia_por_mes': {
-                    titulo: 'Asistencia Mensual',
-                    descripcion: 'Evolución de la asistencia durante los últimos 12 meses',
-                    cabeceras: ['Mes', 'Total Registros', 'Asistencias', 'Faltas', 'Porcentaje'],
-                    formatoEspecial: {
-                        'Total Registros': (val) => Number(val),
-                        'Asistencias': (val) => Number(val),
-                        'Faltas': (val) => Number(val),
-                        'Porcentaje': (val) => parseFloat(val).toFixed(2) + '%'
                     }
                 },
                 'seguimientos_por_mes': {
@@ -813,15 +928,12 @@ $datos = $estadisticasController->obtenerEstadisticas();
                 ['Total de Alumnos', <?php echo $datos['total_alumnos']; ?>],
                 ['Total de Carreras Activas', <?php echo $datos['total_carreras']; ?>],
                 ['Total de Grupos', <?php echo $datos['total_grupos']; ?>],
-                ['Tasa de Asistencia General', '<?php echo $datos['tasa_asistencia']; ?>%'],
                 [''],
                 ['INDICADORES DE ACTIVIDAD'],
                 ['Indicador', 'Valor'],
                 ['Alumnos Activos', <?php echo $datos['estadisticas_generales']['alumnos_activos']; ?>],
                 ['Usuarios Activos en Sistema', <?php echo $datos['estadisticas_generales']['usuarios_activos']; ?>],
                 ['Seguimientos Abiertos', <?php echo $datos['estadisticas_generales']['seguimientos_abiertos']; ?>],
-                ['Asistencias Registradas Hoy', <?php echo $datos['estadisticas_generales']['asistencias_hoy']; ?>],
-                ['Asistencias Esta Semana', <?php echo $datos['estadisticas_generales']['asistencias_semana']; ?>],
                 ['Seguimientos Este Mes', <?php echo $datos['estadisticas_generales']['seguimientos_mes']; ?>]
             ];
 
@@ -852,13 +964,14 @@ $datos = $estadisticasController->obtenerEstadisticas();
             // Crear hojas de datos
             const datasets = {
                 'Alumnos por Estatus': alumnosPorEstatus,
+                <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
                 'Usuarios por Nivel': usuariosPorNivel,
+                <?php endif; ?>
                 'Seguimientos por Estatus': seguimientosPorEstatus,
                 'Seguimientos por Tipo': seguimientosPorTipo,
                 'Alumnos por Carrera': alumnosPorCarrera,
                 'Grupos por Modalidad': gruposPorModalidad,
                 'Alumnos por Grupo': alumnosPorGrupo,
-                'Asistencia Mensual': asistenciaPorMes,
                 'Seguimientos Mensuales': seguimientosPorMes,
                 'Productividad Tutores': productividadTutores,
                 'Alumnos por Año Ingreso': alumnosPorAnioIngreso,
@@ -927,10 +1040,11 @@ $datos = $estadisticasController->obtenerEstadisticas();
     async function exportarGraficasComoImagenes() {
         const chartsToExport = [
             { id: 'alumnosPorEstatusChart', title: 'Distribución de Alumnos por Estatus' },
+            <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
             { id: 'usuariosPorNivelChart', title: 'Usuarios por Nivel' },
+            <?php endif; ?>
             { id: 'seguimientosPorEstatusChart', title: 'Seguimientos por Estatus' },
             { id: 'seguimientosPorTipoChart', title: 'Seguimientos por Tipo' },
-            { id: 'asistenciaPorMesChart', title: 'Asistencia por Mes' },
             { id: 'seguimientosPorMesChart', title: 'Seguimientos por Mes' },
             { id: 'carrerasMasPopularesChart', title: 'Carreras Más Populares' },
             { id: 'modalidadesMasUtilizadasChart', title: 'Modalidades Más Utilizadas' },
@@ -1026,10 +1140,11 @@ $datos = $estadisticasController->obtenerEstadisticas();
             // Capturar gráficas como imágenes y crear hojas
             const chartsToCapture = [
                 { id: 'alumnosPorEstatusChart', title: 'Distribución Alumnos' },
+                <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
                 { id: 'usuariosPorNivelChart', title: 'Usuarios por Nivel' },
+                <?php endif; ?>
                 { id: 'seguimientosPorEstatusChart', title: 'Seguimientos Estado' },
                 { id: 'seguimientosPorTipoChart', title: 'Seguimientos Tipo' },
-                { id: 'asistenciaPorMesChart', title: 'Asistencia Mensual' },
                 { id: 'seguimientosPorMesChart', title: 'Seguimientos Mensuales' },
                 { id: 'carrerasMasPopularesChart', title: 'Carreras Populares' },
                 { id: 'modalidadesMasUtilizadasChart', title: 'Modalidades' },
@@ -1096,13 +1211,14 @@ $datos = $estadisticasController->obtenerEstadisticas();
             // Obtener los datos del dataset específico
             const datasets = {
                 'alumnos_por_estatus': { data: alumnosPorEstatus, name: 'Alumnos por Estatus' },
+                <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
                 'usuarios_por_nivel': { data: usuariosPorNivel, name: 'Usuarios por Nivel' },
+                <?php endif; ?>
                 'seguimientos_por_estatus': { data: seguimientosPorEstatus, name: 'Seguimientos por Estatus' },
                 'seguimientos_por_tipo': { data: seguimientosPorTipo, name: 'Seguimientos por Tipo' },
                 'alumnos_por_carrera': { data: alumnosPorCarrera, name: 'Alumnos por Carrera' },
                 'grupos_por_modalidad': { data: gruposPorModalidad, name: 'Grupos por Modalidad' },
                 'alumnos_por_grupo': { data: alumnosPorGrupo, name: 'Alumnos por Grupo' },
-                'asistencia_por_mes': { data: asistenciaPorMes, name: 'Asistencia por Mes' },
                 'seguimientos_por_mes': { data: seguimientosPorMes, name: 'Seguimientos por Mes' },
                 'productividad_tutores': { data: productividadTutores, name: 'Productividad Tutores' },
                 'alumnos_por_anio_ingreso': { data: alumnosPorAnioIngreso, name: 'Alumnos por Año Ingreso' },
@@ -1159,13 +1275,14 @@ $datos = $estadisticasController->obtenerEstadisticas();
     function mostrarSelectorDatasets() {
         const datasets = [
             { key: 'alumnos_por_estatus', name: 'Alumnos por Estatus' },
+            <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
             { key: 'usuarios_por_nivel', name: 'Usuarios por Nivel' },
+            <?php endif; ?>
             { key: 'seguimientos_por_estatus', name: 'Seguimientos por Estatus' },
             { key: 'seguimientos_por_tipo', name: 'Seguimientos por Tipo' },
             { key: 'alumnos_por_carrera', name: 'Alumnos por Carrera' },
             { key: 'grupos_por_modalidad', name: 'Grupos por Modalidad' },
             { key: 'alumnos_por_grupo', name: 'Alumnos por Grupo' },
-            { key: 'asistencia_por_mes', name: 'Asistencia por Mes' },
             { key: 'seguimientos_por_mes', name: 'Seguimientos por Mes' },
             { key: 'productividad_tutores', name: 'Productividad Tutores' },
             { key: 'alumnos_por_anio_ingreso', name: 'Alumnos por Año Ingreso' },
@@ -1220,18 +1337,18 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     total_alumnos: <?php echo $datos['total_alumnos']; ?>,
                     total_carreras: <?php echo $datos['total_carreras']; ?>,
                     total_grupos: <?php echo $datos['total_grupos']; ?>,
-                    tasa_asistencia: <?php echo $datos['tasa_asistencia']; ?>,
                     estadisticas_generales: <?php echo json_encode($datos['estadisticas_generales']); ?>
                 },
                 datasets: {
                     alumnos_por_estatus: alumnosPorEstatus,
+                    <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
                     usuarios_por_nivel: usuariosPorNivel,
+                    <?php endif; ?>
                     seguimientos_por_estatus: seguimientosPorEstatus,
                     seguimientos_por_tipo: seguimientosPorTipo,
                     alumnos_por_carrera: alumnosPorCarrera,
                     grupos_por_modalidad: gruposPorModalidad,
                     alumnos_por_grupo: alumnosPorGrupo,
-                    asistencia_por_mes: asistenciaPorMes,
                     seguimientos_por_mes: seguimientosPorMes,
                     productividad_tutores: productividadTutores,
                     alumnos_por_anio_ingreso: alumnosPorAnioIngreso,
@@ -1275,26 +1392,38 @@ $datos = $estadisticasController->obtenerEstadisticas();
 
     // --- CONFIGURACIÓN GLOBAL DE CHART.JS ---
     Chart.defaults.font.family = "'Inter', 'Segoe UI', system-ui, sans-serif";
-    Chart.defaults.font.size = 11;
+    
+    // Detectar si es móvil
+    const isMobile = window.innerWidth <= 768;
+    const isSmallMobile = window.innerWidth <= 576;
+    
+    // Ajustar tamaños según dispositivo
+    Chart.defaults.font.size = isSmallMobile ? 9 : isMobile ? 10 : 11;
     Chart.defaults.color = '#e5e7eb';
     Chart.defaults.responsive = true;
     Chart.defaults.maintainAspectRatio = false;
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
-    Chart.defaults.plugins.legend.labels.padding = 16;
+    Chart.defaults.plugins.legend.labels.padding = isMobile ? 12 : 16;
     Chart.defaults.plugins.legend.labels.font = {
-        size: 11,
+        size: isSmallMobile ? 9 : isMobile ? 10 : 11,
         weight: '500'
     };
-    Chart.defaults.elements.point.radius = 3;
-    Chart.defaults.elements.point.hoverRadius = 5;
-    Chart.defaults.elements.line.borderWidth = 2;
+    Chart.defaults.elements.point.radius = isMobile ? 2 : 3;
+    Chart.defaults.elements.point.hoverRadius = isMobile ? 4 : 5;
+    Chart.defaults.elements.line.borderWidth = isMobile ? 1.5 : 2;
     Chart.defaults.elements.bar.borderRadius = 4;
 
     // Configuración específica para escalado más estable
-    Chart.defaults.devicePixelRatio = 1; // Forzar a 1 para mayor estabilidad
+    Chart.defaults.devicePixelRatio = isMobile ? 1 : window.devicePixelRatio || 1;
     Chart.defaults.animation = {
-        duration: 0 // Desactivar animaciones para mejor rendimiento
+        duration: isMobile ? 0 : 0 // Desactivar animaciones para mejor rendimiento
     };
+    
+    // Ajustar posición de leyenda en móvil
+    if (isMobile) {
+        Chart.defaults.plugins.legend.position = 'bottom';
+        Chart.defaults.plugins.legend.labels.boxWidth = 10;
+    }
 
     // Array para almacenar referencias de las gráficas
     let chartInstances = [];
@@ -1325,9 +1454,13 @@ $datos = $estadisticasController->obtenerEstadisticas();
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 12,
+                        padding: isMobile ? 8 : 12,
                         usePointStyle: true,
-                        font: { size: 11, weight: '500' }
+                        font: { 
+                            size: isSmallMobile ? 9 : isMobile ? 10 : 11, 
+                            weight: '500' 
+                        },
+                        boxWidth: isMobile ? 10 : 12
                     }
                 }
             }
@@ -1335,41 +1468,49 @@ $datos = $estadisticasController->obtenerEstadisticas();
     });
     chartInstances.push(chart1);
 
-    // 2. Usuarios por Nivel
+    // 2. Usuarios por Nivel (solo para admin)
+    <?php if (isset($_SESSION["usuario_nivel"]) && $_SESSION["usuario_nivel"] == 1): ?>
     if (usuariosPorNivel && usuariosPorNivel.length > 0) {
-        new Chart(document.getElementById('usuariosPorNivelChart').getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: usuariosPorNivel.map(item => item.nombre),
-                datasets: [{
-                    data: usuariosPorNivel.map(item => item.total),
-                    backgroundColor: [
-                        '#3b82f6',   // Azul grande (Administrador)
-                        '#10b981',   // Verde mediano (Tutor)
-                        '#f59e0b'    // Naranja pequeño (Coordinador)
-                    ],
-                    borderColor: '#1f2937',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 12,
-                            usePointStyle: true,
-                            font: { size: 11, weight: '500' }
+        const usuariosPorNivelElement = document.getElementById('usuariosPorNivelChart');
+        if (usuariosPorNivelElement) {
+            new Chart(usuariosPorNivelElement.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: usuariosPorNivel.map(item => item.nombre),
+                    datasets: [{
+                        data: usuariosPorNivel.map(item => item.total),
+                        backgroundColor: [
+                            '#3b82f6',   // Azul grande (Administrador)
+                            '#10b981',   // Verde mediano (Tutor)
+                            '#f59e0b'    // Naranja pequeño (Coordinador)
+                        ],
+                        borderColor: '#1f2937',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                usePointStyle: true,
+                                font: { size: 11, weight: '500' }
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
     } else {
-        document.getElementById('usuariosPorNivelChart').parentElement.innerHTML = '<div class="text-center text-muted p-4">No hay datos disponibles</div>';
+        const usuariosPorNivelElement = document.getElementById('usuariosPorNivelChart');
+        if (usuariosPorNivelElement) {
+            usuariosPorNivelElement.parentElement.innerHTML = '<div class="text-center text-muted p-4">No hay datos disponibles</div>';
+        }
     }
+    <?php endif; ?>
 
     // 3. Seguimientos por Estatus
     new Chart(document.getElementById('seguimientosPorEstatusChart').getContext('2d'), {
@@ -1401,7 +1542,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 },
                 y: {
@@ -1412,7 +1555,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 }
             }
@@ -1444,72 +1589,20 @@ $datos = $estadisticasController->obtenerEstadisticas();
                 legend: {
                     position: 'bottom',
                     labels: {
-                        padding: 12,
+                        padding: isMobile ? 8 : 12,
                         usePointStyle: true,
-                        font: { size: 11, weight: '500' }
+                        font: { 
+                            size: isSmallMobile ? 9 : isMobile ? 10 : 11, 
+                            weight: '500' 
+                        },
+                        boxWidth: isMobile ? 10 : 12
                     }
                 }
             }
         }
     });
 
-    // 5. Asistencia por Mes
-    new Chart(document.getElementById('asistenciaPorMesChart').getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: asistenciaPorMes.map(item => item.mes),
-            datasets: [{
-                label: 'Porcentaje de Asistencia',
-                data: asistenciaPorMes.map(item => item.porcentaje_asistencia),
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: '#10b981',
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    },
-                    ticks: {
-                        color: '#9ca3af',
-                        font: { size: 11 }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    grid: {
-                        color: '#374151',
-                        drawBorder: false
-                    },
-                    ticks: {
-                        color: '#9ca3af',
-                        font: { size: 11 },
-                        callback: function (value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    // 6. Seguimientos por Mes
+    // 5. Seguimientos por Mes
     new Chart(document.getElementById('seguimientosPorMesChart').getContext('2d'), {
         type: 'bar',
         data: {
@@ -1545,9 +1638,13 @@ $datos = $estadisticasController->obtenerEstadisticas();
                 legend: {
                     position: 'top',
                     labels: {
-                        padding: 12,
+                        padding: isMobile ? 8 : 12,
                         usePointStyle: true,
-                        font: { size: 11, weight: '500' }
+                        font: { 
+                            size: isSmallMobile ? 9 : isMobile ? 10 : 11, 
+                            weight: '500' 
+                        },
+                        boxWidth: isMobile ? 10 : 12
                     }
                 }
             },
@@ -1558,7 +1655,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     },
                     stacked: true
                 },
@@ -1570,7 +1669,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     },
                     stacked: true
                 }
@@ -1606,7 +1707,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 },
                 y: {
@@ -1617,7 +1720,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 }
             }
@@ -1652,7 +1757,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 },
                 y: {
@@ -1663,7 +1770,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 }
             }
@@ -1710,7 +1819,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 },
                 y: {
@@ -1727,7 +1838,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     }
                 }
             }
@@ -1770,9 +1883,13 @@ $datos = $estadisticasController->obtenerEstadisticas();
                 legend: {
                     position: 'top',
                     labels: {
-                        padding: 12,
+                        padding: isMobile ? 8 : 12,
                         usePointStyle: true,
-                        font: { size: 11, weight: '500' }
+                        font: { 
+                            size: isSmallMobile ? 9 : isMobile ? 10 : 11, 
+                            weight: '500' 
+                        },
+                        boxWidth: isMobile ? 10 : 12
                     }
                 }
             },
@@ -1783,7 +1900,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     },
                     stacked: true
                 },
@@ -1795,7 +1914,9 @@ $datos = $estadisticasController->obtenerEstadisticas();
                     },
                     ticks: {
                         color: '#9ca3af',
-                        font: { size: 11 }
+                        font: { size: isSmallMobile ? 9 : isMobile ? 10 : 11 },
+                        maxRotation: isMobile ? 45 : 0,
+                        minRotation: isMobile ? 45 : 0
                     },
                     stacked: true
                 }
@@ -1870,6 +1991,7 @@ $datos = $estadisticasController->obtenerEstadisticas();
     window.addEventListener('beforeunload', () => {
         clearInterval(zoomCheckInterval);
     });
+
 </script>
 
 <?php

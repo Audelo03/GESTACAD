@@ -77,6 +77,7 @@
             <form id="formTutoriaIndividual">
                 <div class="modal-body">
                     <input type="hidden" id="individual-grupo-id" name="grupo_id">
+                    <input type="hidden" id="individual-parcial-id" name="parcial_id" value="1">
 
                     <div class="mb-3">
                         <label for="individual-fecha" class="form-label">Fecha</label>

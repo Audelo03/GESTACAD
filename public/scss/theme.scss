@@ -123,6 +123,50 @@ a:hover {
 	border-color: $color-primario !important;
 }
 
+// ========== TEMA CLARO - Switch de tema ==========
+:root:not([data-theme="dark"]) {
+	#app-sidebar.sidebar {
+		.theme-toggle-wrapper {
+			background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+			border: 1px solid rgba(59, 130, 246, 0.2);
+
+			&:hover {
+				background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.08));
+				border-color: rgba(59, 130, 246, 0.3);
+				box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+			}
+
+			.theme-toggle-icon {
+				color: #3b82f6;
+			}
+
+			.theme-toggle-label {
+				color: #1a202c;
+			}
+		}
+
+		.theme-switch-slider {
+			background: linear-gradient(135deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+			border: 2px solid rgba(0, 0, 0, 0.15);
+
+			&::before {
+				background: linear-gradient(135deg, #ffffff, #f8fafc);
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+			}
+		}
+
+		.theme-switch-input:checked + .theme-switch-slider {
+			background: linear-gradient(135deg, #3b82f6, rgba(59, 130, 246, 0.8));
+			border-color: #3b82f6;
+			box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+		}
+
+		.theme-icon-dark {
+			color: #e0e7ff;
+		}
+	}
+}
+
 // Sobrescribir clases de texto de Bootstrap para tema oscuro
 [data-theme="dark"] {
 	// Texto principal - BLANCO PURO (excepto primary que mantiene color)
@@ -699,6 +743,149 @@ a:hover {
 		letter-spacing: 1px;
 		font-size: 0.7rem;
 		margin-top: 1rem;
+	}
+
+	// ========== SWITCH DE TEMA MODERNO ==========
+	.theme-toggle-wrapper {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.75rem 1rem;
+		background: linear-gradient(135deg, rgba($color-primario, 0.1), rgba($color-primario, 0.05));
+		border: 1px solid rgba($color-primario, 0.2);
+		border-radius: 0.75rem;
+		transition: all 0.3s ease;
+		cursor: pointer;
+
+		&:hover {
+			background: linear-gradient(135deg, rgba($color-primario, 0.15), rgba($color-primario, 0.08));
+			border-color: rgba($color-primario, 0.3);
+			transform: translateY(-1px);
+			box-shadow: 0 4px 12px rgba($color-primario, 0.15);
+		}
+
+		.theme-toggle-header {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			flex: 1;
+
+			.theme-toggle-icon {
+				font-size: 1.25rem;
+				color: $color-primario;
+				transition: transform 0.3s ease;
+			}
+
+			.theme-toggle-label {
+				font-size: 0.875rem;
+				font-weight: 600;
+				color: $text-color;
+				letter-spacing: 0.3px;
+			}
+		}
+
+		&:hover .theme-toggle-icon {
+			transform: rotate(15deg) scale(1.1);
+		}
+	}
+
+	// Switch personalizado moderno
+	.theme-switch-container {
+		position: relative;
+		display: inline-block;
+		width: 4rem;
+		height: 2rem;
+		cursor: pointer;
+		flex-shrink: 0;
+	}
+
+	.theme-switch-input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+		position: absolute;
+	}
+
+	.theme-switch-slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+		border: 2px solid rgba(255, 255, 255, 0.2);
+		border-radius: 2rem;
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+
+		&::before {
+			content: '';
+			position: absolute;
+			height: 1.5rem;
+			width: 1.5rem;
+			left: 0.25rem;
+			bottom: 0.125rem;
+			background: linear-gradient(135deg, #ffffff, #f0f0f0);
+			border-radius: 50%;
+			transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+		}
+	}
+
+	.theme-switch-thumb {
+		position: absolute;
+		top: 50%;
+		left: 0.5rem;
+		transform: translateY(-50%);
+		width: 1.25rem;
+		height: 1.25rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		z-index: 2;
+		pointer-events: none;
+	}
+
+	.theme-switch-icon {
+		font-size: 0.75rem;
+		position: absolute;
+		transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.theme-icon-dark {
+		color: #e0e7ff;
+		opacity: 0;
+		transform: scale(0) rotate(180deg);
+	}
+
+	// Estado activo (dark mode)
+	.theme-switch-input:checked + .theme-switch-slider {
+		background: linear-gradient(135deg, $color-primario, rgba($color-primario, 0.8));
+		border-color: $color-primario;
+		box-shadow: 0 0 20px rgba($color-primario, 0.3);
+
+		&::before {
+			transform: translateX(2rem);
+			background: linear-gradient(135deg, #ffffff, #f8fafc);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		.theme-switch-thumb {
+			left: 2.5rem;
+
+			.theme-icon-dark {
+				opacity: 1;
+				transform: scale(1) rotate(0deg);
+			}
+		}
+	}
+
+	// Focus state
+	.theme-switch-input:focus + .theme-switch-slider {
+		box-shadow: 0 0 0 3px rgba($color-primario, 0.3);
 	}
 }
 

@@ -36,17 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (theme === 'dark') {
             htmlElement.setAttribute('data-theme', 'dark');
             if (themeToggle) themeToggle.checked = true;
-            if (themeIcon) {
-                themeIcon.classList.remove('bi-sun-fill');
-                themeIcon.classList.add('bi-moon-stars-fill');
-            }
         } else {
             htmlElement.setAttribute('data-theme', 'light');
             if (themeToggle) themeToggle.checked = false;
-            if (themeIcon) {
-                themeIcon.classList.remove('bi-moon-stars-fill');
-                themeIcon.classList.add('bi-sun-fill');
-            }
         }
     }
 });

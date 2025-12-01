@@ -218,14 +218,19 @@ if (!isset($modificacion_ruta)) {
     </ul>
 
     <div class="mt-auto pt-3 border-top border-secondary">
-      <div class="d-flex align-items-center justify-content-between px-3 text-white">
-        <span class="sidebar-text small fw-bold">Tema</span>
-        <div class="form-check form-switch m-0">
-          <input class="form-check-input" type="checkbox" role="switch" id="themeToggle">
-          <label class="form-check-label" for="themeToggle">
-            <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-          </label>
+      <div class="theme-toggle-wrapper">
+        <div class="theme-toggle-header">
+          <i class="bi bi-palette-fill theme-toggle-icon"></i>
+          <span class="theme-toggle-label">Tema</span>
         </div>
+        <label class="theme-switch-container" for="themeToggle">
+          <input type="checkbox" id="themeToggle" class="theme-switch-input">
+          <div class="theme-switch-slider">
+            <div class="theme-switch-thumb">
+              <i class="bi bi-moon-stars-fill theme-switch-icon theme-icon-dark"></i>
+            </div>
+          </div>
+        </label>
       </div>
     </div>
 

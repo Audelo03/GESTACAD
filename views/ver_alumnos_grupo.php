@@ -1507,87 +1507,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // MANEJO DE INFERENCIAS
     // ============================================
     const API_BASE_URL = 'http://localhost:5000';
-    let modalInferenciasInstance = null;
-    const modalInferenciasElement = document.getElementById('modalInferenciasAlumno');
-    
-    // Inicializar modal una sola vez
-    if (modalInferenciasElement) {
-        modalInferenciasInstance = new bootstrap.Modal(modalInferenciasElement, {
-            backdrop: true,
-            keyboard: true,
-            focus: true
-        });
-        
-        // Limpiar backdrop cuando se oculta el modal
-        modalInferenciasElement.addEventListener('hidden.bs.modal', function() {
-            // Eliminar backdrop si existe
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => {
-                backdrop.remove();
-            });
-            // Restaurar el body
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        });
-        
-        // Limpiar backdrop cuando se cierra el modal
-        modalInferenciasElement.addEventListener('hide.bs.modal', function() {
-            // Asegurar que el modal se cierre correctamente
-            if (modalInferenciasInstance) {
-                modalInferenciasInstance.hide();
-            }
-        });
-    }
     
     // Event listener para botones de inferencias
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.btn-inferencias-alumno');
         if (btn) {
             e.preventDefault();
-            e.stopPropagation();
-            
-            // Limpiar cualquier backdrop residual antes de abrir
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => {
-                backdrop.remove();
-            });
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-            
             const alumnoId = btn.getAttribute('data-alumno-id');
             const alumnoNombre = btn.getAttribute('data-alumno-nombre');
             const alumnoMatricula = btn.getAttribute('data-alumno-matricula');
             
             // Actualizar título del modal
-            const modalLabel = document.getElementById('modalInferenciasAlumnoLabel');
-            if (modalLabel) {
-                modalLabel.innerHTML = `<i class="bi bi-graph-up-arrow me-2"></i>Análisis de Inferencias - ${alumnoNombre}`;
-            }
+            document.getElementById('modalInferenciasAlumnoLabel').innerHTML = 
+                `<i class="bi bi-graph-up-arrow me-2"></i>Análisis de Inferencias - ${alumnoNombre}`;
             
             // Mostrar loading
             const modalBody = document.getElementById('modalInferenciasBody');
-            if (modalBody) {
-                modalBody.innerHTML = `
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;">
-                            <span class="visually-hidden">Cargando inferencias...</span>
-                        </div>
-                        <p class="mt-3 text-muted">Analizando datos del alumno...</p>
-                        <small class="text-muted d-block mt-2">Matrícula: ${alumnoMatricula}</small>
+            modalBody.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Cargando inferencias...</span>
                     </div>
-                `;
-            }
+                    <p class="mt-3 text-muted">Analizando datos del alumno...</p>
+                    <small class="text-muted d-block mt-2">Matrícula: ${alumnoMatricula}</small>
+                </div>
+            `;
             
-            // Mostrar modal usando la instancia existente
-            if (modalInferenciasInstance) {
-                modalInferenciasInstance.show();
-            } else if (modalInferenciasElement) {
-                // Si no hay instancia, crear una nueva
-                modalInferenciasInstance = new bootstrap.Modal(modalInferenciasElement);
-                modalInferenciasInstance.show();
-            }
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalInferenciasAlumno'));
+            modal.show();
             
             // Cargar inferencias
             cargarInferenciasAlumno(alumnoId, alumnoNombre, alumnoMatricula);
@@ -1744,14 +1692,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="col-md-6 mb-3">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
-                            <h6 class="card-title text-muted mb-2"><i class="bi bi-people me-2"></i>Participación en Tutorías</h6>
-                            <h3 class="mb-0 ${estadisticas.asistencia_tutorias_grupales < 50 ? 'text-danger' : estadisticas.asistencia_tutorias_grupales < 70 ? 'text-warning' : 'text-success'}">
-                                ${estadisticas.asistencia_tutorias_grupales || 0}%
+                            <h6 class="card-title text-muted mb-2"><i class="bi bi-calendar-check me-2"></i>Asistencia</h6>
+                            <h3 class="mb-0 ${estadisticas.asistencia_promedio < 70 ? 'text-danger' : estadisticas.asistencia_promedio < 85 ? 'text-warning' : 'text-success'}">
+                                ${estadisticas.asistencia_promedio || 0}%
                             </h3>
                             <small class="text-muted">
-                                ${estadisticas.tutorias_grupales_asistidas || 0} de ${estadisticas.total_tutorias_grupales || 0} tutorías grupales
+                                ${estadisticas.asistencias || 0} de ${estadisticas.total_clases || 0} clases
                             </small>
-                            ${estadisticas.faltas_consecutivas_tutorias > 0 ? `<br><span class="badge bg-danger mt-1">${estadisticas.faltas_consecutivas_tutorias} faltas consecutivas</span>` : ''}
+                            ${estadisticas.faltas_consecutivas > 0 ? `<br><span class="badge bg-danger mt-1">${estadisticas.faltas_consecutivas} faltas consecutivas</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1765,41 +1713,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <small class="text-muted">
                                 ${estadisticas.materias_aprobadas || 0} aprobadas, ${estadisticas.materias_reprobadas || 0} reprobadas
                             </small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Métricas Adicionales -->
-            <div class="row mb-4">
-                <div class="col-md-4 mb-3">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted mb-2"><i class="bi bi-person-check me-2"></i>Participación General</h6>
-                            <h4 class="mb-0 ${estadisticas.participacion_general < 50 ? 'text-danger' : estadisticas.participacion_general < 70 ? 'text-warning' : 'text-success'}">
-                                ${estadisticas.participacion_general || 0}%
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted mb-2"><i class="bi bi-book me-2"></i>Compromiso Académico</h6>
-                            <h4 class="mb-0 ${estadisticas.compromiso_academico < 50 ? 'text-danger' : estadisticas.compromiso_academico < 70 ? 'text-warning' : 'text-success'}">
-                                ${estadisticas.compromiso_academico || 0}%
-                            </h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="card-title text-muted mb-2"><i class="bi bi-chat-dots me-2"></i>Tutorías Individuales</h6>
-                            <h4 class="mb-0 text-info">
-                                ${estadisticas.tutorias_individuales_recientes || 0}
-                            </h4>
-                            <small class="text-muted">Últimos 3 meses</small>
                         </div>
                     </div>
                 </div>
@@ -1895,26 +1808,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="col-md-6 mb-3">
                             <strong><i class="bi bi-calendar-x me-2"></i>Seguimientos:</strong><br>
                             <span class="badge bg-info">${estadisticas.seguimientos_abiertos || 0} abiertos</span>
-                            <span class="badge bg-warning">${estadisticas.seguimientos_en_progreso || 0} en progreso</span>
                             <span class="badge bg-success">${estadisticas.seguimientos_cerrados || 0} cerrados</span>
-                            ${estadisticas.seguimientos_cerrados_recientes > 0 ? `<br><span class="badge bg-success mt-1">${estadisticas.seguimientos_cerrados_recientes} cerrados recientemente</span>` : ''}
                         </div>
                         <div class="col-md-6 mb-3">
-                            <strong><i class="bi bi-people me-2"></i>Tutorías Grupales:</strong><br>
-                            <span class="badge bg-primary">${estadisticas.asistencia_tutorias_grupales || 0}% asistencia</span>
-                            <span class="badge bg-secondary">${estadisticas.total_tutorias_grupales || 0} disponibles</span>
-                            <span class="badge bg-success">${estadisticas.tutorias_grupales_asistidas || 0} asistidas</span>
-                            <span class="badge bg-danger">${estadisticas.tutorias_grupales_faltadas || 0} faltadas</span>
+                            <strong><i class="bi bi-people me-2"></i>Tutorías:</strong><br>
+                            <span class="badge bg-primary">${estadisticas.asistencia_tutorias || 0}% asistencia</span>
+                            <span class="badge bg-secondary">${estadisticas.tutorias_disponibles || 0} disponibles</span>
                         </div>
+                        ${estadisticas.tendencia_asistencia !== undefined ? `
                         <div class="col-md-6 mb-3">
-                            <strong><i class="bi bi-person-check me-2"></i>Tutorías Individuales:</strong><br>
-                            <span class="badge bg-info">${estadisticas.tutorias_individuales_recientes || 0} en últimos 3 meses</span>
-                        </div>
-                        ${estadisticas.tendencia_tutorias !== undefined ? `
-                        <div class="col-md-6 mb-3">
-                            <strong><i class="bi bi-arrow-${estadisticas.tendencia_tutorias >= 0 ? 'up' : 'down'}-circle me-2"></i>Tendencia Participación:</strong><br>
-                            <span class="badge bg-${estadisticas.tendencia_tutorias >= 0 ? 'success' : 'danger'}">
-                                ${estadisticas.tendencia_tutorias >= 0 ? '+' : ''}${estadisticas.tendencia_tutorias || 0}%
+                            <strong><i class="bi bi-arrow-${estadisticas.tendencia_asistencia >= 0 ? 'up' : 'down'}-circle me-2"></i>Tendencia Asistencia:</strong><br>
+                            <span class="badge bg-${estadisticas.tendencia_asistencia >= 0 ? 'success' : 'danger'}">
+                                ${estadisticas.tendencia_asistencia >= 0 ? '+' : ''}${estadisticas.tendencia_asistencia || 0}%
                             </span>
                         </div>
                         ` : ''}

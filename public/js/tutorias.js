@@ -185,7 +185,7 @@
                 tutoriaIdInput = document.createElement('input');
                 tutoriaIdInput.type = 'hidden';
                 tutoriaIdInput.id = 'grupal-tutoria-id';
-                tutoriaIdInput.name = 'id';
+                tutoriaIdInput.name = 'tutoria_id';
                 form.appendChild(tutoriaIdInput);
             }
             tutoriaIdInput.value = tutoria.id;
@@ -524,51 +524,37 @@
             method: 'POST',
             body: formData
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                try {
-                    const data = JSON.parse(text);
-                    if (data.success) {
-                        // Show success message
-                        const message = tutoriaId ? 'Tutoría grupal actualizada exitosamente' : 'Tutoría grupal creada exitosamente';
-                        showAlert('success', data.message || message);
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    const message = tutoriaId ? 'Tutoría grupal actualizada exitosamente' : 'Tutoría grupal creada exitosamente';
+                    showAlert('success', data.message || message);
 
-                        // Close modal
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTutoriaGrupal'));
-                        modal.hide();
+                    // Close modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalTutoriaGrupal'));
+                    modal.hide();
 
-                        // Reset form
-                        form.reset();
-                        setDefaultDates();
-                        
-                        // Reload page to refresh the list
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
-                    } else {
-                        console.error('Error response:', data);
-                        showAlert('danger', data.message || 'Error al guardar la tutoría grupal');
-                    }
-                } catch (e) {
-                    console.error('Error parsing JSON:', e);
-                    console.error('Response text:', text);
-                    showAlert('danger', 'Error al procesar la respuesta del servidor');
+                    // Reset form
+                    form.reset();
+                    setDefaultDates();
+                    
+                    // Reload page to refresh the list
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert('danger', data.message || 'Error al guardar la tutoría grupal');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('danger', 'Error al procesar la solicitud: ' + error.message);
+                showAlert('danger', 'Error al procesar la solicitud');
             })
             .finally(() => {
                 // Re-enable submit button
                 submitBtn.disabled = false;
-                const buttonText = tutoriaId ? '<i class="bi bi-save me-1"></i>Actualizar Tutoría Grupal' : '<i class="bi bi-save me-1"></i>Guardar Tutoría Grupal';
-                submitBtn.innerHTML = buttonText;
+                submitBtn.innerHTML = '<i class="bi bi-save me-1"></i>Guardar Tutoría Grupal';
             });
     }
 
