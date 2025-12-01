@@ -384,35 +384,44 @@ class AlumnoController
                     ?>
                     <div class="accordion-item shadow-sm rounded-3 mb-2 border-0">
                         <h2 class="accordion-header" id="heading_<?= htmlspecialchars($grupoUid) ?>">
-                            <button class="accordion-button collapsed bg-light fw-bold" type="button" data-bs-toggle="collapse"
+                            <button class="accordion-button collapsed bg-light fw-bold small" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#collapse_<?= htmlspecialchars($grupoUid) ?>">
-                                <i class="bi bi-people-fill me-2 text-primary"></i><span class="text-muted"> Grupo:
-                                    <?= htmlspecialchars($grupo_nombre) ?></span>
-                                <span class="badge bg-primary ms-2"><?= $totalAlumnos ?> alumnos</span>
+                                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center w-100 me-2">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        <i class="bi bi-people-fill me-2 text-primary"></i>
+                                        <span class="text-muted small">Grupo: <?= htmlspecialchars($grupo_nombre) ?></span>
+                                    </div>
+                                    <span class="badge bg-primary ms-md-2 mt-1 mt-md-0"><?= $totalAlumnos ?> alumnos</span>
+                                </div>
                             </button>
                         </h2>
                         <div id="collapse_<?= htmlspecialchars($grupoUid) ?>" class="accordion-collapse collapse"
                             data-bs-parent="#accordion_<?= htmlspecialchars($parentUid) ?>">
-                            <div class="accordion-body">
-                                <div class="d-flex mb-3 gap-2">
+                            <div class="accordion-body p-2 p-md-3">
+                                <div class="d-grid d-md-flex gap-2 mb-3">
                                     <a href="gestionar_listas.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
-                                        class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" title="Gestionar Listas"><i
-                                            class="bi bi-pencil-square"></i></a>
-                                    <button type="button" class="btn btn-outline-success btn-sm btn-tutoria-grupal"
+                                        class="btn btn-outline-primary btn-sm flex-fill flex-md-none" data-bs-toggle="tooltip" title="Gestionar Listas">
+                                        <i class="bi bi-pencil-square me-1 d-md-none"></i>
+                                        <span class="d-none d-md-inline"><i class="bi bi-pencil-square"></i></span>
+                                        <span class="d-md-none">Gestionar</span>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-success btn-sm btn-tutoria-grupal flex-fill flex-md-none"
                                         data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
                                         data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
                                         title="Lista Grupal">
-                                        <i class="bi bi-people-fill"></i> Grupal
+                                        <i class="bi bi-people-fill me-1"></i> <span class="d-none d-sm-inline">Grupal</span>
                                     </button>
-                                    <button type="button" class="btn btn-outline-info btn-sm btn-tutoria-individual"
+                                    <button type="button" class="btn btn-outline-info btn-sm btn-tutoria-individual flex-fill flex-md-none"
                                         data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
                                         data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
                                         title="Tutoría Individual">
-                                        <i class="bi bi-person-fill"></i> Individual
+                                        <i class="bi bi-person-fill me-1"></i> <span class="d-none d-sm-inline">Individual</span>
                                     </button>
                                     <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
-                                        class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip" title="Ver Alumnos del Grupo">
-                                        <i class="bi bi-gear-fill"></i>
+                                        class="btn btn-outline-secondary btn-sm flex-fill flex-md-none" data-bs-toggle="tooltip" title="Ver Alumnos del Grupo">
+                                        <i class="bi bi-gear-fill me-1 d-md-none"></i>
+                                        <span class="d-none d-md-inline"><i class="bi bi-gear-fill"></i></span>
+                                        <span class="d-md-none">Alumnos</span>
                                     </a>
                                 </div>
                                 <div id="lista-alumnos-<?= htmlspecialchars($id_grupo) ?>">
@@ -422,18 +431,27 @@ class AlumnoController
                                     <?php else: ?>
                                         <ul class="list-group list-group-flush">
                                             <?php foreach ($alumnos as $a): ?>
-                                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <i class="bi bi-person-circle text-muted fs-5 me-2"></i>
-                                                        <span><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></span>
+                                                <li class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 p-2 p-md-3">
+                                                    <div class="d-flex align-items-center flex-grow-1 w-100 w-md-auto">
+                                                        <i class="bi bi-person-circle text-muted fs-5 me-2 d-none d-md-inline"></i>
+                                                        <i class="bi bi-person-circle text-muted me-2 d-md-none"></i>
+                                                        <span class="small small-md"><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></span>
                                                     </div>
-                                                    <div class="btn-group" role="group">
+                                                    <div class="btn-group w-100 w-md-auto" role="group">
                                                         <a href="crear_seguimiento.php?id_alumno=<?= $a['id_alumno'] ?>"
-                                                            class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip"
-                                                            title="Crear seguimiento"><i class="bi bi-journal-plus"></i></a>
+                                                            class="btn btn-sm btn-outline-success flex-fill flex-md-none" data-bs-toggle="tooltip"
+                                                            title="Crear seguimiento">
+                                                            <i class="bi bi-journal-plus me-1 d-md-none"></i>
+                                                            <span class="d-none d-md-inline"><i class="bi bi-journal-plus"></i></span>
+                                                            <span class="d-md-none">Crear</span>
+                                                        </a>
                                                         <a href="ver_seguimientos.php?id_alumno=<?= $a['id_alumno'] ?>"
-                                                            class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip"
-                                                            title="Ver seguimientos"><i class="bi bi-card-list"></i></a>
+                                                            class="btn btn-sm btn-outline-primary flex-fill flex-md-none" data-bs-toggle="tooltip"
+                                                            title="Ver seguimientos">
+                                                            <i class="bi bi-card-list me-1 d-md-none"></i>
+                                                            <span class="d-none d-md-inline"><i class="bi bi-card-list"></i></span>
+                                                            <span class="d-md-none">Ver</span>
+                                                        </a>
                                                     </div>
                                                 </li>
                                             <?php endforeach; ?>
@@ -483,9 +501,10 @@ class AlumnoController
             <div class="accordion mb-3" id="<?= $carreraUid ?>">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="heading_<?= $carreraUid ?>">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        <button class="accordion-button collapsed small" type="button" data-bs-toggle="collapse"
                             data-bs-target="#collapse_<?= $carreraUid ?>">
-                            <i class="bi bi-mortarboard-fill me-2"></i> Carrera: <?= htmlspecialchars($nombre_carrera) ?>
+                            <i class="bi bi-mortarboard-fill me-2"></i> 
+                            <span class="text-truncate">Carrera: <?= htmlspecialchars($nombre_carrera) ?></span>
                         </button>
                     </h2>
                     <div id="collapse_<?= $carreraUid ?>" class="accordion-collapse collapse" data-bs-parent="#<?= $carreraUid ?>">

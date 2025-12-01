@@ -95,18 +95,18 @@ $tipo_seguimiento_id = $_POST['tipo_seguimiento_id'] ?? null;
 
 ?>
 
-<div class="container py-5">
+<div class="container py-3 py-md-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-12 col-lg-8">
 
             <div class="card shadow border-0">
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
 
-                
+                    <h3 class="h4 h3-md mb-3 mb-md-4">Nuevo Seguimiento</h3>
 
-                    <div class="mb-4 p-3 rounded">
-                        <h5 class="mb-1"><?= htmlspecialchars($alumno['nombre']) ?></h5>
-                        <small class="mb-0">Matrícula: <?= htmlspecialchars($alumno['matricula']) ?></small>
+                    <div class="mb-3 mb-md-4 p-3 rounded bg-light">
+                        <h5 class="h6 h5-md mb-1"><?= htmlspecialchars($alumno['nombre']) ?></h5>
+                        <small class="text-muted">Matrícula: <?= htmlspecialchars($alumno['matricula']) ?></small>
                     </div>
 
                     <?php if (!empty($errors['general'])): ?>
@@ -125,8 +125,8 @@ $tipo_seguimiento_id = $_POST['tipo_seguimiento_id'] ?? null;
                             <?php endif; ?>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-2 g-md-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label for="estatus" class="form-label">Estatus</label>
                                 <select class="form-select <?= isset($errors['estatus']) ? 'is-invalid' : '' ?>"
                                         id="estatus" name="estatus">
@@ -139,7 +139,7 @@ $tipo_seguimiento_id = $_POST['tipo_seguimiento_id'] ?? null;
                                 <?php endif; ?>
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label for="tipo_seguimiento_id" class="form-label">Tipo de Seguimiento</label>
                                 <select class="form-select <?= isset($errors['tipo_seguimiento_id']) ? 'is-invalid' : '' ?>"
                                         id="tipo_seguimiento_id" name="tipo_seguimiento_id">
@@ -157,27 +157,27 @@ $tipo_seguimiento_id = $_POST['tipo_seguimiento_id'] ?? null;
                         </div>
 
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="fecha_movimiento" class="form-label" >Fecha de Creación</label>
+                        <div class="row g-2 g-md-3">
+                            <div class="col-12 col-md-6 mb-3">
+                                <label for="fecha_movimiento" class="form-label">Fecha de Creación</label>
                                 <input type="date" class="form-control" id="fecha_movimiento"
                                        name="fecha_movimiento" disabled value="<?= htmlspecialchars($fecha_movimiento) ?>">
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label for="fecha_compromiso" class="form-label">Fecha Compromiso</label>
                                 <input type="date" class="form-control" id="fecha_compromiso"
                                        name="fecha_compromiso" value="<?= htmlspecialchars($fecha_compromiso) ?>">
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
                             <a href="javascript:window.history.back();" 
-                               class="btn btn-outline-secondary me-2">
+                               class="btn btn-outline-secondary w-100 w-sm-auto">
                                 Cancelar
                             </a>
                             <button type="submit" 
-                                    class="btn btn-primary">
-                                Guardar
+                                    class="btn btn-primary w-100 w-sm-auto">
+                                <i class="bi bi-save me-2"></i>Guardar
                             </button>
                         </div>
 

@@ -20,18 +20,18 @@ $page_title = "Alumnos del Grupo: " . htmlspecialchars($nombre_grupo);
 include 'objects/header.php';
 ?>
 
-<div class="container mt-5">
-    <div class="card shadow-sm mb-4">
+<div class="container mt-3 mt-md-5">
+    <div class="card shadow-sm mb-3 mb-md-4">
         <div class="card-body">
-            <h1 class="h3 mb-1"><i class="bi bi-people-fill me-2"></i>Alumnos del Grupo</h1>
-            <h2 class="h5 text-muted"><?= htmlspecialchars($nombre_grupo) ?></h2>
+            <h1 class="h4 h3-md mb-1"><i class="bi bi-people-fill me-2"></i>Alumnos del Grupo</h1>
+            <h2 class="h6 h5-md text-muted mb-0"><?= htmlspecialchars($nombre_grupo) ?></h2>
         </div>
     </div>
 
     <!-- Botón para capturar calificaciones -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body text-center">
-            <button type="button" class="btn btn-primary btn-lg" id="btnCapturarCalificaciones">
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body text-center p-2 p-md-3">
+            <button type="button" class="btn btn-primary w-100 w-md-auto btn-lg" id="btnCapturarCalificaciones">
                 <i class="bi bi-journal-check me-2"></i>Capturar Calificaciones
             </button>
         </div>
@@ -40,12 +40,12 @@ include 'objects/header.php';
     <!-- Tabla de alumnos -->
     <div class="card shadow-sm">
         <div class="card-header">
-            <h3 class="h5 mb-0"><i class="bi bi-list-ul me-2"></i>Lista de Alumnos</h3>
+            <h3 class="h5 h6-md mb-0"><i class="bi bi-list-ul me-2"></i>Lista de Alumnos</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-2 p-md-3">
             <!-- Buscador -->
             <div class="mb-3">
-                <div class="input-group">
+                <div class="input-group input-group-lg">
                     <span class="input-group-text bg-primary text-white">
                         <i class="bi bi-search"></i>
                     </span>
@@ -53,20 +53,24 @@ include 'objects/header.php';
                            class="form-control" 
                            id="buscadorAlumnos" 
                            placeholder="Buscar por matrícula o nombre...">
-                    <button class="btn btn-outline-secondary" type="button" id="btnLimpiarBusqueda" title="Limpiar búsqueda">
+                    <button class="btn btn-outline-secondary d-none d-md-block" type="button" id="btnLimpiarBusqueda" title="Limpiar búsqueda">
                         <i class="bi bi-x-circle"></i>
                     </button>
                 </div>
+                <button class="btn btn-outline-secondary btn-sm w-100 d-md-none mt-2" type="button" id="btnLimpiarBusquedaMobile">
+                    <i class="bi bi-x-circle me-1"></i>Limpiar búsqueda
+                </button>
             </div>
             
-            <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
-                <table class="table table-hover table-striped">
+            <!-- Vista de tabla para desktop -->
+            <div class="table-responsive d-none d-md-block" style="max-height: 600px; overflow-y: auto;">
+                <table class="table table-hover table-striped mb-0">
                     <thead class="table-light sticky-top">
                         <tr>
-                            <th>#</th>
+                            <th style="width: 50px;">#</th>
                             <th>Matrícula</th>
                             <th>Nombre Completo</th>
-                            <th>Acciones</th>
+                            <th style="min-width: 300px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaAlumnosBody">
@@ -78,9 +82,9 @@ include 'objects/header.php';
                                 <td><strong><?= htmlspecialchars($alumno['matricula']) ?></strong></td>
                                 <td><?= htmlspecialchars($alumno['nombre_completo']) ?></td>
                                 <td>
-                                    <div class="btn-group" role="group">
+                                    <div class="btn-group btn-group-sm" role="group">
                                         <button type="button"
-                                                class="btn btn-sm btn-primary btn-inscribir-alumno"
+                                                class="btn btn-primary btn-inscribir-alumno"
                                                 data-alumno-id="<?= $alumno['id_alumno'] ?>"
                                                 data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
                                                 data-bs-toggle="modal"
@@ -89,21 +93,21 @@ include 'objects/header.php';
                                             <i class="bi bi-plus-circle me-1"></i>Inscribir
                                         </button>
                                         <button type="button"
-                                                class="btn btn-sm btn-warning btn-editar-clases-alumno"
+                                                class="btn btn-warning btn-editar-clases-alumno"
                                                 data-alumno-id="<?= $alumno['id_alumno'] ?>"
                                                 data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#modalEditarClasesAlumno"
                                                 title="Editar clases inscritas">
-                                            <i class="bi bi-pencil-square me-1"></i>Editar Clases
+                                            <i class="bi bi-pencil-square me-1"></i>Editar
                                         </button>
                                         <button type="button"
-                                                class="btn btn-sm btn-success btn-calificaciones-alumno"
+                                                class="btn btn-success btn-calificaciones-alumno"
                                                 data-alumno-id="<?= $alumno['id_alumno'] ?>"
                                                 data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
                                                 data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
                                                 title="Capturar Calificaciones">
-                                            <i class="bi bi-journal-check me-1"></i>Calificaciones
+                                            <i class="bi bi-journal-check me-1"></i>Calif.
                                         </button>
                                     </div>
                                 </td>
@@ -112,13 +116,60 @@ include 'objects/header.php';
                     </tbody>
                 </table>
             </div>
+
+            <!-- Vista de cards para móvil -->
+            <div class="d-md-none" id="cardsAlumnosContainer" style="max-height: 600px; overflow-y: auto;">
+                <?php foreach ($alumnos as $index => $alumno): ?>
+                    <div class="card mb-3 fila-alumno-card" 
+                         data-matricula="<?= htmlspecialchars(strtolower($alumno['matricula'])) ?>"
+                         data-nombre="<?= htmlspecialchars(strtolower($alumno['nombre_completo'])) ?>">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1 fw-bold"><?= htmlspecialchars($alumno['nombre_completo']) ?></h6>
+                                    <p class="card-text text-muted mb-0 small">
+                                        <i class="bi bi-person-badge me-1"></i>
+                                        <strong>Matrícula:</strong> <?= htmlspecialchars($alumno['matricula']) ?>
+                                    </p>
+                                </div>
+                                <span class="badge bg-secondary">#<?= $index + 1 ?></span>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button type="button"
+                                        class="btn btn-primary btn-inscribir-alumno"
+                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalInscribirAlumno">
+                                    <i class="bi bi-plus-circle me-2"></i>Inscribir en Clase
+                                </button>
+                                <button type="button"
+                                        class="btn btn-warning btn-editar-clases-alumno"
+                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalEditarClasesAlumno">
+                                    <i class="bi bi-pencil-square me-2"></i>Editar Clases
+                                </button>
+                                <button type="button"
+                                        class="btn btn-success btn-calificaciones-alumno"
+                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                        data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>">
+                                    <i class="bi bi-journal-check me-2"></i>Capturar Calificaciones
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- Modal para inscribir alumno -->
 <div class="modal fade" id="modalInscribirAlumno" tabindex="-1" aria-labelledby="modalInscribirAlumnoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalInscribirAlumnoLabel">Inscribir Alumno en Clase</h5>
@@ -139,9 +190,9 @@ include 'objects/header.php';
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnConfirmarInscripcion">
+            <div class="modal-footer flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary w-100 w-sm-auto" id="btnConfirmarInscripcion">
                     <i class="bi bi-check-circle me-1"></i>Inscribir
                 </button>
             </div>
@@ -151,7 +202,7 @@ include 'objects/header.php';
 
 <!-- Modal para editar clases del alumno -->
 <div class="modal fade" id="modalEditarClasesAlumno" tabindex="-1" aria-labelledby="modalEditarClasesAlumnoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalEditarClasesAlumnoLabel">Clases Inscritas del Alumno</h5>
@@ -166,8 +217,8 @@ include 'objects/header.php';
                     <p class="text-center text-muted">Cargando clases...</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <div class="modal-footer flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -175,7 +226,7 @@ include 'objects/header.php';
 
 <!-- Modal para capturar calificaciones -->
 <div class="modal fade" id="modalCapturarCalificaciones" tabindex="-1" aria-labelledby="modalCapturarCalificacionesLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="modalCapturarCalificacionesLabel">
@@ -185,47 +236,47 @@ include 'objects/header.php';
             </div>
             <div class="modal-body">
                 <!-- Navegación y progreso -->
-                <div class="row mb-4">
+                <div class="row mb-3 mb-md-4">
                     <div class="col-12">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <button type="button" class="btn btn-outline-primary me-3" id="btnAlumnoAnterior">
-                                <i class="bi bi-chevron-left"></i> Anterior
+                        <div class="d-flex flex-column flex-md-row align-items-center justify-content-center gap-2 gap-md-3">
+                            <button type="button" class="btn btn-outline-primary w-100 w-md-auto order-2 order-md-1" id="btnAlumnoAnterior">
+                                <i class="bi bi-chevron-left"></i> <span class="d-none d-sm-inline">Anterior</span>
                             </button>
-                            <div class="text-center">
-                                <h5 class="mb-0" id="calificaciones-alumno-nombre">-</h5>
-                                <small class="text-muted" id="calificaciones-alumno-matricula">-</small>
+                            <div class="text-center order-1 order-md-2 flex-grow-1">
+                                <h5 class="mb-0 h6 h5-md" id="calificaciones-alumno-nombre">-</h5>
+                                <small class="text-muted d-block" id="calificaciones-alumno-matricula">-</small>
                                 <div class="mt-2">
                                     <span class="badge bg-info fs-6" id="calificaciones-progreso">0 / 0</span>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-outline-primary ms-3" id="btnAlumnoSiguiente">
-                                Siguiente <i class="bi bi-chevron-right"></i>
+                            <button type="button" class="btn btn-outline-primary w-100 w-md-auto order-3" id="btnAlumnoSiguiente">
+                                <span class="d-none d-sm-inline">Siguiente</span> <i class="bi bi-chevron-right"></i>
                             </button>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Pestañas de parciales -->
-                <div class="mb-4">
-                    <ul class="nav nav-pills nav-justified" id="parciales-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="parcial-1-tab" data-bs-toggle="pill" data-bs-target="#parcial-1" type="button" role="tab" data-parcial="1">
-                                <i class="bi bi-1-circle me-1"></i>Parcial 1
+                <div class="mb-3 mb-md-4">
+                    <ul class="nav nav-pills nav-justified flex-nowrap" id="parciales-tabs" role="tablist">
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link active small" id="parcial-1-tab" data-bs-toggle="pill" data-bs-target="#parcial-1" type="button" role="tab" data-parcial="1">
+                                <i class="bi bi-1-circle d-none d-sm-inline me-1"></i><span class="d-sm-none">P1</span><span class="d-none d-sm-inline">Parcial 1</span>
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="parcial-2-tab" data-bs-toggle="pill" data-bs-target="#parcial-2" type="button" role="tab" data-parcial="2">
-                                <i class="bi bi-2-circle me-1"></i>Parcial 2
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link small" id="parcial-2-tab" data-bs-toggle="pill" data-bs-target="#parcial-2" type="button" role="tab" data-parcial="2">
+                                <i class="bi bi-2-circle d-none d-sm-inline me-1"></i><span class="d-sm-none">P2</span><span class="d-none d-sm-inline">Parcial 2</span>
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="parcial-3-tab" data-bs-toggle="pill" data-bs-target="#parcial-3" type="button" role="tab" data-parcial="3">
-                                <i class="bi bi-3-circle me-1"></i>Parcial 3
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link small" id="parcial-3-tab" data-bs-toggle="pill" data-bs-target="#parcial-3" type="button" role="tab" data-parcial="3">
+                                <i class="bi bi-3-circle d-none d-sm-inline me-1"></i><span class="d-sm-none">P3</span><span class="d-none d-sm-inline">Parcial 3</span>
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="parcial-4-tab" data-bs-toggle="pill" data-bs-target="#parcial-4" type="button" role="tab" data-parcial="4">
-                                <i class="bi bi-4-circle me-1"></i>Parcial 4
+                        <li class="nav-item flex-fill" role="presentation">
+                            <button class="nav-link small" id="parcial-4-tab" data-bs-toggle="pill" data-bs-target="#parcial-4" type="button" role="tab" data-parcial="4">
+                                <i class="bi bi-4-circle d-none d-sm-inline me-1"></i><span class="d-sm-none">P4</span><span class="d-none d-sm-inline">Parcial 4</span>
                             </button>
                         </li>
                     </ul>
@@ -283,7 +334,7 @@ include 'objects/header.php';
 
 <!-- Modal para capturar calificaciones individuales (sin navegación) -->
 <div class="modal fade" id="modalCalificacionesIndividual" tabindex="-1" aria-labelledby="modalCalificacionesIndividualLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="modalCalificacionesIndividualLabel">
@@ -751,7 +802,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                let html = '<div class="row g-3">';
+                let html = '<div class="row g-2 g-md-3">';
                 inscripcionesParaMostrar.forEach(function(inscripcion) {
                     const asignatura = inscripcion.asignatura_nombre || 'N/A';
                     const clave = inscripcion.asignatura_clave || '';
@@ -760,11 +811,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     const estadoCampo = `estado_parcial${parcial}`;
                     const estadoActual = inscripcion[estadoCampo] || inscripcion.estado || 'CURSANDO';
 
-                    html += '<div class="col-md-6 col-lg-4">';
+                    html += '<div class="col-12 col-md-6 col-lg-4">';
                     html += '<div class="card h-100">';
-                    html += '<div class="card-body">';
-                    html += `<h6 class="card-title">${asignatura}${clave ? ' (' + clave + ')' : ''}</h6>`;
-                    html += `<p class="card-text small text-muted mb-3">Sección: ${seccion}</p>`;
+                    html += '<div class="card-body p-2 p-md-3">';
+                    html += `<h6 class="card-title mb-2 small fw-bold">${asignatura}${clave ? ' (' + clave + ')' : ''}</h6>`;
+                    html += `<p class="card-text small text-muted mb-2 mb-md-3">Sección: ${seccion}</p>`;
 
                     html += '<div class="btn-group-vertical w-100" role="group">';
 
@@ -1066,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
 
-                    let html = '<div class="row g-3">';
+                    let html = '<div class="row g-2 g-md-3">';
                     inscripcionesIndividualActuales.forEach(function(inscripcion) {
                         const asignatura = inscripcion.asignatura_nombre || 'N/A';
                         const clave = inscripcion.asignatura_clave || '';
@@ -1075,11 +1126,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         const estadoCampo = `estado_parcial${parcial}`;
                         const estadoActual = inscripcion[estadoCampo] || inscripcion.estado || 'CURSANDO';
 
-                        html += '<div class="col-md-6 col-lg-4">';
+                        html += '<div class="col-12 col-md-6 col-lg-4">';
                         html += '<div class="card h-100">';
-                        html += '<div class="card-body">';
-                        html += `<h6 class="card-title">${asignatura}${clave ? ' (' + clave + ')' : ''}</h6>`;
-                        html += `<p class="card-text small text-muted mb-3">Sección: ${seccion}</p>`;
+                        html += '<div class="card-body p-2 p-md-3">';
+                        html += `<h6 class="card-title mb-2 small fw-bold">${asignatura}${clave ? ' (' + clave + ')' : ''}</h6>`;
+                        html += `<p class="card-text small text-muted mb-2 mb-md-3">Sección: ${seccion}</p>`;
 
                         html += '<div class="btn-group-vertical w-100" role="group">';
 
@@ -1241,20 +1292,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========== BUSCADOR DE ALUMNOS ==========
     const buscadorAlumnos = document.getElementById('buscadorAlumnos');
     const btnLimpiarBusqueda = document.getElementById('btnLimpiarBusqueda');
+    const btnLimpiarBusquedaMobile = document.getElementById('btnLimpiarBusquedaMobile');
     const tablaAlumnosBody = document.getElementById('tablaAlumnosBody');
+    const cardsAlumnosContainer = document.getElementById('cardsAlumnosContainer');
 
-    if (buscadorAlumnos && tablaAlumnosBody) {
-        buscadorAlumnos.addEventListener('input', function() {
-            const termino = this.value.toLowerCase().trim();
+    function filtrarAlumnos(termino) {
+        termino = termino.toLowerCase().trim();
+        let contador = 0;
+        let hayResultados = false;
+
+        // Filtrar tabla (desktop)
+        if (tablaAlumnosBody) {
             const filas = tablaAlumnosBody.querySelectorAll('.fila-alumno');
-            let contador = 0;
-
-            filas.forEach(function(fila, index) {
+            filas.forEach(function(fila) {
                 const matricula = fila.getAttribute('data-matricula') || '';
                 const nombre = fila.getAttribute('data-nombre') || '';
                 
                 if (matricula.includes(termino) || nombre.includes(termino)) {
                     fila.style.display = '';
+                    hayResultados = true;
                     // Actualizar el número de fila
                     const celdaNumero = fila.querySelector('td:first-child');
                     if (celdaNumero) {
@@ -1266,10 +1322,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Mostrar mensaje si no hay resultados
-            const filasVisibles = Array.from(filas).filter(f => f.style.display !== 'none');
-            if (termino && filasVisibles.length === 0) {
-                if (!tablaAlumnosBody.querySelector('.sin-resultados')) {
+            // Mostrar mensaje si no hay resultados en tabla
+            const mensajeTabla = tablaAlumnosBody.querySelector('.sin-resultados');
+            if (termino && !hayResultados) {
+                if (!mensajeTabla) {
                     const mensaje = document.createElement('tr');
                     mensaje.className = 'sin-resultados';
                     mensaje.innerHTML = `
@@ -1281,22 +1337,73 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                     tablaAlumnosBody.appendChild(mensaje);
                 }
-            } else {
-                const mensaje = tablaAlumnosBody.querySelector('.sin-resultados');
-                if (mensaje) {
-                    mensaje.remove();
-                }
+            } else if (mensajeTabla) {
+                mensajeTabla.remove();
             }
-        });
-
-        // Limpiar búsqueda
-        if (btnLimpiarBusqueda) {
-            btnLimpiarBusqueda.addEventListener('click', function() {
-                buscadorAlumnos.value = '';
-                buscadorAlumnos.dispatchEvent(new Event('input'));
-                buscadorAlumnos.focus();
-            });
         }
+
+        // Filtrar cards (móvil)
+        if (cardsAlumnosContainer) {
+            const cards = cardsAlumnosContainer.querySelectorAll('.fila-alumno-card');
+            let hayResultadosCards = false;
+            contador = 0;
+
+            cards.forEach(function(card) {
+                const matricula = card.getAttribute('data-matricula') || '';
+                const nombre = card.getAttribute('data-nombre') || '';
+                
+                if (matricula.includes(termino) || nombre.includes(termino)) {
+                    card.style.display = '';
+                    hayResultadosCards = true;
+                    // Actualizar el número en el badge
+                    const badge = card.querySelector('.badge');
+                    if (badge) {
+                        contador++;
+                        badge.textContent = '#' + contador;
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Mostrar mensaje si no hay resultados en cards
+            const mensajeCards = cardsAlumnosContainer.querySelector('.sin-resultados-card');
+            if (termino && !hayResultadosCards) {
+                if (!mensajeCards) {
+                    const mensaje = document.createElement('div');
+                    mensaje.className = 'sin-resultados-card alert alert-info text-center py-4';
+                    mensaje.innerHTML = `
+                        <i class="bi bi-info-circle me-2"></i>No se encontraron alumnos que coincidan con "${termino}"
+                    `;
+                    cardsAlumnosContainer.appendChild(mensaje);
+                }
+            } else if (mensajeCards) {
+                mensajeCards.remove();
+            }
+        }
+    }
+
+    if (buscadorAlumnos) {
+        buscadorAlumnos.addEventListener('input', function() {
+            filtrarAlumnos(this.value);
+        });
+    }
+
+    // Limpiar búsqueda
+    function limpiarBusqueda() {
+        if (buscadorAlumnos) {
+            buscadorAlumnos.value = '';
+            filtrarAlumnos('');
+            buscadorAlumnos.focus();
+        }
+    }
+
+    if (btnLimpiarBusqueda) {
+        btnLimpiarBusqueda.addEventListener('click', limpiarBusqueda);
+    }
+
+    if (btnLimpiarBusquedaMobile) {
+        btnLimpiarBusquedaMobile.addEventListener('click', limpiarBusqueda);
     }
 });
 </script>

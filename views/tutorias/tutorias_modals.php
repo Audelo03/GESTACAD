@@ -1,7 +1,7 @@
 <!-- Modal for Group Tutoring -->
 <div class="modal fade" id="modalTutoriaGrupal" tabindex="-1" aria-labelledby="modalTutoriaGrupalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTutoriaGrupalLabel">
@@ -51,9 +51,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-success">
+                <div class="modal-footer flex-column flex-sm-row gap-2">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success w-100 w-sm-auto">
                         <i class="bi bi-save me-1"></i>Guardar Tutoría Grupal
                     </button>
                 </div>
@@ -65,7 +65,7 @@
 <!-- Modal for Individual Tutoring -->
 <div class="modal fade" id="modalTutoriaIndividual" tabindex="-1" aria-labelledby="modalTutoriaIndividualLabel"
     aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTutoriaIndividualLabel">
@@ -103,9 +103,9 @@
                             required></textarea>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-info">
+                <div class="modal-footer flex-column flex-sm-row gap-2">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info w-100 w-sm-auto">
                         <i class="bi bi-save me-1"></i>Guardar Tutoría Individual
                     </button>
                 </div>

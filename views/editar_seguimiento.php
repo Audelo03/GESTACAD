@@ -71,16 +71,16 @@ include 'objects/header.php';
 
 ?>
 
-<div class="container py-5">
+<div class="container py-3 py-md-5">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-12 col-lg-8">
             <div class="card shadow border-0">
-                <div class="card-body p-4">
+                <div class="card-body p-3 p-md-4">
 
-                    <h3 class="mb-4">Editar Seguimiento</h3>
+                    <h3 class="h4 h3-md mb-3 mb-md-4">Editar Seguimiento</h3>
 
-                    <div class="mb-4 p-3 rounded">
-                        <h5 class="mb-1 "><?= htmlspecialchars($alumno['nombre'] ?? '') ?></h5>
+                    <div class="mb-3 mb-md-4 p-3 rounded bg-light">
+                        <h5 class="h6 h5-md mb-1"><?= htmlspecialchars($alumno['nombre'] ?? '') ?></h5>
                         <small class="text-muted">Matrícula: <?= htmlspecialchars($alumno['matricula'] ?? '') ?></small>
                     </div>
 
@@ -98,8 +98,8 @@ include 'objects/header.php';
                             <?php endif; ?>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                        <div class="row g-2 g-md-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label for="estatus" class="form-label">Estatus</label>
                                 <select class="form-select <?= isset($errors['estatus']) ? 'is-invalid' : '' ?>" id="estatus" name="estatus">
                                     <option value="1" <?= $estatus == 1 ? 'selected' : '' ?>>Abierto</option>
@@ -110,7 +110,7 @@ include 'objects/header.php';
                                     <div class="invalid-feedback"><?= htmlspecialchars($errors['estatus']) ?></div>
                                 <?php endif; ?>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label for="tipo_seguimiento_id" class="form-label">Tipo de Seguimiento</label>
                                 <select class="form-select <?= isset($errors['tipo_seguimiento_id']) ? 'is-invalid' : '' ?>" id="tipo_seguimiento_id" name="tipo_seguimiento_id">
                                     <option value="">Selecciona un tipo...</option>
@@ -132,14 +132,14 @@ include 'objects/header.php';
                         </div>
                         
 
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
                             <a href="ver_seguimientos.php?id_alumno=<?= $id_alumno ?>" 
-                               class="btn btn-outline-secondary me-2">
+                               class="btn btn-outline-secondary w-100 w-sm-auto">
                                 Cancelar
                             </a>
                             <button type="submit" 
-                                    class="btn btn-primary">
-                                Actualizar
+                                    class="btn btn-primary w-100 w-sm-auto">
+                                <i class="bi bi-save me-2"></i>Actualizar
                             </button>
                         </div>
                     </form>

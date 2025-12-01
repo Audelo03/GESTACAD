@@ -31,69 +31,75 @@ include 'objects/header.php';
 include 'tutorias/tutorias_modals.php';
 ?>
 
-<div class="container mt-5">
-    <div class="card shadow-sm mb-4"> <div class="card-body">
-<h1 class="h3 mb-1">Gestionar Asistencias del Grupo</h1>
- <h2 class="h5 text-muted"><?= htmlspecialchars($nombre_grupo) ?></h2>
- </div>
- </div>
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-            <button type="button" 
-                    class="btn btn-primary btn-lg btn-tutoria-grupal-today" 
-                    data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
-                    data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
-                    data-bs-toggle="tooltip" 
-                    data-bs-placement="top" 
-                    title="Tomar Asistencia Grupal para Hoy">
-                <i class="bi bi-calendar-plus-fill me-2"></i>
-                Pasar lista / Editar la de hoy (<?= date('d/m/Y') ?>)
-            </button>
-            
-            <div class="d-flex gap-2">
+<div class="container mt-3 mt-md-5">
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <h1 class="h4 h3-md mb-1">Gestionar Asistencias del Grupo</h1>
+            <h2 class="h6 h5-md text-muted mb-0"><?= htmlspecialchars($nombre_grupo) ?></h2>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3">
                 <button type="button" 
-                        class="btn btn-outline-primary btn-lg btn-tutoria-grupal" 
+                        class="btn btn-primary w-100 w-md-auto btn-lg btn-tutoria-grupal-today" 
                         data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
                         data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
                         data-bs-toggle="tooltip" 
                         data-bs-placement="top" 
-                        title="Tutoría Grupal">
-                    <i class="bi bi-people-fill me-2"></i>Grupal
+                        title="Tomar Asistencia Grupal para Hoy">
+                    <i class="bi bi-calendar-plus-fill me-2"></i>
+                    <span class="d-none d-sm-inline">Pasar lista / Editar la de hoy</span>
+                    <span class="d-sm-none">Pasar lista</span>
+                    <small class="d-block d-sm-inline d-md-none mt-1">(<?= date('d/m/Y') ?>)</small>
+                    <span class="d-none d-md-inline"> (<?= date('d/m/Y') ?>)</span>
                 </button>
                 
-                <button type="button" 
-                        class="btn btn-outline-info btn-lg btn-tutoria-individual" 
-                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
-                        data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
-                        data-bs-toggle="tooltip" 
-                        data-bs-placement="top" 
-                        title="Tutoría Individual">
-                    <i class="bi bi-person-fill me-2"></i>Individual
-                </button>
-                
-                <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>" 
-                   class="btn btn-outline-secondary btn-lg"
-                   data-bs-toggle="tooltip" 
-                   data-bs-placement="top" 
-                   title="Ver Alumnos del Grupo">
-                    <i class="bi bi-gear-fill me-2"></i>Ver Alumnos
-                </a>
+                <div class="d-grid d-md-flex gap-2 w-100 w-md-auto">
+                    <button type="button" 
+                            class="btn btn-outline-primary btn-lg btn-tutoria-grupal flex-fill flex-md-none" 
+                            data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
+                            data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Tutoría Grupal">
+                        <i class="bi bi-people-fill me-2"></i>Grupal
+                    </button>
+                    
+                    <button type="button" 
+                            class="btn btn-outline-info btn-lg btn-tutoria-individual flex-fill flex-md-none" 
+                            data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
+                            data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
+                            data-bs-toggle="tooltip" 
+                            data-bs-placement="top" 
+                            title="Tutoría Individual">
+                        <i class="bi bi-person-fill me-2"></i>Individual
+                    </button>
+                    
+                    <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>" 
+                       class="btn btn-outline-secondary btn-lg flex-fill flex-md-none"
+                       data-bs-toggle="tooltip" 
+                       data-bs-placement="top" 
+                       title="Ver Alumnos del Grupo">
+                        <i class="bi bi-gear-fill me-2"></i><span class="d-none d-sm-inline">Ver Alumnos</span><span class="d-sm-none">Alumnos</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
     <!-- Tutorías Grupales -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-3 mb-md-4">
         <div class="card-header">
-            <h3 class="h5 mb-0"><i class="bi bi-people-fill me-2"></i> Tutorías Grupales</h3>
+            <h3 class="h5 h6-md mb-0"><i class="bi bi-people-fill me-2"></i> Tutorías Grupales</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-2 p-md-3">
             <?php if (!empty($tutoriasGrupales)): ?>
-                <div class="table-responsive">
-                    <table class="table table-hover">
+                <!-- Vista de tabla para desktop -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -131,21 +137,54 @@ include 'tutorias/tutorias_modals.php';
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Vista de cards para móvil -->
+                <div class="d-md-none">
+                    <?php foreach ($tutoriasGrupales as $tutoria): ?>
+                        <div class="card mb-3 border-start border-primary border-3">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="card-title mb-1 fw-bold">
+                                            <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                            <?= htmlspecialchars(date("d/m/Y", strtotime($tutoria['fecha']))) ?>
+                                        </h6>
+                                        <p class="card-text text-muted small mb-2">
+                                            <i class="bi bi-person-badge me-1"></i>
+                                            <?= htmlspecialchars(($tutoria['tutor_nombre'] ?? '') . ' ' . ($tutoria['tutor_apellido'] ?? '')) ?>
+                                        </p>
+                                    </div>
+                                    <span class="badge bg-info fs-6">
+                                        <?= $tutoria['total_presentes'] ?? 0 ?> / <?= $tutoria['total_alumnos'] ?? 0 ?>
+                                    </span>
+                                </div>
+                                <button type="button"
+                                        class="btn btn-outline-primary w-100 btn-editar-tutoria-grupal"
+                                        data-tutoria-id="<?= $tutoria['id'] ?>"
+                                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
+                                        data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>">
+                                    <i class="bi bi-pencil-square me-2"></i> Editar
+                                </button>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php else: ?>
-                <div class="alert alert-info">No hay tutorías grupales registradas para este grupo.</div>
+                <div class="alert alert-info mb-0">No hay tutorías grupales registradas para este grupo.</div>
             <?php endif; ?>
         </div>
     </div>
 
     <!-- Tutorías Individuales -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm mb-3 mb-md-4">
         <div class="card-header">
-            <h3 class="h5 mb-0"><i class="bi bi-person-fill me-2"></i> Tutorías Individuales</h3>
+            <h3 class="h5 h6-md mb-0"><i class="bi bi-person-fill me-2"></i> Tutorías Individuales</h3>
         </div>
-        <div class="card-body">
+        <div class="card-body p-2 p-md-3">
             <?php if (!empty($tutoriasIndividuales)): ?>
-                <div class="table-responsive">
-                    <table class="table table-hover">
+                <!-- Vista de tabla para desktop -->
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-hover mb-0">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -170,8 +209,44 @@ include 'tutorias/tutorias_modals.php';
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Vista de cards para móvil -->
+                <div class="d-md-none">
+                    <?php foreach ($tutoriasIndividuales as $tutoria): ?>
+                        <div class="card mb-3 border-start border-info border-3">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="card-title mb-1 fw-bold">
+                                            <i class="bi bi-person me-2 text-info"></i>
+                                            <?= htmlspecialchars(($tutoria['alumno_nombre'] ?? '') . ' ' . ($tutoria['alumno_apellido_paterno'] ?? '') . ' ' . ($tutoria['alumno_apellido_materno'] ?? '')) ?>
+                                        </h6>
+                                        <p class="card-text text-muted small mb-1">
+                                            <i class="bi bi-person-badge me-1"></i>
+                                            <strong>Matrícula:</strong> <?= htmlspecialchars($tutoria['matricula'] ?? '') ?>
+                                        </p>
+                                        <p class="card-text text-muted small mb-0">
+                                            <i class="bi bi-calendar3 me-1"></i>
+                                            <?= htmlspecialchars(date("d/m/Y", strtotime($tutoria['fecha']))) ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted d-block mb-1"><strong>Motivo:</strong></small>
+                                    <p class="card-text small mb-0"><?= htmlspecialchars($tutoria['motivo'] ?? '') ?></p>
+                                </div>
+                                <div class="mt-2 pt-2 border-top">
+                                    <small class="text-muted">
+                                        <i class="bi bi-person-check me-1"></i>
+                                        <strong>Tutor:</strong> <?= htmlspecialchars(($tutoria['tutor_nombre'] ?? '') . ' ' . ($tutoria['tutor_apellido'] ?? '')) ?>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             <?php else: ?>
-                <div class="alert alert-info">No hay tutorías individuales registradas para este grupo.</div>
+                <div class="alert alert-info mb-0">No hay tutorías individuales registradas para este grupo.</div>
             <?php endif; ?>
         </div>
     </div>
