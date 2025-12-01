@@ -78,150 +78,406 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
   <style>
     :root {
-      --login-bg: linear-gradient(160deg, #0f172a 0%, #111827 35%, #0b1323 100%);
-      --login-card: #0f172a;
-      --login-accent: #4f9cf9;
-      --login-text: #e5e7eb;
-      --login-muted: #9ca3af;
+      --login-bg: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+      --login-card: rgba(255, 255, 255, 0.95);
+      --login-card-blur: rgba(255, 255, 255, 0.1);
+      --login-accent: #667eea;
+      --login-accent-hover: #5568d3;
+      --login-text: #1a202c;
+      --login-muted: #718096;
+      --login-border: rgba(102, 126, 234, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     html,
     body {
       height: 100%;
+      overflow-x: hidden;
     }
 
     body.login-page {
       background: var(--login-bg);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
       color: var(--login-text);
-      padding: 1.5rem 0;
+      padding: 1.5rem;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Animated background gradient */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Floating particles effect */
+    body.login-page::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
     }
 
     .form-signin {
-      max-width: 420px;
-      padding: 2.25rem 2rem;
+      max-width: 440px;
+      width: 100%;
+      padding: 3rem 2.5rem;
       background: var(--login-card);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+      border-radius: 24px;
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.6s ease-out;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-signin:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .login-brand {
-      color: var(--login-accent);
-      letter-spacing: 0.5px;
-      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 1px;
+      font-weight: 900;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .login-logo {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 20px;
+      padding: 12px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin-bottom: 1rem;
+    }
+
+    .login-logo:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
     }
 
     .login-title {
       color: var(--login-text);
-      font-weight: 700;
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
     }
 
     .login-footer {
       color: var(--login-muted);
-      font-size: 0.9rem;
+      font-size: 0.875rem;
+      margin-top: 2rem;
+    }
+
+    .form-floating {
+      margin-bottom: 1.5rem;
     }
 
     .form-floating>label {
       color: var(--login-muted);
       font-weight: 500;
+      padding: 1rem 1.25rem;
+      font-size: 0.95rem;
     }
 
     .form-floating .form-control {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #000000;
-      padding-right: 3.2rem;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid var(--login-border);
+      color: #1a202c;
+      padding: 1rem 1.25rem;
+      padding-right: 3.5rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: calc(3.5rem + 2px);
+    }
+
+    .form-floating .form-control::placeholder {
+      color: transparent;
+    }
+
+    .form-floating .form-control:focus {
+      background: rgba(255, 255, 255, 1);
+      border-color: var(--login-accent);
+      box-shadow: 
+        0 0 0 4px rgba(102, 126, 234, 0.1),
+        0 4px 12px rgba(102, 126, 234, 0.15);
+      color: #1a202c;
+      transform: translateY(-1px);
+    }
+
+    .form-floating .form-control.is-valid {
+      border-color: #10b981;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1a202c;
+    }
+
+    .form-floating .form-control.is-valid:focus {
+      border-color: #10b981;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 
+        0 0 0 4px rgba(16, 185, 129, 0.1),
+        0 4px 12px rgba(16, 185, 129, 0.15);
+      color: #1a202c;
+    }
+
+    .form-floating .form-control.is-invalid {
+      border-color: #ef4444;
+      background: rgba(255, 255, 255, 0.95);
+      color: #1a202c;
+    }
+
+    .form-floating .form-control.is-invalid:focus {
+      border-color: #ef4444;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 
+        0 0 0 4px rgba(239, 68, 68, 0.1),
+        0 4px 12px rgba(239, 68, 68, 0.15);
+      color: #1a202c;
+    }
+
+    .login-submit {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      padding: 0.875rem 1.5rem;
+      box-shadow: 
+        0 4px 15px rgba(102, 126, 234, 0.4),
+        0 0 0 0 rgba(102, 126, 234, 0.5);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      margin-top: 0.5rem;
+    }
+
+    .login-submit::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .login-submit:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .login-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 20px rgba(102, 126, 234, 0.5),
+        0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .login-submit:active {
+      transform: translateY(0);
+      box-shadow: 
+        0 2px 10px rgba(102, 126, 234, 0.4),
+        0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+
+    .login-submit span {
       position: relative;
       z-index: 1;
     }
 
-    .form-floating .form-control:focus {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: var(--login-accent);
-      box-shadow: 0 0 0 0.2rem rgba(79, 156, 249, 0.2);
-      color: #000000;
-    }
-
-    .login-submit {
-      background: linear-gradient(135deg, #4f9cf9, #3b82f6);
-      color: #fff;
-      font-weight: 700;
-      border: none;
-      box-shadow: 0 10px 25px rgba(79, 156, 249, 0.35);
-    }
-
-    .login-submit:hover {
-      opacity: 0.95;
-    }
-
     .password-toggle {
-      right: 0.6rem;
+      right: 0.75rem;
       top: 50%;
       transform: translateY(-50%);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0;
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       color: var(--login-muted);
       z-index: 3;
       cursor: pointer;
       background: transparent;
       border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
     }
 
     .password-toggle:focus {
-      outline: none;
-      box-shadow: none;
+      outline: 2px solid var(--login-accent);
+      outline-offset: 2px;
     }
 
     .password-toggle:hover {
-      color: var(--login-muted) !important;
-      transform: translateY(-50%) !important;
+      color: var(--login-accent);
+      background: rgba(102, 126, 234, 0.1);
+      transform: translateY(-50%) scale(1.1);
     }
 
     .password-toggle i {
       pointer-events: none;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
     }
 
     .login-card .form-floating {
-      border-radius: 0.75rem;
-      overflow: hidden;
+      border-radius: 12px;
     }
 
-    .photo-placeholder {
-      width: 70px;
-      height: 70px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .alert {
+      border-radius: 12px;
+      border: none;
+      backdrop-filter: blur(10px);
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .invalid-feedback,
+    .valid-feedback {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-top: 0.5rem;
+      padding-left: 0.25rem;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .valid-feedback {
+      color: #10b981;
+    }
+
+    .invalid-feedback {
+      color: #ef4444;
     }
 
     @media (max-width: 575.98px) {
       body.login-page {
-        padding: 1rem 0.75rem;
+        padding: 1rem;
       }
 
       .form-signin {
-        padding: 1.5rem 1.25rem;
-        border-radius: 1.25rem;
+        padding: 2rem 1.5rem;
+        border-radius: 20px;
+      }
+
+      .login-brand {
+        font-size: 1.75rem;
+      }
+
+      .login-logo {
+        width: 75px;
+        height: 75px;
       }
 
       .form-floating .form-control {
-        padding-left: 2.9rem;
+        padding-left: 1rem;
         padding-right: 3rem;
+        font-size: 16px; /* Prevents zoom on iOS */
       }
 
       .form-floating>label {
-        padding-left: 2.9rem;
+        padding-left: 1rem;
       }
+    }
 
-      .login-title {
-        margin-top: 0.5rem;
-      }
+    /* Smooth focus transitions */
+    .form-control,
+    .btn {
+      outline: none;
+    }
+
+    /* Loading state for button */
+    .login-submit.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .login-submit.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
   <link href="/GESTACAD/public/css/theme.css" rel="stylesheet">
@@ -240,14 +496,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
         <?php unset($_SESSION['error_message']); endif; ?>
 
-      <div class="text-center mb-4">
-        <p class="h3 mb-3 font-weight-bold login-brand">GESTACAD</p>
-        <div class="login-photo-placeholder mb-3">
+      <div class="text-center mb-5">
+        <div class="mb-4">
           <img src="/GESTACAD/public/images/logo.png" alt="Logo GESTACAD" class="login-logo"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-
+            onerror="this.style.display='none';">
         </div>
-        <h2 class="h5 mb-4 fw-normal login-title">Iniciar Sesión</h2>
+        <p class="login-brand mb-2">GESTACAD</p>
+        <h2 class="login-title">Iniciar Sesión</h2>
+        <p style="color: var(--login-muted); font-size: 0.9rem; margin-top: 0.5rem;">Ingresa tus credenciales para continuar</p>
       </div>
 
       <div class="form-floating mb-3">
@@ -268,12 +524,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </button>
         <div class="invalid-feedback" id="passwordError"></div>
       </div>
-      <button class="btn login-submit w-100 py-2" type="submit">Entrar</button>
+      <button class="btn login-submit w-100 py-3" type="submit">
+        <span>Entrar</span>
+      </button>
 
       <?php if (!empty($error)): ?>
-        <div class="alert alert-danger d-flex align-items-center mt-3" role="alert">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          <div>
+        <div class="alert alert-danger d-flex align-items-center mt-4" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+          <div class="flex-grow-1">
             <?= htmlspecialchars($error) ?>
           </div>
         </div>
@@ -330,7 +588,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       });
 
       // Form submission validation
-      document.querySelector('form').addEventListener('submit', function (e) {
+      const form = document.querySelector('form');
+      const submitBtn = document.querySelector('.login-submit');
+      
+      form.addEventListener('submit', function (e) {
         const email = emailField.value.trim();
         const password = passwordField.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -358,6 +619,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           if (firstInvalid) {
             firstInvalid.focus();
           }
+        } else {
+          // Add loading state
+          submitBtn.classList.add('loading');
+          submitBtn.querySelector('span').textContent = 'Iniciando sesión...';
         }
       });
 
