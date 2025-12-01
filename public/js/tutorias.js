@@ -25,6 +25,15 @@
                 const grupoNombre = btn.dataset.grupoNombre;
                 openModalTutoriaGrupal(grupoId, grupoNombre);
             }
+            
+            // Button for today's tutoring (check if exists)
+            if (e.target.closest('.btn-tutoria-grupal-today')) {
+                e.preventDefault();
+                const btn = e.target.closest('.btn-tutoria-grupal-today');
+                const grupoId = btn.dataset.grupoId;
+                const grupoNombre = btn.dataset.grupoNombre;
+                openModalTutoriaGrupalToday(grupoId, grupoNombre);
+            }
         });
 
         // Individual tutoring buttons
@@ -63,15 +72,21 @@
     }
 
     /**
-     * Set default dates to today
+     * Set default dates to today and make them readonly
      */
     function setDefaultDates() {
         const today = new Date().toISOString().split('T')[0];
         const grupalFecha = document.getElementById('grupal-fecha');
         const individualFecha = document.getElementById('individual-fecha');
-
-        if (grupalFecha) grupalFecha.value = today;
-        if (individualFecha) individualFecha.value = today;
+        
+        if (grupalFecha) {
+            grupalFecha.value = today;
+            grupalFecha.setAttribute('readonly', 'readonly');
+        }
+        if (individualFecha) {
+            individualFecha.value = today;
+            individualFecha.setAttribute('readonly', 'readonly');
+        }
     }
 
     /**
@@ -79,8 +94,29 @@
      */
     function openModalTutoriaGrupal(grupoId, grupoNombre) {
         // Set group info
-        document.getElementById('grupal-grupo-id').value = grupoId;
-        document.getElementById('grupal-grupo-nombre').textContent = grupoNombre;
+        const grupoIdInput = document.getElementById('grupal-grupo-id');
+        const grupoNombreSpan = document.getElementById('grupal-grupo-nombre');
+        const modalLabel = document.getElementById('modalTutoriaGrupalLabel');
+        const fechaInput = document.getElementById('grupal-fecha');
+        const submitBtn = document.querySelector('#formTutoriaGrupal button[type="submit"]');
+        
+        if (grupoIdInput) grupoIdInput.value = grupoId;
+        if (grupoNombreSpan) grupoNombreSpan.textContent = grupoNombre;
+        if (modalLabel) modalLabel.innerHTML = `<i class="bi bi-people-fill me-2"></i>Lista Grupal - ${grupoNombre}`;
+        
+        // Set today's date and make it readonly
+        const today = new Date().toISOString().split('T')[0];
+        if (fechaInput) {
+            fechaInput.value = today;
+            fechaInput.setAttribute('readonly', 'readonly');
+        }
+        if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-save me-1"></i>Guardar Tutoría Grupal';
+
+        // Clear any existing tutoria ID
+        const tutoriaIdInput = document.getElementById('grupal-tutoria-id');
+        if (tutoriaIdInput) {
+            tutoriaIdInput.remove();
+        }
 
         // Load students for attendance
         loadAlumnosForGrupal(grupoId);
@@ -91,12 +127,94 @@
     }
 
     /**
+     * Open group tutoring modal for today (check if exists and edit if so)
+     */
+    function openModalTutoriaGrupalToday(grupoId, grupoNombre) {
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Check if a tutoring session exists for today
+        fetch(`controllers/tutoriasController.php?action=getGrupalByGrupoAndDate&grupo_id=${grupoId}&fecha=${today}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data) {
+                    // Existe, abrir en modo edición
+                    openModalTutoriaGrupalEdit(data.data, grupoId, grupoNombre);
+                } else {
+                    // No existe, abrir en modo creación
+                    openModalTutoriaGrupal(grupoId, grupoNombre);
+                }
+            })
+            .catch(error => {
+                console.error('Error checking for existing tutoring:', error);
+                // En caso de error, abrir en modo creación
+                openModalTutoriaGrupal(grupoId, grupoNombre);
+            });
+    }
+
+    /**
+     * Open group tutoring modal in edit mode
+     */
+    function openModalTutoriaGrupalEdit(tutoria, grupoId, grupoNombre) {
+        // Set group info
+        const grupoIdInput = document.getElementById('grupal-grupo-id');
+        const grupoNombreSpan = document.getElementById('grupal-grupo-nombre');
+        const modalLabel = document.getElementById('modalTutoriaGrupalLabel');
+        const fechaInput = document.getElementById('grupal-fecha');
+        const actividadNombreInput = document.getElementById('grupal-actividad-nombre');
+        const actividadDescripcionInput = document.getElementById('grupal-actividad-descripcion');
+        const submitBtn = document.querySelector('#formTutoriaGrupal button[type="submit"]');
+        
+        if (grupoIdInput) grupoIdInput.value = grupoId;
+        if (grupoNombreSpan) grupoNombreSpan.textContent = grupoNombre;
+        if (modalLabel) modalLabel.innerHTML = `<i class="bi bi-pencil-square me-2"></i>Editar Tutoría Grupal - ${grupoNombre}`;
+        if (fechaInput) {
+            fechaInput.value = tutoria.fecha;
+            fechaInput.setAttribute('readonly', 'readonly');
+        }
+        if (actividadNombreInput) actividadNombreInput.value = tutoria.actividad_nombre || '';
+        if (actividadDescripcionInput) actividadDescripcionInput.value = tutoria.actividad_descripcion || '';
+        if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-save me-1"></i>Actualizar Tutoría Grupal';
+        
+        // Add hidden input for tutoria ID
+        const form = document.getElementById('formTutoriaGrupal');
+        if (form) {
+            let tutoriaIdInput = document.getElementById('grupal-tutoria-id');
+            if (!tutoriaIdInput) {
+                tutoriaIdInput = document.createElement('input');
+                tutoriaIdInput.type = 'hidden';
+                tutoriaIdInput.id = 'grupal-tutoria-id';
+                tutoriaIdInput.name = 'tutoria_id';
+                form.appendChild(tutoriaIdInput);
+            }
+            tutoriaIdInput.value = tutoria.id;
+        }
+        
+        // Load students and mark present ones
+        loadAlumnosForGrupalEdit(grupoId, tutoria.asistencia || []);
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('modalTutoriaGrupal'));
+        modal.show();
+    }
+
+    /**
      * Open individual tutoring modal
      */
     function openModalTutoriaIndividual(grupoId, grupoNombre) {
         // Set group info
-        document.getElementById('individual-grupo-id').value = grupoId;
-        document.getElementById('individual-grupo-nombre').textContent = grupoNombre;
+        const grupoIdInput = document.getElementById('individual-grupo-id');
+        const grupoNombreSpan = document.getElementById('individual-grupo-nombre');
+        const fechaInput = document.getElementById('individual-fecha');
+        
+        if (grupoIdInput) grupoIdInput.value = grupoId;
+        if (grupoNombreSpan) grupoNombreSpan.textContent = grupoNombre;
+        
+        // Set today's date and make it readonly
+        const today = new Date().toISOString().split('T')[0];
+        if (fechaInput) {
+            fechaInput.value = today;
+            fechaInput.setAttribute('readonly', 'readonly');
+        }
 
         // Load students for selection
         loadAlumnosForIndividual(grupoId);
@@ -121,6 +239,8 @@
      */
     function loadAlumnosForGrupal(grupoId) {
         const container = document.getElementById('grupal-lista-alumnos');
+        if (!container) return;
+        
         container.innerHTML = '<div class="text-center text-muted"><div class="spinner-border spinner-border-sm me-2" role="status"><span class="visually-hidden">Cargando...</span></div>Cargando alumnos...</div>';
 
         fetch(`controllers/tutoriasController.php?action=getAlumnosByGrupo&grupo_id=${grupoId}`)
@@ -133,6 +253,56 @@
                             <div class="list-group-item">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="asistencia[${alumno.id_alumno}]" value="1" id="asist_${alumno.id_alumno}">
+                                    <label class="form-check-label" for="asist_${alumno.id_alumno}">
+                                        ${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}
+                                        <small class="text-muted d-block">${alumno.matricula}</small>
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<div class="alert alert-warning mb-0">No hay alumnos en este grupo</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading students:', error);
+                container.innerHTML = '<div class="alert alert-danger mb-0">Error al cargar los alumnos</div>';
+            });
+    }
+
+    /**
+     * Load students for group tutoring attendance in edit mode
+     */
+    function loadAlumnosForGrupalEdit(grupoId, asistencia) {
+        const container = document.getElementById('grupal-lista-alumnos');
+        if (!container) return;
+        
+        container.innerHTML = '<div class="text-center text-muted"><div class="spinner-border spinner-border-sm me-2" role="status"><span class="visually-hidden">Cargando...</span></div>Cargando alumnos...</div>';
+
+        // Create a map of present students
+        const presentesMap = {};
+        if (asistencia && asistencia.length > 0) {
+            asistencia.forEach(function(a) {
+                if (a.presente == 1 || a.presente === '1') {
+                    presentesMap[a.alumno_id] = true;
+                }
+            });
+        }
+
+        fetch(`controllers/tutoriasController.php?action=getAlumnosByGrupo&grupo_id=${grupoId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data.length > 0) {
+                    let html = '<div class="list-group list-group-flush">';
+                    data.data.forEach(alumno => {
+                        const checked = presentesMap[alumno.id_alumno] ? 'checked' : '';
+                        html += `
+                            <div class="list-group-item">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="asistencia[${alumno.id_alumno}]" value="1" id="asist_${alumno.id_alumno}" ${checked}>
                                     <label class="form-check-label" for="asist_${alumno.id_alumno}">
                                         ${alumno.nombre} ${alumno.apellido_paterno} ${alumno.apellido_materno}
                                         <small class="text-muted d-block">${alumno.matricula}</small>
@@ -233,12 +403,20 @@
     function submitTutoriaGrupal(form) {
         const formData = new FormData(form);
         const submitBtn = form.querySelector('button[type="submit"]');
+        const tutoriaIdInput = document.getElementById('grupal-tutoria-id');
+        const tutoriaId = tutoriaIdInput ? tutoriaIdInput.value : null;
 
         // Disable submit button
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
 
-        fetch('controllers/tutoriasController.php?action=createGrupal', {
+        // Determine if it's an update or create
+        const action = tutoriaId ? 'updateGrupal' : 'createGrupal';
+        if (tutoriaId) {
+            formData.append('id', tutoriaId);
+        }
+
+        fetch(`controllers/tutoriasController.php?action=${action}`, {
             method: 'POST',
             body: formData
         })
@@ -246,7 +424,8 @@
             .then(data => {
                 if (data.success) {
                     // Show success message
-                    showAlert('success', data.message || 'Tutoría grupal creada exitosamente');
+                    const message = tutoriaId ? 'Tutoría grupal actualizada exitosamente' : 'Tutoría grupal creada exitosamente';
+                    showAlert('success', data.message || message);
 
                     // Close modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById('modalTutoriaGrupal'));
@@ -255,8 +434,13 @@
                     // Reset form
                     form.reset();
                     setDefaultDates();
+                    
+                    // Reload page to refresh the list
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
-                    showAlert('danger', data.message || 'Error al crear la tutoría grupal');
+                    showAlert('danger', data.message || 'Error al guardar la tutoría grupal');
                 }
             })
             .catch(error => {

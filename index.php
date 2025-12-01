@@ -85,6 +85,8 @@ $viewMap = [
     'gestionar-listas' => 'views/gestionar_listas.php',
     'gestionar_listas' => 'views/gestionar_listas.php',
     'guardar_asistencia' => 'views/guardar_asistencia.php',
+    'ver-alumnos-grupo' => 'views/ver_alumnos_grupo.php',
+    'ver_alumnos_grupo' => 'views/ver_alumnos_grupo.php',
 
     // Estructura Académica
     'divisiones' => 'views/CRUDS/divisiones.php',

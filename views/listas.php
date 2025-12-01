@@ -67,18 +67,6 @@ $nombre = $_SESSION['usuario_nombre'] . ' ' . $_SESSION['usuario_apellido_patern
     if (window.listasScriptLoaded) return;
     window.listasScriptLoaded = true;
 
-    // Esperar a que el DOM y Bootstrap estén listos
-    function waitForBootstrap(callback) {
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Tooltip !== 'undefined') {
-            callback();
-        } else {
-            // Si Bootstrap no está disponible, esperar un poco más
-            setTimeout(function() {
-                waitForBootstrap(callback);
-            }, 100);
-        }
-    }
-
     const buscadorInput = document.getElementById('buscador');
     const contenedorAlumnos = document.getElementById('contenedor-alumnos');
     const paginacionControles = document.getElementById('paginacion-controles');
@@ -95,12 +83,7 @@ $nombre = $_SESSION['usuario_nombre'] . ' ' . $_SESSION['usuario_apellido_patern
             if (!response.ok) throw new Error('Error en la respuesta del servidor.');
             const data = await response.json();
             contenedorAlumnos.innerHTML = data.html;
-            
-            // Inicializar tooltips después de un pequeño delay para asegurar que Bootstrap esté cargado
-            setTimeout(function() {
-                initTooltips();
-            }, 100);
-            
+             initTooltips(); 
             actualizarPaginacion(data.currentPage, data.totalPages, termino);
         } catch (error) {
             console.error('Error al cargar alumnos:', error);
@@ -121,22 +104,6 @@ $nombre = $_SESSION['usuario_nombre'] . ' ' . $_SESSION['usuario_apellido_patern
     }
 
     function initTooltips() {
-        // Verificar que Bootstrap esté disponible
-        if (typeof bootstrap === 'undefined' || typeof bootstrap.Tooltip === 'undefined') {
-            console.warn('Bootstrap no está disponible aún. Los tooltips se inicializarán cuando Bootstrap esté cargado.');
-            return;
-        }
-        
-        // Eliminar tooltips existentes antes de crear nuevos
-        var oldTooltipList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        oldTooltipList.forEach(function (tooltipEl) {
-            var tooltip = bootstrap.Tooltip.getInstance(tooltipEl);
-            if (tooltip) {
-                tooltip.dispose();
-            }
-        });
-        
-        // Crear nuevos tooltips
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -161,13 +128,13 @@ $nombre = $_SESSION['usuario_nombre'] . ' ' . $_SESSION['usuario_apellido_patern
                 cargarAlumnos(1, termino, true);
             else
                 cargarAlumnos(1, termino, false);
+            
+
+
+            
         }, 500);
     });
-    
-    // Esperar a que Bootstrap esté disponible antes de cargar alumnos
-    waitForBootstrap(function() {
-        cargarAlumnos(1);
-    });
+    cargarAlumnos(1); 
 })();
 </script>
 

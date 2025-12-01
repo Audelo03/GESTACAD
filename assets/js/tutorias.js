@@ -5,16 +5,11 @@
 (function() {
     'use strict';
 
-    // Modal instances
-    let modalGrupalInstance = null;
-    let modalIndividualInstance = null;
-
     // Initialize on DOM ready
     document.addEventListener('DOMContentLoaded', function() {
         initTutoriaButtons();
         initTutoriaForms();
         setDefaultDates();
-        initModalCleanup();
     });
 
     /**
@@ -80,38 +75,6 @@
     }
 
     /**
-     * Initialize modal cleanup handlers
-     */
-    function initModalCleanup() {
-        const modalGrupal = document.getElementById('modalTutoriaGrupal');
-        const modalIndividual = document.getElementById('modalTutoriaIndividual');
-
-        if (modalGrupal) {
-            modalGrupal.addEventListener('hidden.bs.modal', function() {
-                // Remove any remaining backdrop
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(backdrop => backdrop.remove());
-                // Remove modal-open class from body
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            });
-        }
-
-        if (modalIndividual) {
-            modalIndividual.addEventListener('hidden.bs.modal', function() {
-                // Remove any remaining backdrop
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(backdrop => backdrop.remove());
-                // Remove modal-open class from body
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            });
-        }
-    }
-
-    /**
      * Open group tutoring modal
      */
     function openModalTutoriaGrupal(grupoId, grupoNombre) {
@@ -122,12 +85,9 @@
         // Load students for attendance
         loadAlumnosForGrupal(grupoId);
 
-        // Get or create modal instance
-        const modalElement = document.getElementById('modalTutoriaGrupal');
-        if (!modalGrupalInstance) {
-            modalGrupalInstance = new bootstrap.Modal(modalElement);
-        }
-        modalGrupalInstance.show();
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('modalTutoriaGrupal'));
+        modal.show();
     }
 
     /**
@@ -141,12 +101,9 @@
         // Load students for selection
         loadAlumnosForIndividual(grupoId);
 
-        // Get or create modal instance
-        const modalElement = document.getElementById('modalTutoriaIndividual');
-        if (!modalIndividualInstance) {
-            modalIndividualInstance = new bootstrap.Modal(modalElement);
-        }
-        modalIndividualInstance.show();
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('modalTutoriaIndividual'));
+        modal.show();
     }
 
     /**

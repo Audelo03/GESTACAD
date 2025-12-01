@@ -85,6 +85,78 @@ class TutoriasController
     }
 
     /**
+     * Update an existing group tutoring session
+     */
+    public function updateGrupal()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        if (!isset($_POST['id'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de tutoría no proporcionado']);
+            return;
+        }
+
+        try {
+            // Handle file upload if provided
+            $evidencia_foto_id = null;
+            if (isset($_POST['evidencia_foto_id']) && !empty($_POST['evidencia_foto_id'])) {
+                $evidencia_foto_id = $_POST['evidencia_foto_id'];
+            }
+            
+            // If a new file is uploaded, process it
+            if (isset($_FILES['evidencia_foto']) && $_FILES['evidencia_foto']['error'] === UPLOAD_ERR_OK) {
+                $new_file_id = $this->uploadFile($_FILES['evidencia_foto']);
+                if ($new_file_id) {
+                    $evidencia_foto_id = $new_file_id;
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Error al subir la foto de evidencia']);
+                    return;
+                }
+            }
+
+            // Prepare tutoring data
+            $data = [
+                'grupo_id' => $_POST['grupo_id'],
+                'parcial_id' => $_POST['parcial_id'],
+                'fecha' => $_POST['fecha'] ?? date('Y-m-d'),
+                'actividad_nombre' => $_POST['actividad_nombre'],
+                'actividad_descripcion' => $_POST['actividad_descripcion'] ?? '',
+                'evidencia_foto_id' => $evidencia_foto_id,
+                'usuario_id' => $_SESSION['usuario_id']
+            ];
+
+            // Prepare attendance data
+            $asistencia = [];
+            if (isset($_POST['asistencia']) && is_array($_POST['asistencia'])) {
+                foreach ($_POST['asistencia'] as $alumno_id => $presente) {
+                    $asistencia[$alumno_id] = (int) $presente;
+                }
+            }
+
+            // Update the tutoring session
+            $success = $this->tutoriaGrupal->update($_POST['id'], $data, $asistencia);
+
+            if ($success) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Tutoría grupal actualizada exitosamente'
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al actualizar la tutoría grupal']);
+            }
+
+        } catch (Exception $e) {
+            error_log("Error in updateGrupal: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
      * Create a new individual tutoring session
      */
     public function createIndividual()
@@ -100,6 +172,7 @@ class TutoriasController
             $data = [
                 'alumno_id' => $_POST['alumno_id'],
                 'grupo_id' => $_POST['grupo_id'],
+                'parcial_id' => $_POST['parcial_id'],
                 'fecha' => $_POST['fecha'] ?? date('Y-m-d'),
                 'motivo' => $_POST['motivo'],
                 'acciones' => $_POST['acciones'],
@@ -162,6 +235,56 @@ class TutoriasController
             echo json_encode(['success' => true, 'data' => $tutorias]);
         } catch (Exception $e) {
             error_log("Error in getIndividualesByGrupo: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Get a specific group tutoring session by ID
+     */
+    public function getGrupalById()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_GET['id'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de tutoría no proporcionado']);
+            return;
+        }
+
+        try {
+            $tutoria = $this->tutoriaGrupal->getById($_GET['id']);
+            if ($tutoria) {
+                echo json_encode(['success' => true, 'data' => $tutoria]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Tutoría no encontrada']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in getGrupalById: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Get a group tutoring session by grupo_id and fecha
+     */
+    public function getGrupalByGrupoAndDate()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_GET['grupo_id']) || !isset($_GET['fecha'])) {
+            echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
+            return;
+        }
+
+        try {
+            $tutoria = $this->tutoriaGrupal->getByGrupoAndDate($_GET['grupo_id'], $_GET['fecha']);
+            if ($tutoria) {
+                echo json_encode(['success' => true, 'data' => $tutoria]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'No se encontró tutoría para esta fecha']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in getGrupalByGrupoAndDate: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }

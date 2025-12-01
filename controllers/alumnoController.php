@@ -410,6 +410,10 @@ class AlumnoController
                                         title="Tutoría Individual">
                                         <i class="bi bi-person-fill"></i> Individual
                                     </button>
+                                    <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
+                                        class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip" title="Ver Alumnos del Grupo">
+                                        <i class="bi bi-gear-fill"></i>
+                                    </a>
                                 </div>
                                 <div id="lista-alumnos-<?= htmlspecialchars($id_grupo) ?>">
                                     <?php if (empty($alumnos)): ?>

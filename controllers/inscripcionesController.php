@@ -18,45 +18,87 @@ class InscripcionesController
 
     public function index()
     {
-        if (isset($_GET['clase_id'])) {
+        header('Content-Type: application/json');
+        if (isset($_GET['alumno_id'])) {
+            echo json_encode($this->inscripcion->getByAlumno($_GET['alumno_id']));
+        } elseif (isset($_GET['clase_id'])) {
             echo json_encode($this->inscripcion->getByClase($_GET['clase_id']));
         } else {
             echo json_encode($this->inscripcion->getAll());
         }
+        exit;
     }
 
     public function store()
     {
-        $data = [
-            'alumno_id' => $_POST['alumno_id'],
-            'clase_id' => $_POST['clase_id']
-        ];
-        if ($this->inscripcion->create($data)) {
-            echo json_encode(["status" => "ok"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Error al inscribir al alumno"]);
+        header('Content-Type: application/json');
+        try {
+            if (!isset($_POST['alumno_id']) || !isset($_POST['clase_id'])) {
+                echo json_encode(["status" => "error", "message" => "Datos incompletos"]);
+                exit;
+            }
+            
+            $data = [
+                'alumno_id' => $_POST['alumno_id'],
+                'clase_id' => $_POST['clase_id']
+            ];
+            if ($this->inscripcion->create($data)) {
+                echo json_encode(["status" => "ok"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Error al inscribir al alumno"]);
+            }
+        } catch (Exception $e) {
+            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+        } catch (Error $e) {
+            echo json_encode(["status" => "error", "message" => "Error del sistema: " . $e->getMessage()]);
         }
+        exit;
     }
 
-    public function updateCalificaciones()
+    public function updateEstados()
     {
-        $id = $_POST['id'];
-        $data = [
-            'cal_parcial1' => $_POST['cal_parcial1'],
-            'cal_parcial2' => $_POST['cal_parcial2'],
-            'cal_parcial3' => $_POST['cal_parcial3'],
-            'cal_parcial4' => $_POST['cal_parcial4'],
-            'cal_final' => $_POST['cal_final']
-        ];
-        if ($this->inscripcion->updateCalificaciones($id, $data)) {
-            echo json_encode(["status" => "ok"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Error al actualizar calificaciones"]);
+        header('Content-Type: application/json');
+        try {
+            $input = file_get_contents('php://input');
+            $data = json_decode($input, true);
+
+            if (!isset($data['updates']) || !is_array($data['updates'])) {
+                echo json_encode(["status" => "error", "message" => "Datos inválidos"]);
+                exit;
+            }
+
+            $updates = [];
+            foreach ($data['updates'] as $update) {
+                if (!isset($update['id']) || !isset($update['estado']) || !isset($update['parcial'])) {
+                    echo json_encode(["status" => "error", "message" => "Formato de actualización inválido. Se requiere: id, estado y parcial"]);
+                    exit;
+                }
+                $updates[] = [
+                    'id' => $update['id'],
+                    'estado' => $update['estado'],
+                    'parcial' => $update['parcial']
+                ];
+            }
+
+            if ($this->inscripcion->updateEstadosMasivo($updates)) {
+                echo json_encode(["status" => "ok"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Error al actualizar estados"]);
+            }
+        } catch (Exception $e) {
+            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+        } catch (Error $e) {
+            echo json_encode(["status" => "error", "message" => "Error del sistema: " . $e->getMessage()]);
         }
+        exit;
     }
+
+    // Método eliminado: updateCalificaciones ya no es necesario
+    // Los estados por parcial se manejan con updateEstados
 
     public function delete()
     {
+        header('Content-Type: application/json');
         try {
             $this->inscripcion->delete($_POST['id']);
             echo json_encode(['status' => 'success', 'message' => 'La inscripción ha sido dada de baja.']);
