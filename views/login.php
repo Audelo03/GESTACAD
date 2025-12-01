@@ -343,7 +343,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     .password-toggle {
       right: 0.75rem;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translateY(-50%) !important;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -356,18 +356,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       background: transparent;
       border: none;
       border-radius: 8px;
-      transition: all 0.2s ease;
+      position: absolute;
+      transition: none;
     }
 
-    .password-toggle:focus {
-      outline: 2px solid var(--login-accent);
-      outline-offset: 2px;
-    }
-
-    .password-toggle:hover {
-      color: var(--login-accent);
-      background: rgba(102, 126, 234, 0.1);
-      transform: translateY(-50%) scale(1.1);
+    .password-toggle:focus,
+    .password-toggle:hover,
+    .password-toggle:active,
+    .password-toggle:focus-visible {
+      outline: none;
+      transform: translateY(-50%) !important;
+      top: 50% !important;
+      right: 0.75rem !important;
     }
 
     .password-toggle i {

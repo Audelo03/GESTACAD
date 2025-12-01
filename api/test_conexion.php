@@ -76,3 +76,4 @@ echo "<h3>✅ Pruebas completadas</h3>";
 echo "<p>Si todos los tests pasaron, la API está funcionando correctamente.</p>";
 ?>
 
+

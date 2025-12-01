@@ -262,3 +262,4 @@ estadisticas = {
 **Este sistema demuestra la aplicación práctica de conceptos de Programación Lógica y Funcional en un problema del mundo real.**
 
 
+

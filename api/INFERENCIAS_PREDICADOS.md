@@ -470,3 +470,4 @@ RiesgoBajo(x) ← Alumno(x), Asistencia(x, p), p ≥ 85,
 
 **Este sistema demuestra la aplicación práctica de la lógica de predicados y sistemas de inferencia en un problema del mundo real.**
 
+
