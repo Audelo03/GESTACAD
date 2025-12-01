@@ -37,8 +37,21 @@ include 'tutorias/tutorias_modals.php';
 <div class="container mt-3 mt-md-5">
     <div class="card shadow-sm mb-3 mb-md-4">
         <div class="card-body p-3 p-md-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
             <h1 class="h4 h3-md mb-1">Gestionar Asistencias del Grupo</h1>
             <h2 class="h6 h5-md text-muted mb-0"><?= htmlspecialchars($nombre_grupo) ?></h2>
+                </div>
+                <button class="btn btn-info" 
+                        id="btnGenerarQR"
+                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
+                        data-fecha="<?= htmlspecialchars($fecha) ?>"
+                        title="Generar código QR para que los alumnos marquen su asistencia (válido por 5 minutos)">
+                    <i class="bi bi-qr-code me-1"></i>
+                    <span class="d-none d-md-inline">Generar QR</span>
+                    <span class="d-md-none">QR</span>
+                </button>
+            </div>
         </div>
     </div>
     
@@ -55,23 +68,13 @@ include 'tutorias/tutorias_modals.php';
                         title="Tomar Asistencia Grupal para Hoy">
                     <i class="bi bi-calendar-plus-fill me-2"></i>
                     <span class="d-none d-sm-inline">Pasar lista / Editar la de hoy</span>
-                    <span class="d-sm-none">Pasar lista</span>
+                    <span class="d-sm-none">Pasar lista grupal</span>
                     <small class="d-block d-sm-inline d-md-none mt-1">(<?= date('d/m/Y') ?>)</small>
                     <span class="d-none d-md-inline"> (<?= date('d/m/Y') ?>)</span>
                 </button>
                 
                 <div class="d-grid d-md-flex gap-2 w-100 w-md-auto">
-                    <button type="button" 
-                            class="btn btn-outline-primary btn-lg btn-tutoria-grupal flex-fill flex-md-none" 
-                            data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
-                            data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
-                            data-bs-toggle="tooltip" 
-                            data-bs-placement="top" 
-                            title="Tomar Lista Grupal">
-                        <i class="bi bi-people-fill me-2"></i>
-                        <span class="d-none d-md-inline">Grupal</span>
-                        <span class="d-md-none">Tomar Lista Grupal</span>
-                    </button>
+                
                     
                     <button type="button" 
                             class="btn btn-outline-info btn-lg btn-tutoria-individual flex-fill flex-md-none" 
@@ -270,12 +273,238 @@ include 'tutorias/tutorias_modals.php';
 
 </div>
 
+<!-- Modal para mostrar el código QR -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrModalLabel">
+                    <i class="bi bi-qr-code me-2"></i>
+                    Código QR - Asistencia de Alumnos
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qrLoading" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Generando código QR...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Generando código QR seguro...</p>
+                </div>
+                <div id="qrContent" class="d-none">
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-shield-check me-2 text-success"></i>
+                        Escanea este código para marcar tu asistencia. <strong>Válido por 5 minutos</strong>
+                    </p>
+                    <div class="mb-3">
+                        <strong><?= htmlspecialchars($nombre_grupo) ?></strong><br>
+                        <small class="text-muted">Fecha: <?= htmlspecialchars(date('d/m/Y', strtotime($fecha))) ?></small><br>
+                        <small class="text-danger" id="qrExpiraEn">
+                            <i class="bi bi-clock me-1"></i>
+                            Expira en: <span id="qrTiempoRestante">5:00</span>
+                        </small>
+                    </div>
+                    <div id="qrcode" class="d-flex justify-content-center mb-3"></div>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <button class="btn btn-primary" onclick="descargarQR()">
+                            <i class="bi bi-download me-1"></i>
+                            Descargar QR
+                        </button>
+                        <button class="btn btn-secondary" onclick="copiarEnlace()">
+                            <i class="bi bi-link-45deg me-1"></i>
+                            Copiar Enlace
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Librería para generar códigos QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 <?php
 include 'objects/footer.php';
 ?>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Variables globales para QR
+    const idGrupo = <?= json_encode($id_grupo) ?>;
+    const nombreGrupo = <?= json_encode($nombre_grupo) ?>;
+    const fecha = <?= json_encode($fecha) ?>;
+    let urlQRBase = '';
+    let qrCodeInstance = null;
+    let qrExpiraEn = null;
+    let countdownInterval = null;
+    
+    // Botón para generar QR
+    const btnGenerarQR = document.getElementById('btnGenerarQR');
+    if (btnGenerarQR) {
+        btnGenerarQR.addEventListener('click', function() {
+            generarNuevoToken();
+        });
+    }
+    
+    // Función para generar nuevo token
+    async function generarNuevoToken() {
+        const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+        qrModal.show();
+        
+        // Mostrar loading
+        document.getElementById('qrLoading').classList.remove('d-none');
+        document.getElementById('qrContent').classList.add('d-none');
+        
+        try {
+            const formData = new FormData();
+            formData.append('grupo_id', idGrupo);
+            formData.append('fecha', fecha);
+            
+            const response = await fetch('/GESTACAD/controllers/asistenciaTokenController.php?action=generarToken', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                urlQRBase = result.url;
+                // Calcular la fecha de expiración directamente: 5 minutos desde ahora
+                qrExpiraEn = new Date(Date.now() + 5 * 60 * 1000);
+                
+                // Generar QR
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = '';
+                
+                if (typeof QRCode !== 'undefined') {
+                    qrCodeInstance = new QRCode(qrContainer, {
+                        text: urlQRBase,
+                        width: 256,
+                        height: 256,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } else {
+                    qrContainer.innerHTML = `
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(urlQRBase)}" 
+                             alt="Código QR" 
+                             class="img-fluid">
+                    `;
+                }
+                
+                // Ocultar loading y mostrar contenido
+                document.getElementById('qrLoading').classList.add('d-none');
+                document.getElementById('qrContent').classList.remove('d-none');
+                
+                // Iniciar countdown inmediatamente y luego cada segundo
+                iniciarCountdown();
+            } else {
+                alert('Error al generar el código QR: ' + (result.error || 'Error desconocido'));
+                qrModal.hide();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al generar el código QR. Intenta nuevamente.');
+            qrModal.hide();
+        }
+    }
+    
+    // Función para iniciar countdown
+    function iniciarCountdown() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+        
+        const tiempoRestanteEl = document.getElementById('qrTiempoRestante');
+        
+        // Función para actualizar el tiempo
+        function actualizarTiempo() {
+            if (!qrExpiraEn) return;
+            
+            const ahora = Date.now();
+            const expiraEn = qrExpiraEn.getTime();
+            const diferencia = expiraEn - ahora;
+            
+            if (diferencia <= 0) {
+                tiempoRestanteEl.textContent = '0:00';
+                tiempoRestanteEl.parentElement.classList.add('text-danger');
+                clearInterval(countdownInterval);
+                return;
+            }
+            
+            // Calcular minutos y segundos correctamente
+            // diferencia está en milisegundos
+            const totalSegundos = Math.floor(diferencia / 1000);
+            const minutos = Math.floor(totalSegundos / 60);
+            const segundos = totalSegundos % 60;
+            
+            // Asegurar que no sea negativo
+            const minutosFinal = Math.max(0, minutos);
+            const segundosFinal = Math.max(0, segundos);
+            
+            tiempoRestanteEl.textContent = `${minutosFinal}:${segundosFinal.toString().padStart(2, '0')}`;
+        }
+        
+        // Actualizar inmediatamente
+        actualizarTiempo();
+        
+        // Actualizar cada segundo
+        countdownInterval = setInterval(actualizarTiempo, 1000);
+    }
+    
+    // Limpiar interval cuando se cierre el modal
+    const qrModal = document.getElementById('qrModal');
+    if (qrModal) {
+        qrModal.addEventListener('hidden.bs.modal', function () {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        });
+    }
+    
+    // Función para descargar el QR
+    window.descargarQR = function() {
+        if (!urlQRBase) {
+            alert('Primero genera un código QR');
+            return;
+        }
+        const canvas = document.querySelector('#qrcode canvas');
+        if (canvas) {
+            const url = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `QR_Asistencia_${nombreGrupo}_${fecha}.png`;
+            link.href = url;
+            link.click();
+        }
+    };
+    
+    // Función para copiar el enlace
+    window.copiarEnlace = function() {
+        if (!urlQRBase) {
+            alert('Primero genera un código QR');
+            return;
+        }
+        navigator.clipboard.writeText(urlQRBase).then(function() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Enlace copiado!',
+                    text: 'El enlace ha sido copiado al portapapeles',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                alert('Enlace copiado al portapapeles');
+            }
+        }).catch(function(err) {
+            console.error('Error al copiar:', err);
+            alert('Error al copiar el enlace');
+        });
+    };
+    
     // Event listener para botón de editar tutoría grupal
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.btn-editar-tutoria-grupal');

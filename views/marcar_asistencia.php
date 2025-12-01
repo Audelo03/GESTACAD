@@ -72,7 +72,7 @@ include 'objects/header.php';
                                 <small>Fecha: <?= htmlspecialchars(date('d/m/Y', strtotime($tokenInfo['fecha']))) ?></small><br>
                                 <small class="text-danger">
                                     <i class="bi bi-clock me-1"></i>
-                                    Este código expira en: <?= date('H:i', strtotime($tokenInfo['expira_en'])) ?>
+                                    Este código expira en: <span id="tokenExpiraEn">5:00</span>
                                 </small>
                             </div>
                         </div>
@@ -197,14 +197,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const bloqueoData = localStorage.getItem(bloqueoKey);
         
         if (bloqueoData) {
-            const bloqueo = JSON.parse(bloqueoData);
-            const ahora = Date.now();
-            const tiempoRestante = bloqueo.expiraEn - ahora;
-            
-            if (tiempoRestante > 0) {
-                return tiempoRestante;
-            } else {
-                // Bloqueo expirado, limpiar
+            try {
+                const bloqueo = JSON.parse(bloqueoData);
+                const ahora = Date.now();
+                const expiraEn = parseInt(bloqueo.expiraEn);
+                
+                if (!isNaN(expiraEn)) {
+                    const tiempoRestante = expiraEn - ahora;
+                    
+                    if (tiempoRestante > 0) {
+                        return tiempoRestante; // Retorna en milisegundos
+                    } else {
+                        // Bloqueo expirado, limpiar
+                        localStorage.removeItem(bloqueoKey);
+                    }
+                }
+            } catch (e) {
+                // Error al parsear, limpiar
                 localStorage.removeItem(bloqueoKey);
             }
         }
@@ -338,11 +347,15 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Verificar si es un error de bloqueo
                 if (result.bloqueado && result.tiempo_restante) {
-                    const minutos = Math.floor(result.tiempo_restante / 60);
-                    const segundos = result.tiempo_restante % 60;
+                    // tiempo_restante viene en segundos del servidor
+                    const totalSegundos = parseInt(result.tiempo_restante);
+                    const minutos = Math.floor(totalSegundos / 60);
+                    const segundos = totalSegundos % 60;
                     
-                    // Actualizar bloqueo local
-                    establecerBloqueoLocal();
+                    // Actualizar bloqueo local con el tiempo correcto
+                    const bloqueoKey = 'asistencia_bloqueo';
+                    const expiraEn = Date.now() + (totalSegundos * 1000);
+                    localStorage.setItem(bloqueoKey, JSON.stringify({ expiraEn: expiraEn }));
                     
                     await Swal.fire({
                         title: 'Espera un momento',
@@ -391,22 +404,93 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Verificar expiración del token cada minuto
-    setInterval(() => {
-        const expiraEn = new Date(<?= json_encode($tokenInfo['expira_en']) ?>);
-        const ahora = new Date();
+    // Timer para mostrar countdown de expiración del token
+    const tokenExpiraEnEl = document.getElementById('tokenExpiraEn');
+    if (tokenExpiraEnEl) {
+        // Parsear fecha de expiración del token (formato: YYYY-MM-DD HH:MM:SS)
+        const fechaExpiraToken = '<?= $tokenInfo['expira_en'] ?>';
+        let tokenExpiraEn = null;
         
-        if (ahora >= expiraEn) {
-            mensajeResultado.innerHTML = `
-                <div class="alert alert-danger">
-                    <h5><i class="bi bi-clock-history me-2"></i>Token expirado</h5>
-                    <p class="mb-0">Este código QR ha expirado. Por favor, solicita un nuevo código al docente.</p>
-                </div>
-            `;
-            buscador.disabled = true;
-            listaAlumnos.classList.add('d-none');
+        // Intentar parsear la fecha manualmente para evitar problemas de zona horaria
+        if (fechaExpiraToken) {
+            try {
+                // Formato: YYYY-MM-DD HH:MM:SS
+                const partes = fechaExpiraToken.split(' ');
+                if (partes.length === 2) {
+                    const fecha = partes[0].split('-');
+                    const hora = partes[1].split(':');
+                    if (fecha.length === 3 && hora.length === 3) {
+                        // Crear fecha en hora local (no UTC)
+                        tokenExpiraEn = new Date(
+                            parseInt(fecha[0]), // año
+                            parseInt(fecha[1]) - 1, // mes (0-indexed)
+                            parseInt(fecha[2]), // día
+                            parseInt(hora[0]), // hora
+                            parseInt(hora[1]), // minuto
+                            parseInt(hora[2])  // segundo
+                        );
+                    }
+                }
+            } catch (e) {
+                console.error('Error parsing date:', e);
+            }
         }
-    }, 60000); // Verificar cada minuto
+        
+        // Si falla, calcular 5 minutos desde ahora
+        if (!tokenExpiraEn || isNaN(tokenExpiraEn.getTime())) {
+            tokenExpiraEn = new Date(Date.now() + 5 * 60 * 1000);
+        }
+        
+        // Debug: verificar que la fecha sea razonable (no más de 10 minutos en el futuro)
+        const ahora = Date.now();
+        const expiraEn = tokenExpiraEn.getTime();
+        const diferenciaInicial = expiraEn - ahora;
+        const minutosIniciales = Math.floor(diferenciaInicial / 60000);
+        
+        // Si la diferencia es mayor a 10 minutos o negativa, recalcular
+        if (diferenciaInicial < 0 || diferenciaInicial > 10 * 60 * 1000) {
+            tokenExpiraEn = new Date(Date.now() + 5 * 60 * 1000);
+        }
+        
+        // Función para actualizar el countdown del token
+        function actualizarCountdownToken() {
+            const ahora = Date.now();
+            const expiraEn = tokenExpiraEn.getTime();
+            const diferencia = expiraEn - ahora;
+            
+            if (diferencia <= 0) {
+                tokenExpiraEnEl.textContent = '0:00';
+                tokenExpiraEnEl.parentElement.classList.add('text-danger');
+                mensajeResultado.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5><i class="bi bi-clock-history me-2"></i>Token expirado</h5>
+                        <p class="mb-0">Este código QR ha expirado. Por favor, solicita un nuevo código al docente.</p>
+                    </div>
+                `;
+                buscador.disabled = true;
+                listaAlumnos.classList.add('d-none');
+                return;
+            }
+            
+            // Calcular minutos y segundos correctamente
+            // diferencia está en milisegundos
+            const totalSegundos = Math.floor(diferencia / 1000);
+            const minutos = Math.floor(totalSegundos / 60);
+            const segundos = totalSegundos % 60;
+            
+            // Asegurar que no sea negativo y limitar a valores razonables (máximo 5 minutos)
+            const minutosFinal = Math.max(0, Math.min(5, minutos));
+            const segundosFinal = Math.max(0, Math.min(59, segundos));
+            
+            tokenExpiraEnEl.textContent = `${minutosFinal}:${segundosFinal.toString().padStart(2, '0')}`;
+        }
+        
+        // Actualizar inmediatamente
+        actualizarCountdownToken();
+        
+        // Actualizar cada segundo
+        setInterval(actualizarCountdownToken, 1000);
+    }
 });
 </script>
 

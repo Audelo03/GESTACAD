@@ -128,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     .form-floating .form-control {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--login-text);
+      color: #000000;
       padding-right: 3.2rem;
       position: relative;
       z-index: 1;
@@ -138,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       background: rgba(255, 255, 255, 0.05);
       border-color: var(--login-accent);
       box-shadow: 0 0 0 0.2rem rgba(79, 156, 249, 0.2);
-      color: var(--login-text);
+      color: #000000;
     }
 
     .login-submit {

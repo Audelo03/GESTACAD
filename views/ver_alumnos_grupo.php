@@ -1508,6 +1508,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // ============================================
     const API_BASE_URL = 'http://localhost:5000';
     
+    // Crear instancia única del modal de inferencias
+    const modalInferenciasElement = document.getElementById('modalInferenciasAlumno');
+    let modalInferenciasInstance = null;
+    if (modalInferenciasElement) {
+        modalInferenciasInstance = new bootstrap.Modal(modalInferenciasElement, {
+            backdrop: true,
+            keyboard: true,
+            focus: true
+        });
+    }
+    
     // Event listener para botones de inferencias
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.btn-inferencias-alumno');
@@ -1533,9 +1544,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             `;
             
-            // Mostrar modal
-            const modal = new bootstrap.Modal(document.getElementById('modalInferenciasAlumno'));
-            modal.show();
+            // Mostrar modal usando la instancia única
+            if (modalInferenciasInstance) {
+                modalInferenciasInstance.show();
+            }
             
             // Cargar inferencias
             cargarInferenciasAlumno(alumnoId, alumnoNombre, alumnoMatricula);
@@ -1837,6 +1849,54 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         
         modalBody.innerHTML = html;
+    }
+    
+    // ============================================
+    // MANEJO DEL CIERRE DEL MODAL DE INFERENCIAS
+    // ============================================
+    if (modalInferenciasElement) {
+        // Event listener para cuando el modal comienza a ocultarse
+        modalInferenciasElement.addEventListener('hide.bs.modal', function() {
+            // Remover el foco del botón de cierre antes de que el modal se oculte
+            // Esto previene el error de accesibilidad con aria-hidden
+            const closeButton = modalInferenciasElement.querySelector('.btn-close');
+            if (closeButton && document.activeElement === closeButton) {
+                closeButton.blur();
+            }
+        });
+        
+        // Event listener para cuando el modal se oculta completamente
+        modalInferenciasElement.addEventListener('hidden.bs.modal', function() {
+            // Remover el overlay de Bootstrap si existe (puede quedar residual)
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            // Restaurar el scroll y padding del body
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Remover clase modal-open que puede quedar bloqueando
+            document.body.classList.remove('modal-open');
+            
+            // Asegurar que el modal esté completamente oculto
+            modalInferenciasElement.style.display = 'none';
+            modalInferenciasElement.setAttribute('aria-hidden', 'true');
+            
+            // Limpiar el contenido del modal para evitar problemas en la próxima apertura
+            const modalBody = document.getElementById('modalInferenciasBody');
+            if (modalBody) {
+                modalBody.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Cargando inferencias...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Analizando datos del alumno...</p>
+                    </div>
+                `;
+            }
+        });
     }
 });
 </script>

@@ -66,6 +66,7 @@ function initializeSidebar() {
     const overlay = document.querySelector('.sidebar-overlay');
     const mobileMenuIcon = mobileMenuBtn ? mobileMenuBtn.querySelector('i') : null;
     const bottomNavManage = document.getElementById('bottom-nav-manage');
+    const bottomNavConfig = document.getElementById('bottom-nav-config');
     
     // Función para detectar si estamos en móvil
     function isMobile() {
@@ -139,6 +140,13 @@ function initializeSidebar() {
 
     if (bottomNavManage) {
         bottomNavManage.addEventListener('click', function(e) {
+            e.preventDefault();
+            openMobileSidebar();
+        });
+    }
+
+    if (bottomNavConfig) {
+        bottomNavConfig.addEventListener('click', function(e) {
             e.preventDefault();
             openMobileSidebar();
         });

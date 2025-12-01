@@ -404,29 +404,14 @@ class AlumnoController
                                         class="btn btn-outline-primary btn-sm flex-fill flex-md-none" data-bs-toggle="tooltip" title="Gestionar Listas">
                                         <i class="bi bi-pencil-square me-1 d-md-none"></i>
                                         <span class="d-none d-md-inline"><i class="bi bi-pencil-square"></i></span>
-                                        <span class="d-md-none">Gestionar</span>
+                                        <span class="d-md-none">Gestionar Listas</span>
                                     </a>
-                                    <button type="button" class="btn btn-outline-success btn-sm btn-tutoria-grupal flex-fill flex-md-none"
-                                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
-                                        data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
-                                        title="Tomar Lista Grupal">
-                                        <i class="bi bi-people-fill me-1"></i>
-                                        <span class="d-none d-md-inline">Grupal</span>
-                                        <span class="d-md-none">Tomar Lista Grupal</span>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-info btn-sm btn-tutoria-individual flex-fill flex-md-none"
-                                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
-                                        data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
-                                        title="Tomar Lista Individual">
-                                        <i class="bi bi-person-fill me-1"></i>
-                                        <span class="d-none d-md-inline">Individual</span>
-                                        <span class="d-md-none">Tomar Lista Individual</span>
-                                    </button>
+                                    
                                     <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
                                         class="btn btn-outline-secondary btn-sm flex-fill flex-md-none" data-bs-toggle="tooltip" title="Ver Alumnos del Grupo">
                                         <i class="bi bi-gear-fill me-1 d-md-none"></i>
                                         <span class="d-none d-md-inline"><i class="bi bi-gear-fill"></i></span>
-                                        <span class="d-md-none">Alumnos</span>
+                                        <span class="d-md-none">Gestionar Alumnos</span>
                                     </a>
                                 </div>
                                 <?php endif; ?>

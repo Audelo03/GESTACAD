@@ -126,6 +126,55 @@ a:hover {
 // ========== TEMA CLARO - Switch de tema ==========
 :root:not([data-theme="dark"]) {
 	#app-sidebar.sidebar {
+		background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+		border-right: 1px solid rgba(0, 0, 0, 0.1);
+		color: #1a202c;
+
+		.sidebar-title {
+			color: #1a202c !important;
+		}
+
+		.sidebar-link {
+			color: #4a5568 !important;
+
+			.sidebar-icon {
+				color: #4a5568 !important;
+			}
+
+			&:hover {
+				color: #1a202c !important;
+				background-color: rgba(59, 130, 246, 0.1);
+
+				.sidebar-icon {
+					color: #3b82f6 !important;
+				}
+			}
+
+			&.active {
+				color: #3b82f6 !important;
+				background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.08));
+
+				.sidebar-icon {
+					color: #3b82f6 !important;
+				}
+			}
+		}
+
+		.sidebar-section-title {
+			color: #718096 !important;
+		}
+
+		.btn-toggle-sidebar {
+			border-color: rgba(0, 0, 0, 0.2);
+			color: #4a5568;
+
+			&:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+				border-color: rgba(0, 0, 0, 0.3);
+				color: #1a202c;
+			}
+		}
+
 		.theme-toggle-wrapper {
 			background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
 			border: 1px solid rgba(59, 130, 246, 0.2);
@@ -163,6 +212,38 @@ a:hover {
 
 		.theme-icon-dark {
 			color: #e0e7ff;
+		}
+
+		.btn-outline-light {
+			border-color: rgba(0, 0, 0, 0.2);
+			color: #4a5568;
+
+			&:hover {
+				background-color: #ef4444;
+				border-color: #ef4444;
+				color: #ffffff;
+			}
+		}
+	}
+
+	// Clases específicas para tema claro
+	.nombre-alumno-mobile {
+		color: #1a202c !important;
+	}
+
+	.small-md {
+		color: #1a202c !important;
+	}
+
+	.bi-info-circle {
+		color: #1a202c !important;
+	}
+
+	.alert-secondary {
+		color: #1a202c !important;
+
+		.bi-info-circle {
+			color: #1a202c !important;
 		}
 	}
 }
@@ -693,7 +774,8 @@ a:hover {
 	box-shadow: $shadow-md;
 	backdrop-filter: blur(10px);
 
-	.nav-link {
+	.nav-link,
+	.sidebar-link {
 		border-radius: $radio-sm;
 		transition: all 0.3s ease;
 		color: $text-color;
@@ -701,27 +783,49 @@ a:hover {
 		padding: 0.75rem 1rem;
 		margin-bottom: 0.25rem;
 
+		.sidebar-icon {
+			color: $text-color;
+			transition: transform 0.2s ease, color 0.3s ease;
+		}
+
 		&.active {
 			background: linear-gradient(135deg, rgba($color-primario, .15), rgba($color-primario, .08));
 			color: $color-primario !important;
 			border-left: 3px solid $color-primario;
 			box-shadow: 0 2px 8px rgba($color-primario, 0.15);
 			font-weight: 600;
+
+			.sidebar-icon {
+				color: $color-primario !important;
+			}
 		}
 
 		&:hover:not(.active) {
 			background: rgba($color-primario, .08);
 			color: $color-primario;
 			transform: translateX(4px);
+
+			.sidebar-icon {
+				color: $color-primario;
+				transform: scale(1.1);
+			}
 		}
 
 		i {
-			transition: transform 0.2s ease;
+			transition: transform 0.2s ease, color 0.3s ease;
 		}
 
 		&:hover i {
 			transform: scale(1.1);
 		}
+	}
+
+	.sidebar-title {
+		color: $text-color !important;
+	}
+
+	.sidebar-section-title {
+		color: $text-color-muted !important;
 	}
 
 	.btn-outline-light {
