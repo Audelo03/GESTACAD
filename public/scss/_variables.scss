@@ -52,18 +52,19 @@
 }
 
 [data-theme="dark"] {
-    // --- TEMA OSCURO (Paleta profunda y vibrante) ---
-    // Fondos - Tonos oscuros con profundidad
-    --bg-body: #0a0e1a; // Azul oscuro casi negro
-    --bg-body-rgb: 10, 14, 26;
+    // --- TEMA OSCURO MODERNO (Paleta sofisticada y elegante) ---
+    // Fondos - Tonos oscuros con profundidad y calidez
+    --bg-body: #0f1419; // Azul oscuro profundo con toque cálido
+    --bg-body-rgb: 15, 20, 25;
 
-    --bg-surface-1: #111827; // Gris azulado oscuro
-    --bg-surface-1-rgb: 17, 24, 39;
+    --bg-surface-1: #1a1f2e; // Gris azulado oscuro (más cálido)
+    --bg-surface-1-rgb: 26, 31, 46;
 
-    --bg-surface-2: #1f2937; // Gris medio oscuro
-    --bg-surface-2-rgb: 31, 41, 55;
+    --bg-surface-2: #252b3a; // Gris medio oscuro con matiz azul
+    --bg-surface-2-rgb: 37, 43, 58;
 
-    --bg-surface-3: #374151; // Gris medio
+    --bg-surface-3: #3a4152; // Gris medio con profundidad
+    --bg-surface-3-rgb: 58, 65, 82;
 
     // Textos - TODOS BLANCOS para máximo contraste
     --text-main: #ffffff; // Blanco puro
@@ -71,36 +72,36 @@
     --text-muted: #ffffff; // Blanco puro
     --text-on-primary: #ffffff;
 
-    // Color primario - Azul eléctrico brillante
-    --color-primary: #60a5fa; // Azul brillante (más claro para dark mode)
-    --color-primary-dark: #3b82f6;
-    --color-primary-light: #93c5fd;
-    --color-primary-rgb: 96, 165, 250;
+    // Color primario - Azul vibrante pero elegante
+    --color-primary: #5b9bd5; // Azul moderno y suave
+    --color-primary-dark: #4a8bc2;
+    --color-primary-light: #7ab3e0;
+    --color-primary-rgb: 91, 155, 213;
 
-    // Colores de estado - Más brillantes para dark mode
-    --color-success: #34d399; // Verde menta brillante
-    --color-success-dark: #10b981;
-    --color-success-light: #6ee7b7;
+    // Colores de estado - Vibrantes pero no agresivos
+    --color-success: #4ade80; // Verde esmeralda suave
+    --color-success-dark: #22c55e;
+    --color-success-light: #86efac;
 
-    --color-danger: #f87171; // Rojo coral brillante
+    --color-danger: #f87171; // Rojo coral suave
     --color-danger-dark: #ef4444;
     --color-danger-light: #fca5a5;
 
-    --color-warning: #fbbf24; // Amarillo dorado brillante
+    --color-warning: #fbbf24; // Amarillo dorado cálido
     --color-warning-dark: #f59e0b;
     --color-warning-light: #fcd34d;
 
-    --color-info: #22d3ee; // Cian neón
-    --color-info-dark: #06b6d4;
-    --color-info-light: #67e8f9;
+    --color-info: #38bdf8; // Cian brillante pero suave
+    --color-info-dark: #0ea5e9;
+    --color-info-light: #7dd3fc;
 
-    --color-accent: #fb923c; // Naranja brillante
+    --color-accent: #fb923c; // Naranja cálido
     --color-accent-light: #fdba74;
     --color-accent-dark: #f97316;
 
-    // Bordes y sombras
-    --border-color: rgba(255, 255, 255, 0.1);
-    --shadow-color: rgba(0, 0, 0, 0.4);
+    // Bordes y sombras - Más sutiles y elegantes
+    --border-color: rgba(255, 255, 255, 0.08);
+    --shadow-color: rgba(0, 0, 0, 0.5);
 }
 
 // Mapeo de variables SCSS a variables CSS para compatibilidad
@@ -116,9 +117,10 @@ $color-gris-200: var(--text-main);
 $color-gris-100: var(--text-main);
 
 // Colores constantes (HEX) para compatibilidad con funciones SASS
-$color-primario: #4f9cf9;
-$color-primario-oscuro: #3b82f6;
-$color-primario-claro: #60a5fa;
+// Estos colores se adaptan mejor al tema oscuro
+$color-primario: #5b9bd5;
+$color-primario-oscuro: #4a8bc2;
+$color-primario-claro: #7ab3e0;
 
 $color-exito: #10b981;
 $color-peligro: #ef4444;

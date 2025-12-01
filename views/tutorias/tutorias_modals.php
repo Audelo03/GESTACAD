@@ -77,7 +77,6 @@
             <form id="formTutoriaIndividual">
                 <div class="modal-body">
                     <input type="hidden" id="individual-grupo-id" name="grupo_id">
-                    <input type="hidden" id="individual-parcial-id" name="parcial_id" value="1">
 
                     <div class="mb-3">
                         <label for="individual-fecha" class="form-label">Fecha</label>
@@ -92,15 +91,35 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="individual-motivo" class="form-label">Motivo de la Tutoría</label>
-                        <textarea class="form-control" id="individual-motivo" name="motivo" rows="3"
-                            required></textarea>
+                        <label for="individual-motivo-select" class="form-label">Motivo de la Tutoría</label>
+                        <select class="form-select" id="individual-motivo-select" required>
+                            <option value="">Seleccione un motivo...</option>
+                            <option value="Bajo rendimiento académico">Bajo rendimiento académico</option>
+                            <option value="Problemas de conducta">Problemas de conducta</option>
+                            <option value="Falta de asistencia">Falta de asistencia</option>
+                            <option value="otro">Otro (especificar)</option>
+                        </select>
+                        <div id="individual-motivo-otro-container" class="mt-2" style="display: none;">
+                            <textarea class="form-control" id="individual-motivo-otro" rows="3"
+                                placeholder="Especifique el motivo..."></textarea>
+                        </div>
+                        <input type="hidden" id="individual-motivo" name="motivo" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="individual-acciones" class="form-label">Acciones a Implementar</label>
-                        <textarea class="form-control" id="individual-acciones" name="acciones" rows="3"
-                            required></textarea>
+                        <label for="individual-acciones-select" class="form-label">Acciones a Implementar</label>
+                        <select class="form-select" id="individual-acciones-select" required>
+                            <option value="">Seleccione una acción...</option>
+                            <option value="Seguimiento académico personalizado">Seguimiento académico personalizado</option>
+                            <option value="Canalización a servicios de apoyo">Canalización a servicios de apoyo</option>
+                            <option value="Reunión con padres o tutores">Reunión con padres o tutores</option>
+                            <option value="otro">Otro (especificar)</option>
+                        </select>
+                        <div id="individual-acciones-otro-container" class="mt-2" style="display: none;">
+                            <textarea class="form-control" id="individual-acciones-otro" rows="3"
+                                placeholder="Especifique las acciones..."></textarea>
+                        </div>
+                        <input type="hidden" id="individual-acciones" name="acciones" required>
                     </div>
                 </div>
                 <div class="modal-footer flex-column flex-sm-row gap-2">

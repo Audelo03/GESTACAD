@@ -102,10 +102,42 @@ class TutoriasController
         }
 
         try {
+            // Validate required fields
+            if (!isset($_POST['grupo_id']) || empty($_POST['grupo_id'])) {
+                echo json_encode(['success' => false, 'message' => 'ID de grupo no proporcionado']);
+                return;
+            }
+            
+            if (!isset($_POST['parcial_id']) || empty($_POST['parcial_id'])) {
+                echo json_encode(['success' => false, 'message' => 'ID de parcial no proporcionado']);
+                return;
+            }
+            
+            if (!isset($_POST['actividad_nombre']) || empty(trim($_POST['actividad_nombre']))) {
+                echo json_encode(['success' => false, 'message' => 'El nombre de la actividad es requerido']);
+                return;
+            }
+            
+            if (!isset($_SESSION['usuario_id'])) {
+                echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+                return;
+            }
+            
+            // Get existing tutoring session to preserve evidencia_foto_id if not changed
+            $existing_tutoria = $this->tutoriaGrupal->getById($_POST['id']);
+            if (!$existing_tutoria) {
+                echo json_encode(['success' => false, 'message' => 'Tutoría no encontrada']);
+                return;
+            }
+            
             // Handle file upload if provided
-            $evidencia_foto_id = null;
+            // Preserve existing evidencia_foto_id by default (can be null)
+            $evidencia_foto_id = isset($existing_tutoria['evidencia_foto_id']) && $existing_tutoria['evidencia_foto_id'] !== '' 
+                ? $existing_tutoria['evidencia_foto_id'] 
+                : null;
+            
             if (isset($_POST['evidencia_foto_id']) && !empty($_POST['evidencia_foto_id'])) {
-                $evidencia_foto_id = $_POST['evidencia_foto_id'];
+                $evidencia_foto_id = (int)$_POST['evidencia_foto_id'];
             }
             
             // If a new file is uploaded, process it
@@ -121,13 +153,13 @@ class TutoriasController
 
             // Prepare tutoring data
             $data = [
-                'grupo_id' => $_POST['grupo_id'],
-                'parcial_id' => $_POST['parcial_id'],
+                'grupo_id' => (int)$_POST['grupo_id'],
+                'parcial_id' => (int)$_POST['parcial_id'],
                 'fecha' => $_POST['fecha'] ?? date('Y-m-d'),
-                'actividad_nombre' => $_POST['actividad_nombre'],
-                'actividad_descripcion' => $_POST['actividad_descripcion'] ?? '',
+                'actividad_nombre' => trim($_POST['actividad_nombre']),
+                'actividad_descripcion' => isset($_POST['actividad_descripcion']) ? trim($_POST['actividad_descripcion']) : '',
                 'evidencia_foto_id' => $evidencia_foto_id,
-                'usuario_id' => $_SESSION['usuario_id']
+                'usuario_id' => (int)$_SESSION['usuario_id']
             ];
 
             // Prepare attendance data
@@ -147,7 +179,17 @@ class TutoriasController
                     'message' => 'Tutoría grupal actualizada exitosamente'
                 ]);
             } else {
-                echo json_encode(['success' => false, 'message' => 'Error al actualizar la tutoría grupal']);
+                // Get last error from database
+                $errorInfo = $this->conn->errorInfo();
+                $errorMessage = 'Error al actualizar la tutoría grupal';
+                if ($errorInfo && isset($errorInfo[2]) && !empty($errorInfo[2])) {
+                    $errorMessage .= ': ' . $errorInfo[2];
+                }
+                error_log("Update failed. ID: " . $_POST['id']);
+                error_log("Update failed. Data: " . print_r($data, true));
+                error_log("Update failed. Attendance: " . print_r($asistencia, true));
+                error_log("Update failed. Error info: " . print_r($errorInfo, true));
+                echo json_encode(['success' => false, 'message' => $errorMessage]);
             }
 
         } catch (Exception $e) {
@@ -172,10 +214,9 @@ class TutoriasController
             $data = [
                 'alumno_id' => $_POST['alumno_id'],
                 'grupo_id' => $_POST['grupo_id'],
-                'parcial_id' => $_POST['parcial_id'],
                 'fecha' => $_POST['fecha'] ?? date('Y-m-d'),
-                'motivo' => $_POST['motivo'],
-                'acciones' => $_POST['acciones'],
+                'motivo' => $_POST['motivo'] ?? '',
+                'acciones' => $_POST['acciones'] ?? '',
                 'usuario_id' => $_SESSION['usuario_id']
             ];
 

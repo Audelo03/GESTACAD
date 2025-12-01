@@ -11,19 +11,18 @@ class TutoriaIndividual
 
     /**
      * Create a new individual tutoring session
-     * @param array $data - Contains alumno_id, grupo_id, parcial_id, fecha, motivo, acciones, usuario_id
+     * @param array $data - Contains alumno_id, grupo_id, fecha, motivo, acciones, usuario_id
      * @return int|false - Returns the ID of the created session or false on failure
      */
     public function create($data)
     {
         $sql = "INSERT INTO " . $this->table . " 
-                (alumno_id, grupo_id, parcial_id, fecha, motivo, acciones, usuario_id) 
-                VALUES (:alumno_id, :grupo_id, :parcial_id, :fecha, :motivo, :acciones, :usuario_id)";
+                (alumno_id, grupo_id, fecha, motivo, acciones, usuario_id) 
+                VALUES (:alumno_id, :grupo_id, :fecha, :motivo, :acciones, :usuario_id)";
 
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(":alumno_id", $data['alumno_id'], PDO::PARAM_INT);
         $stmt->bindParam(":grupo_id", $data['grupo_id'], PDO::PARAM_INT);
-        $stmt->bindParam(":parcial_id", $data['parcial_id'], PDO::PARAM_INT);
         $stmt->bindParam(":fecha", $data['fecha']);
         $stmt->bindParam(":motivo", $data['motivo']);
         $stmt->bindParam(":acciones", $data['acciones']);
@@ -48,13 +47,11 @@ class TutoriaIndividual
                        a.apellido_materno as alumno_apellido_materno,
                        a.matricula,
                        g.nombre as grupo_nombre,
-                       p.numero as parcial_numero,
                        u.nombre as tutor_nombre,
                        u.apellido_paterno as tutor_apellido
                 FROM " . $this->table . " ti
                 JOIN alumnos a ON ti.alumno_id = a.id_alumno
                 JOIN grupos g ON ti.grupo_id = g.id_grupo
-                JOIN parciales p ON ti.parcial_id = p.id
                 JOIN usuarios u ON ti.usuario_id = u.id_usuario
                 WHERE ti.alumno_id = :alumno_id
                 ORDER BY ti.fecha DESC, ti.created_at DESC";
@@ -126,13 +123,11 @@ class TutoriaIndividual
                        a.apellido_materno as alumno_apellido_materno,
                        a.matricula,
                        g.nombre as grupo_nombre,
-                       p.numero as parcial_numero,
                        u.nombre as tutor_nombre,
                        u.apellido_paterno as tutor_apellido
                 FROM " . $this->table . " ti
                 JOIN alumnos a ON ti.alumno_id = a.id_alumno
                 JOIN grupos g ON ti.grupo_id = g.id_grupo
-                JOIN parciales p ON ti.parcial_id = p.id
                 JOIN usuarios u ON ti.usuario_id = u.id_usuario
                 WHERE ti.id = :id";
 
@@ -156,11 +151,14 @@ class TutoriaIndividual
     }
 
     /**
-     * Get all individual tutoring sessions for a specific parcial
-     * @param int $parcial_id
+     * Get all individual tutoring sessions for a specific group and date range
+     * Note: This method doesn't filter by parcial_id since the table doesn't have that column
+     * @param int $grupo_id
+     * @param string $fecha_inicio Optional start date
+     * @param string $fecha_fin Optional end date
      * @return array
      */
-    public function getByParcial($parcial_id)
+    public function getByGrupoAndDateRange($grupo_id, $fecha_inicio = null, $fecha_fin = null)
     {
         $sql = "SELECT ti.*, 
                        a.nombre as alumno_nombre,
@@ -174,11 +172,25 @@ class TutoriaIndividual
                 JOIN alumnos a ON ti.alumno_id = a.id_alumno
                 JOIN grupos g ON ti.grupo_id = g.id_grupo
                 JOIN usuarios u ON ti.usuario_id = u.id_usuario
-                WHERE ti.parcial_id = :parcial_id
-                ORDER BY ti.fecha DESC, ti.created_at DESC";
+                WHERE ti.grupo_id = :grupo_id";
+        
+        if ($fecha_inicio) {
+            $sql .= " AND ti.fecha >= :fecha_inicio";
+        }
+        if ($fecha_fin) {
+            $sql .= " AND ti.fecha <= :fecha_fin";
+        }
+        
+        $sql .= " ORDER BY ti.fecha DESC, ti.created_at DESC";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->bindParam(":parcial_id", $parcial_id, PDO::PARAM_INT);
+        $stmt->bindParam(":grupo_id", $grupo_id, PDO::PARAM_INT);
+        if ($fecha_inicio) {
+            $stmt->bindParam(":fecha_inicio", $fecha_inicio);
+        }
+        if ($fecha_fin) {
+            $stmt->bindParam(":fecha_fin", $fecha_fin);
+        }
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

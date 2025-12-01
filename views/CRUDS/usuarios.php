@@ -222,7 +222,7 @@ window.addEventListener('load', function() {
                     <td>${u.id_usuario}</td>
                     <td>${nombreCompleto}</td>
                     <td>${u.email}</td>
-                    <td>${u.nivel_nombre ?? ''}</td>
+                    <td>${u.nivel_usuario ?? ''}</td>
                     <td>
                         <button class="btn btn-sm btn-warning btn-editar" 
                             data-id="${u.id_usuario}" 
@@ -333,8 +333,12 @@ window.addEventListener('load', function() {
         if (nivelSelect) nivelSelect.value = '';
     };
 
-    document.getElementById('btnNuevoUsuario')?.addEventListener('click', () => {
+    document.getElementById('btnNuevoUsuario')?.addEventListener('click', async () => {
         resetForm(true);
+        // Asegurar que los niveles estén cargados antes de abrir el modal
+        if (nivelSelect && nivelSelect.options.length <= 1) {
+            await cargarNiveles();
+        }
         usuarioModal?.show();
     });
 
@@ -369,14 +373,18 @@ window.addEventListener('load', function() {
         cargarUsuarios(page, searchTerm);
     });
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', async (e) => {
         const editBtn = e.target.closest('.btn-editar');
         if (editBtn) {
             resetForm(false);
+            // Asegurar que los niveles estén cargados antes de establecer el valor
+            if (nivelSelect && nivelSelect.options.length <= 1) {
+                await cargarNiveles();
+            }
             document.getElementById('id_usuario').value = editBtn.dataset.id;
             document.getElementById('nombre').value = editBtn.dataset.nombre || '';
-            document.getElementById('apellido_paterno').value = editBtn.dataset.apellidoPaterno || ''
-            document.getElementById('apellido_materno').value = editBtn.dataset.apellidoMaterno || ''
+            document.getElementById('apellido_paterno').value = editBtn.dataset.apellidoPaterno || '';
+            document.getElementById('apellido_materno').value = editBtn.dataset.apellidoMaterno || '';
             document.getElementById('email').value = editBtn.dataset.email || '';
             if (nivelSelect) nivelSelect.value = editBtn.dataset.nivel || '';
             if (passwordInput) passwordInput.required = false;
@@ -411,7 +419,7 @@ window.addEventListener('load', function() {
 
                         const data = await response.json();
 
-                        if (data.success || data === true) {
+                        if (data.success || data.status === 'ok' || data === true) {
                             usuarioModal?.hide();
                             cargarUsuarios(currentPage, searchTerm);
                             Swal.fire('¡Eliminado!', 'El usuario ha sido eliminado.', 'success');
@@ -448,7 +456,7 @@ window.addEventListener('load', function() {
             const data = await response.json();
             
             // Verificamos success (ajusta según tu API si devuelve "status" o "success")
-            if (response.ok && data.success) {
+            if (response.ok && (data.success || data.status === 'ok')) {
                 Swal.fire({ icon: 'success', title: 'Éxito', text: data.message || 'Operación completada', timer: 2000, showConfirmButton: false });
                 usuarioModal?.hide();
                 form?.reset();

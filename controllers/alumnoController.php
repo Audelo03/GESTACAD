@@ -398,6 +398,7 @@ class AlumnoController
                         <div id="collapse_<?= htmlspecialchars($grupoUid) ?>" class="accordion-collapse collapse"
                             data-bs-parent="#accordion_<?= htmlspecialchars($parentUid) ?>">
                             <div class="accordion-body p-2 p-md-3">
+                                <?php if ($totalAlumnos > 0): ?>
                                 <div class="d-grid d-md-flex gap-2 mb-3">
                                     <a href="gestionar_listas.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
                                         class="btn btn-outline-primary btn-sm flex-fill flex-md-none" data-bs-toggle="tooltip" title="Gestionar Listas">
@@ -408,14 +409,18 @@ class AlumnoController
                                     <button type="button" class="btn btn-outline-success btn-sm btn-tutoria-grupal flex-fill flex-md-none"
                                         data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
                                         data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
-                                        title="Lista Grupal">
-                                        <i class="bi bi-people-fill me-1"></i> <span class="d-none d-sm-inline">Grupal</span>
+                                        title="Tomar Lista Grupal">
+                                        <i class="bi bi-people-fill me-1"></i>
+                                        <span class="d-none d-md-inline">Grupal</span>
+                                        <span class="d-md-none">Tomar Lista Grupal</span>
                                     </button>
                                     <button type="button" class="btn btn-outline-info btn-sm btn-tutoria-individual flex-fill flex-md-none"
                                         data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
                                         data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
-                                        title="Tutoría Individual">
-                                        <i class="bi bi-person-fill me-1"></i> <span class="d-none d-sm-inline">Individual</span>
+                                        title="Tomar Lista Individual">
+                                        <i class="bi bi-person-fill me-1"></i>
+                                        <span class="d-none d-md-inline">Individual</span>
+                                        <span class="d-md-none">Tomar Lista Individual</span>
                                     </button>
                                     <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
                                         class="btn btn-outline-secondary btn-sm flex-fill flex-md-none" data-bs-toggle="tooltip" title="Ver Alumnos del Grupo">
@@ -424,6 +429,7 @@ class AlumnoController
                                         <span class="d-md-none">Alumnos</span>
                                     </a>
                                 </div>
+                                <?php endif; ?>
                                 <div id="lista-alumnos-<?= htmlspecialchars($id_grupo) ?>">
                                     <?php if (empty($alumnos)): ?>
                                         <div class="alert alert-secondary py-2 mb-0"><i class="bi bi-info-circle me-1"></i> No hay alumnos
@@ -435,22 +441,22 @@ class AlumnoController
                                                     <div class="d-flex align-items-center flex-grow-1 w-100 w-md-auto">
                                                         <i class="bi bi-person-circle text-muted fs-5 me-2 d-none d-md-inline"></i>
                                                         <i class="bi bi-person-circle text-muted me-2 d-md-none"></i>
-                                                        <span class="small small-md"><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></span>
+                                                        <span class="nombre-alumno-mobile small-md"><?= htmlspecialchars("{$a['nombre']} {$a['apellido_paterno']} {$a['apellido_materno']}") ?></span>
                                                     </div>
-                                                    <div class="btn-group w-100 w-md-auto" role="group">
+                                                    <div class="btn-group btn-group-mobile w-100 w-md-auto" role="group">
                                                         <a href="crear_seguimiento.php?id_alumno=<?= $a['id_alumno'] ?>"
                                                             class="btn btn-sm btn-outline-success flex-fill flex-md-none" data-bs-toggle="tooltip"
                                                             title="Crear seguimiento">
                                                             <i class="bi bi-journal-plus me-1 d-md-none"></i>
                                                             <span class="d-none d-md-inline"><i class="bi bi-journal-plus"></i></span>
-                                                            <span class="d-md-none">Crear</span>
+                                                            <span class="d-md-none">Crear seguimiento</span>
                                                         </a>
                                                         <a href="ver_seguimientos.php?id_alumno=<?= $a['id_alumno'] ?>"
                                                             class="btn btn-sm btn-outline-primary flex-fill flex-md-none" data-bs-toggle="tooltip"
                                                             title="Ver seguimientos">
                                                             <i class="bi bi-card-list me-1 d-md-none"></i>
                                                             <span class="d-none d-md-inline"><i class="bi bi-card-list"></i></span>
-                                                            <span class="d-md-none">Ver</span>
+                                                            <span class="d-md-none">Ver seguimiento</span>
                                                         </a>
                                                     </div>
                                                 </li>

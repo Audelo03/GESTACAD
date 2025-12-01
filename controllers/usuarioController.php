@@ -189,6 +189,20 @@ class UsuarioController {
         return $this->usuario->getById($user_id);
         
     }
+
+    public function getLevels() {
+        try {
+            $sql = "SELECT id_nivel_usuario, nombre FROM niveles_usuarios WHERE estatus = 1 ORDER BY id_nivel_usuario";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $niveles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            header('Content-Type: application/json');
+            echo json_encode($niveles);
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Error al cargar los niveles: ' . $e->getMessage()]);
+        }
+    }
 }
 
 
@@ -199,7 +213,8 @@ if (isset($_GET['action'])) {
     // Mapear acciones
     $actionMap = [
         'search_tutores' => 'searchTutores',
-        'search_coordinadores' => 'searchCoordinadores'
+        'search_coordinadores' => 'searchCoordinadores',
+        'getLevels' => 'getLevels'
     ];
 
     $method = $actionMap[$action] ?? $action;

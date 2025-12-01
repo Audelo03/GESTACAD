@@ -20,6 +20,9 @@ $alumnoController = new AlumnoController($conn);
 
 $nombre_grupo = $alumnoController->getNombreGrupo($id_grupo);
 
+// Contar alumnos del grupo
+$totalAlumnos = $alumnoController->contarTotalAlumnosPorGrupo($id_grupo);
+
 // Obtener tutorías grupales e individuales
 $tutoriaGrupal = new TutoriaGrupal($conn);
 $tutoriaIndividual = new TutoriaIndividual($conn);
@@ -39,6 +42,7 @@ include 'tutorias/tutorias_modals.php';
         </div>
     </div>
     
+    <?php if ($totalAlumnos > 0): ?>
     <div class="card shadow-sm mb-3 mb-md-4">
         <div class="card-body p-3 p-md-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3">
@@ -63,8 +67,10 @@ include 'tutorias/tutorias_modals.php';
                             data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
                             data-bs-toggle="tooltip" 
                             data-bs-placement="top" 
-                            title="Tutoría Grupal">
-                        <i class="bi bi-people-fill me-2"></i>Grupal
+                            title="Tomar Lista Grupal">
+                        <i class="bi bi-people-fill me-2"></i>
+                        <span class="d-none d-md-inline">Grupal</span>
+                        <span class="d-md-none">Tomar Lista Grupal</span>
                     </button>
                     
                     <button type="button" 
@@ -73,8 +79,10 @@ include 'tutorias/tutorias_modals.php';
                             data-grupo-nombre="<?= htmlspecialchars($nombre_grupo) ?>"
                             data-bs-toggle="tooltip" 
                             data-bs-placement="top" 
-                            title="Tutoría Individual">
-                        <i class="bi bi-person-fill me-2"></i>Individual
+                            title="Tomar Lista Individual">
+                        <i class="bi bi-person-fill me-2"></i>
+                        <span class="d-none d-md-inline">Individual</span>
+                        <span class="d-md-none">Tomar Lista Individual</span>
                     </button>
                     
                     <a href="ver-alumnos-grupo?id_grupo=<?= htmlspecialchars($id_grupo) ?>" 
@@ -88,6 +96,15 @@ include 'tutorias/tutorias_modals.php';
             </div>
         </div>
     </div>
+    <?php else: ?>
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="alert alert-secondary py-2 mb-0">
+                <i class="bi bi-info-circle me-1"></i> No hay alumnos en este grupo. No se pueden gestionar listas.
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
 
     <!-- Tutorías Grupales -->
@@ -301,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             tutoriaIdInput = document.createElement('input');
             tutoriaIdInput.type = 'hidden';
             tutoriaIdInput.id = 'grupal-tutoria-id';
-            tutoriaIdInput.name = 'tutoria_id';
+            tutoriaIdInput.name = 'id';
             document.getElementById('formTutoriaGrupal').appendChild(tutoriaIdInput);
         }
         tutoriaIdInput.value = tutoria.id;

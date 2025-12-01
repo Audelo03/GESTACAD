@@ -109,6 +109,16 @@ include 'objects/header.php';
                                                 title="Capturar Calificaciones">
                                             <i class="bi bi-journal-check me-1"></i>Calif.
                                         </button>
+                                        <button type="button"
+                                                class="btn btn-info btn-inferencias-alumno"
+                                                data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalInferenciasAlumno"
+                                                title="Ver Análisis de Inferencias">
+                                            <i class="bi bi-graph-up-arrow me-1"></i>Inferencias
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -158,6 +168,15 @@ include 'objects/header.php';
                                         data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>">
                                     <i class="bi bi-journal-check me-2"></i>Capturar Calificaciones
                                 </button>
+                                <button type="button"
+                                        class="btn btn-info btn-inferencias-alumno"
+                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                        data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalInferenciasAlumno">
+                                    <i class="bi bi-graph-up-arrow me-2"></i>Ver Inferencias
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -205,13 +224,13 @@ include 'objects/header.php';
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalEditarClasesAlumnoLabel">Clases Inscritas del Alumno</h5>
+                <h5 class="modal-title" id="modalEditarClasesAlumnoLabel"><i class="bi bi-book me-2"></i>Clases Inscritas del Alumno</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
+                <div class="mb-3 mb-md-4">
                     <label class="form-label fw-bold">Alumno:</label>
-                    <p id="editar-clases-alumno-nombre" class="mb-0"></p>
+                    <p id="editar-clases-alumno-nombre" class="mb-0 nombre-alumno-mobile"></p>
                 </div>
                 <div id="editar-clases-lista" class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                     <p class="text-center text-muted">Cargando clases...</p>
@@ -429,6 +448,31 @@ include 'objects/header.php';
     </div>
 </div>
 
+<!-- Modal para mostrar inferencias del alumno -->
+<div class="modal fade" id="modalInferenciasAlumno" tabindex="-1" aria-labelledby="modalInferenciasAlumnoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalInferenciasAlumnoLabel">
+                    <i class="bi bi-graph-up-arrow me-2"></i>Análisis de Inferencias
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalInferenciasBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-info" role="status">
+                        <span class="visually-hidden">Cargando inferencias...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Analizando datos del alumno...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 include 'objects/footer.php';
 ?>
@@ -575,6 +619,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalEditarClases = document.getElementById('modalEditarClasesAlumno');
     const nombreAlumnoEditar = document.getElementById('editar-clases-alumno-nombre');
     const listaClases = document.getElementById('editar-clases-lista');
+    let clasesAlumnoActual = null;
+    let alumnoIdClasesActual = null;
 
     document.querySelectorAll('.btn-editar-clases-alumno').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -585,43 +631,94 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Redibujar cuando cambie el tamaño de la ventana
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(function() {
+            if (clasesAlumnoActual && alumnoIdClasesActual) {
+                renderizarClases(clasesAlumnoActual, alumnoIdClasesActual);
+            }
+        }, 250);
+    });
+
     function cargarClasesAlumno(alumnoId) {
         listaClases.innerHTML = '<p class="text-center text-muted">Cargando clases...</p>';
         
         fetch(`/GESTACAD/controllers/inscripcionesController.php?action=index&alumno_id=${alumnoId}`)
             .then(response => response.json())
             .then(inscripciones => {
+                clasesAlumnoActual = inscripciones;
+                alumnoIdClasesActual = alumnoId;
+                
                 if (inscripciones.length === 0) {
                     listaClases.innerHTML = '<div class="alert alert-info">Este alumno no está inscrito en ninguna clase.</div>';
                     return;
                 }
 
-                let html = '<table class="table table-hover"><thead><tr><th>Asignatura</th><th>Sección</th><th>Docente</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
-                inscripciones.forEach(function(inscripcion) {
-                    html += '<tr>';
-                    html += `<td>${inscripcion.asignatura_nombre || 'N/A'} (${inscripcion.asignatura_clave || 'N/A'})</td>`;
-                    html += `<td>${inscripcion.seccion || 'N/A'}</td>`;
-                    html += `<td>${inscripcion.docente_nombre || ''} ${inscripcion.docente_apellido || ''}</td>`;
-                    html += `<td><span class="badge bg-${inscripcion.estado === 'CURSANDO' ? 'primary' : (inscripcion.estado === 'APROBADO' ? 'success' : 'danger')}">${inscripcion.estado || 'CURSANDO'}</span></td>`;
-                    html += `<td><button class="btn btn-sm btn-danger btn-baja-inscripcion" data-inscripcion-id="${inscripcion.id}" data-alumno-id="${alumnoId}"><i class="bi bi-x-circle me-1"></i>Dar de Baja</button></td>`;
-                    html += '</tr>';
-                });
-                html += '</tbody></table>';
-                listaClases.innerHTML = html;
-
-                // Event listeners para dar de baja
-                document.querySelectorAll('.btn-baja-inscripcion').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        const inscripcionId = this.getAttribute('data-inscripcion-id');
-                        const alumnoIdBtn = this.getAttribute('data-alumno-id');
-                        darDeBajaInscripcion(inscripcionId, alumnoIdBtn);
-                    });
-                });
+                renderizarClases(inscripciones, alumnoId);
             })
             .catch(error => {
                 console.error('Error:', error);
                 listaClases.innerHTML = '<div class="alert alert-danger">Error al cargar las clases.</div>';
             });
+    }
+
+    function renderizarClases(inscripciones, alumnoId) {
+        // Detectar si es móvil
+        const isMobile = window.innerWidth < 768;
+        
+        let html = '';
+        
+        if (isMobile) {
+            // Vista de tarjetas para móvil
+            inscripciones.forEach(function(inscripcion) {
+                const estadoBadge = inscripcion.estado === 'CURSANDO' ? 'primary' : (inscripcion.estado === 'APROBADO' ? 'success' : 'danger');
+                const estadoTexto = inscripcion.estado || 'CURSANDO';
+                const asignaturaNombre = inscripcion.asignatura_nombre || 'N/A';
+                const asignaturaClave = inscripcion.asignatura_clave || 'N/A';
+                const docenteNombre = (inscripcion.docente_nombre || '') + ' ' + (inscripcion.docente_apellido || '');
+                const seccion = inscripcion.seccion || 'N/A';
+                
+                html += '<div class="clases-mobile-card">';
+                html += '<div class="clase-header">';
+                html += `<div class="clase-nombre">${asignaturaNombre} <small class="text-muted">(${asignaturaClave})</small></div>`;
+                html += `<div class="clase-estado"><span class="badge bg-${estadoBadge}">${estadoTexto}</span></div>`;
+                html += '</div>';
+                html += '<div class="clase-info">';
+                html += `<div class="info-item"><span class="info-label">Sección:</span><span class="info-value">${seccion}</span></div>`;
+                html += `<div class="info-item"><span class="info-label">Docente:</span><span class="info-value">${docenteNombre.trim() || 'N/A'}</span></div>`;
+                html += '</div>';
+                html += '<div class="clase-acciones">';
+                html += `<button class="btn btn-sm btn-danger btn-baja-inscripcion" data-inscripcion-id="${inscripcion.id}" data-alumno-id="${alumnoId}"><i class="bi bi-x-circle me-1"></i>Dar de Baja</button>`;
+                html += '</div>';
+                html += '</div>';
+            });
+        } else {
+            // Vista de tabla para desktop
+            html = '<table class="table table-hover"><thead><tr><th>Asignatura</th><th>Sección</th><th>Docente</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
+            inscripciones.forEach(function(inscripcion) {
+                html += '<tr>';
+                html += `<td>${inscripcion.asignatura_nombre || 'N/A'} (${inscripcion.asignatura_clave || 'N/A'})</td>`;
+                html += `<td>${inscripcion.seccion || 'N/A'}</td>`;
+                html += `<td>${inscripcion.docente_nombre || ''} ${inscripcion.docente_apellido || ''}</td>`;
+                html += `<td><span class="badge bg-${inscripcion.estado === 'CURSANDO' ? 'primary' : (inscripcion.estado === 'APROBADO' ? 'success' : 'danger')}">${inscripcion.estado || 'CURSANDO'}</span></td>`;
+                html += `<td><button class="btn btn-sm btn-danger btn-baja-inscripcion" data-inscripcion-id="${inscripcion.id}" data-alumno-id="${alumnoId}"><i class="bi bi-x-circle me-1"></i>Dar de Baja</button></td>`;
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+        }
+        
+        listaClases.innerHTML = html;
+
+        // Event listeners para dar de baja
+        document.querySelectorAll('.btn-baja-inscripcion').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const inscripcionId = this.getAttribute('data-inscripcion-id');
+                const alumnoIdBtn = this.getAttribute('data-alumno-id');
+                darDeBajaInscripcion(inscripcionId, alumnoIdBtn);
+            });
+        });
     }
 
     function darDeBajaInscripcion(inscripcionId, alumnoId) {
@@ -1404,6 +1501,437 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (btnLimpiarBusquedaMobile) {
         btnLimpiarBusquedaMobile.addEventListener('click', limpiarBusqueda);
+    }
+
+    // ============================================
+    // MANEJO DE INFERENCIAS
+    // ============================================
+    const API_BASE_URL = 'http://localhost:5000';
+    let modalInferenciasInstance = null;
+    const modalInferenciasElement = document.getElementById('modalInferenciasAlumno');
+    
+    // Inicializar modal una sola vez
+    if (modalInferenciasElement) {
+        modalInferenciasInstance = new bootstrap.Modal(modalInferenciasElement, {
+            backdrop: true,
+            keyboard: true,
+            focus: true
+        });
+        
+        // Limpiar backdrop cuando se oculta el modal
+        modalInferenciasElement.addEventListener('hidden.bs.modal', function() {
+            // Eliminar backdrop si existe
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+            // Restaurar el body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        });
+        
+        // Limpiar backdrop cuando se cierra el modal
+        modalInferenciasElement.addEventListener('hide.bs.modal', function() {
+            // Asegurar que el modal se cierre correctamente
+            if (modalInferenciasInstance) {
+                modalInferenciasInstance.hide();
+            }
+        });
+    }
+    
+    // Event listener para botones de inferencias
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-inferencias-alumno');
+        if (btn) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Limpiar cualquier backdrop residual antes de abrir
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            backdrops.forEach(backdrop => {
+                backdrop.remove();
+            });
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            const alumnoId = btn.getAttribute('data-alumno-id');
+            const alumnoNombre = btn.getAttribute('data-alumno-nombre');
+            const alumnoMatricula = btn.getAttribute('data-alumno-matricula');
+            
+            // Actualizar título del modal
+            const modalLabel = document.getElementById('modalInferenciasAlumnoLabel');
+            if (modalLabel) {
+                modalLabel.innerHTML = `<i class="bi bi-graph-up-arrow me-2"></i>Análisis de Inferencias - ${alumnoNombre}`;
+            }
+            
+            // Mostrar loading
+            const modalBody = document.getElementById('modalInferenciasBody');
+            if (modalBody) {
+                modalBody.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-info" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Cargando inferencias...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Analizando datos del alumno...</p>
+                        <small class="text-muted d-block mt-2">Matrícula: ${alumnoMatricula}</small>
+                    </div>
+                `;
+            }
+            
+            // Mostrar modal usando la instancia existente
+            if (modalInferenciasInstance) {
+                modalInferenciasInstance.show();
+            } else if (modalInferenciasElement) {
+                // Si no hay instancia, crear una nueva
+                modalInferenciasInstance = new bootstrap.Modal(modalInferenciasElement);
+                modalInferenciasInstance.show();
+            }
+            
+            // Cargar inferencias
+            cargarInferenciasAlumno(alumnoId, alumnoNombre, alumnoMatricula);
+        }
+    });
+    
+    function cargarInferenciasAlumno(alumnoId, alumnoNombre, alumnoMatricula) {
+        const modalBody = document.getElementById('modalInferenciasBody');
+        
+        // Obtener periodo activo (opcional, puedes obtenerlo de algún lugar)
+        const periodoId = null; // Puedes obtenerlo de un select o de la sesión
+        
+        let url = `${API_BASE_URL}/api/riesgo/${alumnoId}/detallado`;
+        if (periodoId) {
+            url += `?periodo_id=${periodoId}`;
+        }
+        
+        console.log('Llamando a la API:', url);
+        
+        // Crear controller para timeout manual
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            signal: controller.signal
+        })
+            .then(response => {
+                console.log('Respuesta recibida:', response.status);
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || `Error HTTP: ${response.status}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                clearTimeout(timeoutId);
+                console.log('Datos recibidos:', data);
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                mostrarInferencias(data, alumnoNombre, alumnoMatricula);
+            })
+            .catch(error => {
+                clearTimeout(timeoutId);
+                console.error('Error completo al cargar inferencias:', error);
+                let errorMessage = error.message;
+                
+                // Detectar tipo de error
+                if (error.name === 'AbortError' || error.message.includes('timeout') || error.message.includes('aborted')) {
+                    errorMessage = 'La API tardó demasiado en responder. Verifica que esté ejecutándose.';
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError') || error.message.includes('CORS')) {
+                    errorMessage = 'No se pudo conectar con la API. Verifica que esté ejecutándose en http://localhost:5000';
+                }
+                
+                modalBody.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading"><i class="bi bi-exclamation-triangle me-2"></i>Error al cargar inferencias</h5>
+                        <p class="mb-2"><strong>Error:</strong> ${errorMessage}</p>
+                        <hr>
+                        <p class="mb-2 small">
+                            <strong>Pasos para solucionar:</strong>
+                        </p>
+                        <ol class="small mb-3">
+                            <li>Verifica que la API esté ejecutándose:
+                                <br><code>cd api && python app.py</code>
+                            </li>
+                            <li>Abre en el navegador: <a href="http://localhost:5000" target="_blank">http://localhost:5000</a></li>
+                            <li>Verifica la consola del navegador (F12) para más detalles</li>
+                        </ol>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="cargarInferenciasAlumno(${alumnoId}, '${alumnoNombre}', '${alumnoMatricula}')">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Reintentar
+                            </button>
+                            <a href="/GESTACAD/api/test_conexion.php" target="_blank" class="btn btn-sm btn-outline-info ms-2">
+                                <i class="bi bi-tools me-1"></i>Verificar API
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+    }
+    
+    function mostrarInferencias(data, alumnoNombre, alumnoMatricula) {
+        const modalBody = document.getElementById('modalInferenciasBody');
+        const analisis = data.analisis_riesgo || {};
+        const estadisticas = data.estadisticas || {};
+        
+        // Determinar color según nivel de riesgo
+        let riesgoColor = 'secondary';
+        let riesgoIcon = 'bi-circle';
+        if (analisis.nivel_riesgo === 'CRITICO') {
+            riesgoColor = 'danger';
+            riesgoIcon = 'bi-exclamation-triangle-fill';
+        } else if (analisis.nivel_riesgo === 'ALTO') {
+            riesgoColor = 'warning';
+            riesgoIcon = 'bi-exclamation-circle-fill';
+        } else if (analisis.nivel_riesgo === 'MEDIO') {
+            riesgoColor = 'info';
+            riesgoIcon = 'bi-info-circle-fill';
+        } else {
+            riesgoColor = 'success';
+            riesgoIcon = 'bi-check-circle-fill';
+        }
+        
+        // Calcular porcentaje del score
+        const scorePorcentaje = analisis.score_riesgo || 50;
+        
+        let html = `
+            <!-- Información del Alumno -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-1"><i class="bi bi-person-circle me-2"></i>${alumnoNombre}</h5>
+                            <p class="text-muted mb-0"><i class="bi bi-person-badge me-1"></i>Matrícula: ${alumnoMatricula}</p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <span class="badge bg-${riesgoColor} fs-6 px-3 py-2">
+                                <i class="bi ${riesgoIcon} me-1"></i>${analisis.nivel_riesgo || 'N/A'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Score de Riesgo -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title mb-3"><i class="bi bi-speedometer2 me-2"></i>Score de Riesgo</h6>
+                    <div class="progress mb-2" style="height: 30px;">
+                        <div class="progress-bar bg-${riesgoColor} progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: ${scorePorcentaje}%"
+                             aria-valuenow="${scorePorcentaje}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            <strong>${scorePorcentaje}%</strong>
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Score calculado: ${scorePorcentaje}/100 (${analisis.nivel_riesgo || 'N/A'})
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Estadísticas Principales -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-2"><i class="bi bi-people me-2"></i>Participación en Tutorías</h6>
+                            <h3 class="mb-0 ${estadisticas.asistencia_tutorias_grupales < 50 ? 'text-danger' : estadisticas.asistencia_tutorias_grupales < 70 ? 'text-warning' : 'text-success'}">
+                                ${estadisticas.asistencia_tutorias_grupales || 0}%
+                            </h3>
+                            <small class="text-muted">
+                                ${estadisticas.tutorias_grupales_asistidas || 0} de ${estadisticas.total_tutorias_grupales || 0} tutorías grupales
+                            </small>
+                            ${estadisticas.faltas_consecutivas_tutorias > 0 ? `<br><span class="badge bg-danger mt-1">${estadisticas.faltas_consecutivas_tutorias} faltas consecutivas</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-2"><i class="bi bi-journal-text me-2"></i>Calificación Promedio</h6>
+                            <h3 class="mb-0 ${estadisticas.calificacion_promedio < 6 ? 'text-danger' : estadisticas.calificacion_promedio < 8 ? 'text-warning' : 'text-success'}">
+                                ${estadisticas.calificacion_promedio || 0}
+                            </h3>
+                            <small class="text-muted">
+                                ${estadisticas.materias_aprobadas || 0} aprobadas, ${estadisticas.materias_reprobadas || 0} reprobadas
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Métricas Adicionales -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-2"><i class="bi bi-person-check me-2"></i>Participación General</h6>
+                            <h4 class="mb-0 ${estadisticas.participacion_general < 50 ? 'text-danger' : estadisticas.participacion_general < 70 ? 'text-warning' : 'text-success'}">
+                                ${estadisticas.participacion_general || 0}%
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-2"><i class="bi bi-book me-2"></i>Compromiso Académico</h6>
+                            <h4 class="mb-0 ${estadisticas.compromiso_academico < 50 ? 'text-danger' : estadisticas.compromiso_academico < 70 ? 'text-warning' : 'text-success'}">
+                                ${estadisticas.compromiso_academico || 0}%
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="card-title text-muted mb-2"><i class="bi bi-chat-dots me-2"></i>Tutorías Individuales</h6>
+                            <h4 class="mb-0 text-info">
+                                ${estadisticas.tutorias_individuales_recientes || 0}
+                            </h4>
+                            <small class="text-muted">Últimos 3 meses</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Explicación -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="bi bi-lightbulb me-2"></i>Explicación del Análisis</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-${riesgoColor} mb-0">
+                        ${(analisis.explicacion || 'No hay explicación disponible').replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Reglas Aplicadas
+        if (analisis.reglas_aplicadas && analisis.reglas_aplicadas.length > 0) {
+            html += `
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="bi bi-list-check me-2"></i>Reglas de Inferencia Aplicadas (${analisis.reglas_aplicadas.length})</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+            `;
+            
+            analisis.reglas_aplicadas.forEach((regla, index) => {
+                let reglaColor = 'secondary';
+                if (regla.nivel === 'CRITICO') reglaColor = 'danger';
+                else if (regla.nivel === 'ALTO') reglaColor = 'warning';
+                else if (regla.nivel === 'MEDIO') reglaColor = 'info';
+                else reglaColor = 'success';
+                
+                html += `
+                    <div class="list-group-item px-0">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">
+                                    <span class="badge bg-${reglaColor} me-2">${regla.nivel}</span>
+                                    Regla ${index + 1}
+                                </h6>
+                                <p class="mb-1 small">${regla.descripcion}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-star me-1"></i>Prioridad: ${regla.prioridad} | 
+                                    <i class="bi bi-graph-up me-1"></i>Score: ${regla.score}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Recomendaciones
+        if (analisis.recomendaciones && analisis.recomendaciones.length > 0) {
+            html += `
+                <div class="card mb-4 border-0 shadow-sm border-start border-${riesgoColor} border-4">
+                    <div class="card-header bg-${riesgoColor} text-white">
+                        <h6 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Recomendaciones</h6>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+            `;
+            
+            analisis.recomendaciones.forEach(rec => {
+                html += `<li class="mb-2"><i class="bi bi-arrow-right-circle me-2 text-${riesgoColor}"></i>${rec}</li>`;
+            });
+            
+            html += `
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Estadísticas Adicionales
+        html += `
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Estadísticas Detalladas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-calendar-x me-2"></i>Seguimientos:</strong><br>
+                            <span class="badge bg-info">${estadisticas.seguimientos_abiertos || 0} abiertos</span>
+                            <span class="badge bg-warning">${estadisticas.seguimientos_en_progreso || 0} en progreso</span>
+                            <span class="badge bg-success">${estadisticas.seguimientos_cerrados || 0} cerrados</span>
+                            ${estadisticas.seguimientos_cerrados_recientes > 0 ? `<br><span class="badge bg-success mt-1">${estadisticas.seguimientos_cerrados_recientes} cerrados recientemente</span>` : ''}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-people me-2"></i>Tutorías Grupales:</strong><br>
+                            <span class="badge bg-primary">${estadisticas.asistencia_tutorias_grupales || 0}% asistencia</span>
+                            <span class="badge bg-secondary">${estadisticas.total_tutorias_grupales || 0} disponibles</span>
+                            <span class="badge bg-success">${estadisticas.tutorias_grupales_asistidas || 0} asistidas</span>
+                            <span class="badge bg-danger">${estadisticas.tutorias_grupales_faltadas || 0} faltadas</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-person-check me-2"></i>Tutorías Individuales:</strong><br>
+                            <span class="badge bg-info">${estadisticas.tutorias_individuales_recientes || 0} en últimos 3 meses</span>
+                        </div>
+                        ${estadisticas.tendencia_tutorias !== undefined ? `
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-arrow-${estadisticas.tendencia_tutorias >= 0 ? 'up' : 'down'}-circle me-2"></i>Tendencia Participación:</strong><br>
+                            <span class="badge bg-${estadisticas.tendencia_tutorias >= 0 ? 'success' : 'danger'}">
+                                ${estadisticas.tendencia_tutorias >= 0 ? '+' : ''}${estadisticas.tendencia_tutorias || 0}%
+                            </span>
+                        </div>
+                        ` : ''}
+                        ${estadisticas.tendencia_calificacion !== undefined ? `
+                        <div class="col-md-6 mb-3">
+                            <strong><i class="bi bi-arrow-${estadisticas.tendencia_calificacion >= 0 ? 'up' : 'down'}-circle me-2"></i>Tendencia Calificación:</strong><br>
+                            <span class="badge bg-${estadisticas.tendencia_calificacion >= 0 ? 'success' : 'danger'}">
+                                ${estadisticas.tendencia_calificacion >= 0 ? '+' : ''}${estadisticas.tendencia_calificacion || 0}
+                            </span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modalBody.innerHTML = html;
     }
 });
 </script>

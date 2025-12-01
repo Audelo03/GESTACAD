@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API - Inferencias</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .loading { background: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test de API de Inferencias</h1>
+        
+        <div class="test-section">
+            <h3>1. Verificar que la API esté corriendo</h3>
+            <button onclick="test1()">Probar Conexión</button>
+            <div id="result1"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. Probar endpoint de riesgo (alumno_id=2)</h3>
+            <button onclick="test2()">Probar Riesgo</button>
+            <div id="result2"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. Probar endpoint detallado (alumno_id=2)</h3>
+            <button onclick="test3()">Probar Detallado</button>
+            <div id="result3"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+        
+        async function test1() {
+            const result = document.getElementById('result1');
+            result.innerHTML = '<div class="loading">Probando...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/`);
+                const data = await response.json();
+                result.innerHTML = `
+                    <div class="success">
+                        <strong>✅ API está corriendo</strong>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error:</strong> ${error.message}<br>
+                        <strong>Solución:</strong> Ejecuta: <code>cd api && python app.py</code>
+                    </div>
+                `;
+            }
+        }
+        
+        async function test2() {
+            const result = document.getElementById('result2');
+            result.innerHTML = '<div class="loading">Probando...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/riesgo/2`);
+                const data = await response.json();
+                result.innerHTML = `
+                    <div class="success">
+                        <strong>✅ Respuesta recibida</strong>
+                        <p><strong>Nivel de Riesgo:</strong> ${data.nivel_riesgo}</p>
+                        <p><strong>Score:</strong> ${data.score_riesgo}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function test3() {
+            const result = document.getElementById('result3');
+            result.innerHTML = '<div class="loading">Probando...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/riesgo/2/detallado`);
+                const data = await response.json();
+                result.innerHTML = `
+                    <div class="success">
+                        <strong>✅ Respuesta recibida</strong>
+                        <p><strong>Nivel:</strong> ${data.analisis_riesgo?.nivel_riesgo}</p>
+                        <p><strong>Score:</strong> ${data.analisis_riesgo?.score_riesgo}</p>
+                        <p><strong>Reglas Aplicadas:</strong> ${data.analisis_riesgo?.reglas_aplicadas?.length || 0}</p>
+                        <details>
+                            <summary>Ver respuesta completa</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-ejecutar test 1 al cargar
+        window.onload = test1;
+    </script>
+</body>
+</html>
+

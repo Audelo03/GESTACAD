@@ -10,6 +10,7 @@
         initTutoriaButtons();
         initTutoriaForms();
         setDefaultDates();
+        initIndividualTutoriaSelects();
     });
 
     /**
@@ -23,7 +24,8 @@
                 const btn = e.target.closest('.btn-tutoria-grupal');
                 const grupoId = btn.dataset.grupoId;
                 const grupoNombre = btn.dataset.grupoNombre;
-                openModalTutoriaGrupal(grupoId, grupoNombre);
+                // Verificar si existe una lista para hoy antes de abrir
+                openModalTutoriaGrupalToday(grupoId, grupoNombre);
             }
             
             // Button for today's tutoring (check if exists)
@@ -133,7 +135,7 @@
         const today = new Date().toISOString().split('T')[0];
         
         // Check if a tutoring session exists for today
-        fetch(`controllers/tutoriasController.php?action=getGrupalByGrupoAndDate&grupo_id=${grupoId}&fecha=${today}`)
+        fetch(`/GESTACAD/controllers/tutoriasController.php?action=getGrupalByGrupoAndDate&grupo_id=${grupoId}&fecha=${today}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.data) {
@@ -183,7 +185,7 @@
                 tutoriaIdInput = document.createElement('input');
                 tutoriaIdInput.type = 'hidden';
                 tutoriaIdInput.id = 'grupal-tutoria-id';
-                tutoriaIdInput.name = 'tutoria_id';
+                tutoriaIdInput.name = 'id';
                 form.appendChild(tutoriaIdInput);
             }
             tutoriaIdInput.value = tutoria.id;
@@ -195,6 +197,103 @@
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('modalTutoriaGrupal'));
         modal.show();
+    }
+
+    /**
+     * Initialize motivo and acciones selects for individual tutoring
+     */
+    function initIndividualTutoriaSelects() {
+        // Motivo select handler
+        const motivoSelect = document.getElementById('individual-motivo-select');
+        const motivoOtroContainer = document.getElementById('individual-motivo-otro-container');
+        const motivoOtro = document.getElementById('individual-motivo-otro');
+        const motivoHidden = document.getElementById('individual-motivo');
+
+        if (motivoSelect) {
+            motivoSelect.addEventListener('change', function() {
+                if (this.value === 'otro') {
+                    motivoOtroContainer.style.display = 'block';
+                    motivoOtro.required = true;
+                    motivoOtro.value = '';
+                    motivoHidden.value = '';
+                } else if (this.value) {
+                    motivoOtroContainer.style.display = 'none';
+                    motivoOtro.required = false;
+                    motivoOtro.value = '';
+                    motivoHidden.value = this.value;
+                } else {
+                    motivoOtroContainer.style.display = 'none';
+                    motivoOtro.required = false;
+                    motivoOtro.value = '';
+                    motivoHidden.value = '';
+                }
+            });
+        }
+
+        // Motivo otro textarea handler
+        if (motivoOtro) {
+            motivoOtro.addEventListener('input', function() {
+                motivoHidden.value = this.value;
+            });
+        }
+
+        // Acciones select handler
+        const accionesSelect = document.getElementById('individual-acciones-select');
+        const accionesOtroContainer = document.getElementById('individual-acciones-otro-container');
+        const accionesOtro = document.getElementById('individual-acciones-otro');
+        const accionesHidden = document.getElementById('individual-acciones');
+
+        if (accionesSelect) {
+            accionesSelect.addEventListener('change', function() {
+                if (this.value === 'otro') {
+                    accionesOtroContainer.style.display = 'block';
+                    accionesOtro.required = true;
+                    accionesOtro.value = '';
+                    accionesHidden.value = '';
+                } else if (this.value) {
+                    accionesOtroContainer.style.display = 'none';
+                    accionesOtro.required = false;
+                    accionesOtro.value = '';
+                    accionesHidden.value = this.value;
+                } else {
+                    accionesOtroContainer.style.display = 'none';
+                    accionesOtro.required = false;
+                    accionesOtro.value = '';
+                    accionesHidden.value = '';
+                }
+            });
+        }
+
+        // Acciones otro textarea handler
+        if (accionesOtro) {
+            accionesOtro.addEventListener('input', function() {
+                accionesHidden.value = this.value;
+            });
+        }
+    }
+
+    /**
+     * Reset individual tutoring form selects
+     */
+    function resetIndividualTutoriaSelects() {
+        const motivoSelect = document.getElementById('individual-motivo-select');
+        const motivoOtroContainer = document.getElementById('individual-motivo-otro-container');
+        const motivoOtro = document.getElementById('individual-motivo-otro');
+        const motivoHidden = document.getElementById('individual-motivo');
+        
+        const accionesSelect = document.getElementById('individual-acciones-select');
+        const accionesOtroContainer = document.getElementById('individual-acciones-otro-container');
+        const accionesOtro = document.getElementById('individual-acciones-otro');
+        const accionesHidden = document.getElementById('individual-acciones');
+
+        if (motivoSelect) {
+            motivoSelect.value = '';
+            motivoSelect.dispatchEvent(new Event('change'));
+        }
+        if (accionesSelect) {
+            accionesSelect.value = '';
+            accionesSelect.dispatchEvent(new Event('change'));
+        }
     }
 
     /**
@@ -216,6 +315,9 @@
             fechaInput.setAttribute('readonly', 'readonly');
         }
 
+        // Reset motivo and acciones selects
+        resetIndividualTutoriaSelects();
+
         // Load students for selection
         loadAlumnosForIndividual(grupoId);
 
@@ -229,6 +331,8 @@
             if (select && typeof $ !== 'undefined' && $(select).hasClass('select2-hidden-accessible')) {
                 $(select).select2('destroy');
             }
+            // Reset selects when modal is closed
+            resetIndividualTutoriaSelects();
         }, { once: true });
         
         modal.show();
@@ -420,37 +524,51 @@
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success message
-                    const message = tutoriaId ? 'Tutoría grupal actualizada exitosamente' : 'Tutoría grupal creada exitosamente';
-                    showAlert('success', data.message || message);
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        // Show success message
+                        const message = tutoriaId ? 'Tutoría grupal actualizada exitosamente' : 'Tutoría grupal creada exitosamente';
+                        showAlert('success', data.message || message);
 
-                    // Close modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalTutoriaGrupal'));
-                    modal.hide();
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTutoriaGrupal'));
+                        modal.hide();
 
-                    // Reset form
-                    form.reset();
-                    setDefaultDates();
-                    
-                    // Reload page to refresh the list
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    showAlert('danger', data.message || 'Error al guardar la tutoría grupal');
+                        // Reset form
+                        form.reset();
+                        setDefaultDates();
+                        
+                        // Reload page to refresh the list
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        console.error('Error response:', data);
+                        showAlert('danger', data.message || 'Error al guardar la tutoría grupal');
+                    }
+                } catch (e) {
+                    console.error('Error parsing JSON:', e);
+                    console.error('Response text:', text);
+                    showAlert('danger', 'Error al procesar la respuesta del servidor');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showAlert('danger', 'Error al procesar la solicitud');
+                showAlert('danger', 'Error al procesar la solicitud: ' + error.message);
             })
             .finally(() => {
                 // Re-enable submit button
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="bi bi-save me-1"></i>Guardar Tutoría Grupal';
+                const buttonText = tutoriaId ? '<i class="bi bi-save me-1"></i>Actualizar Tutoría Grupal' : '<i class="bi bi-save me-1"></i>Guardar Tutoría Grupal';
+                submitBtn.innerHTML = buttonText;
             });
     }
 
@@ -458,6 +576,48 @@
      * Submit individual tutoring form
      */
     function submitTutoriaIndividual(form) {
+        // Validate motivo and acciones before submitting
+        const motivoHidden = document.getElementById('individual-motivo');
+        const accionesHidden = document.getElementById('individual-acciones');
+        const motivoSelect = document.getElementById('individual-motivo-select');
+        const accionesSelect = document.getElementById('individual-acciones-select');
+        const motivoOtro = document.getElementById('individual-motivo-otro');
+        const accionesOtro = document.getElementById('individual-acciones-otro');
+
+        // Update hidden fields with current values
+        if (motivoSelect && motivoSelect.value === 'otro' && motivoOtro) {
+            motivoHidden.value = motivoOtro.value.trim();
+        } else if (motivoSelect && motivoSelect.value) {
+            motivoHidden.value = motivoSelect.value;
+        }
+
+        if (accionesSelect && accionesSelect.value === 'otro' && accionesOtro) {
+            accionesHidden.value = accionesOtro.value.trim();
+        } else if (accionesSelect && accionesSelect.value) {
+            accionesHidden.value = accionesSelect.value;
+        }
+
+        // Validate required fields
+        if (!motivoHidden.value || motivoHidden.value.trim() === '') {
+            showAlert('danger', 'Por favor seleccione o especifique un motivo');
+            if (motivoSelect && motivoSelect.value === 'otro' && motivoOtro) {
+                motivoOtro.focus();
+            } else if (motivoSelect) {
+                motivoSelect.focus();
+            }
+            return;
+        }
+
+        if (!accionesHidden.value || accionesHidden.value.trim() === '') {
+            showAlert('danger', 'Por favor seleccione o especifique las acciones');
+            if (accionesSelect && accionesSelect.value === 'otro' && accionesOtro) {
+                accionesOtro.focus();
+            } else if (accionesSelect) {
+                accionesSelect.focus();
+            }
+            return;
+        }
+
         const formData = new FormData(form);
         const submitBtn = form.querySelector('button[type="submit"]');
 
@@ -465,7 +625,7 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
 
-        fetch('controllers/tutoriasController.php?action=createIndividual', {
+        fetch('/GESTACAD/controllers/tutoriasController.php?action=createIndividual', {
             method: 'POST',
             body: formData
         })
@@ -487,6 +647,7 @@
                     // Reset form
                     form.reset();
                     setDefaultDates();
+                    resetIndividualTutoriaSelects();
                     
                     // Hide modal after cleanup
                     modal.hide();

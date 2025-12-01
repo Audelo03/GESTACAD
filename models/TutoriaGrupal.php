@@ -91,41 +91,81 @@ class TutoriaGrupal
                         actividad_nombre = :actividad_nombre,
                         actividad_descripcion = :actividad_descripcion,
                         evidencia_foto_id = :evidencia_foto_id,
-                        usuario_id = :usuario_id,
-                        updated_at = NOW()
+                        usuario_id = :usuario_id
                     WHERE id = :id";
 
             $stmt = $this->conn->prepare($sql);
+            if (!$stmt) {
+                $this->conn->rollBack();
+                $errorInfo = $this->conn->errorInfo();
+                error_log("Error preparing update statement: " . print_r($errorInfo, true));
+                return false;
+            }
+            
             $stmt->bindParam(":id", $id, PDO::PARAM_INT);
             $stmt->bindParam(":grupo_id", $data['grupo_id'], PDO::PARAM_INT);
             $stmt->bindParam(":parcial_id", $data['parcial_id'], PDO::PARAM_INT);
             $stmt->bindParam(":fecha", $data['fecha']);
             $stmt->bindParam(":actividad_nombre", $data['actividad_nombre']);
             $stmt->bindParam(":actividad_descripcion", $data['actividad_descripcion']);
-            $stmt->bindParam(":evidencia_foto_id", $data['evidencia_foto_id'], PDO::PARAM_INT);
+            // Handle null evidencia_foto_id properly
+            if ($data['evidencia_foto_id'] === null || $data['evidencia_foto_id'] === '') {
+                $stmt->bindValue(":evidencia_foto_id", null, PDO::PARAM_NULL);
+            } else {
+                $stmt->bindParam(":evidencia_foto_id", $data['evidencia_foto_id'], PDO::PARAM_INT);
+            }
             $stmt->bindParam(":usuario_id", $data['usuario_id'], PDO::PARAM_INT);
 
             if (!$stmt->execute()) {
                 $this->conn->rollBack();
+                $errorInfo = $stmt->errorInfo();
+                error_log("Error executing update statement: " . print_r($errorInfo, true));
+                error_log("Update data: " . print_r($data, true));
+                error_log("Update ID: " . $id);
                 return false;
             }
 
             // Delete existing attendance records
             $sql_delete = "DELETE FROM " . $this->table_asistencia . " WHERE tutoria_grupal_id = :tutoria_id";
             $stmt_delete = $this->conn->prepare($sql_delete);
+            if (!$stmt_delete) {
+                $this->conn->rollBack();
+                $errorInfo = $this->conn->errorInfo();
+                error_log("Error preparing delete attendance statement: " . print_r($errorInfo, true));
+                return false;
+            }
             $stmt_delete->bindParam(":tutoria_id", $id, PDO::PARAM_INT);
-            $stmt_delete->execute();
+            if (!$stmt_delete->execute()) {
+                $this->conn->rollBack();
+                $errorInfo = $stmt_delete->errorInfo();
+                error_log("Error deleting attendance records: " . print_r($errorInfo, true));
+                return false;
+            }
 
             // Insert new attendance records
             if (!empty($asistencia)) {
                 $sql_asistencia = "INSERT INTO " . $this->table_asistencia . " (tutoria_grupal_id, alumno_id, presente) VALUES (:tutoria_id, :alumno_id, :presente)";
                 $stmt_asistencia = $this->conn->prepare($sql_asistencia);
+                
+                if (!$stmt_asistencia) {
+                    $this->conn->rollBack();
+                    $errorInfo = $this->conn->errorInfo();
+                    error_log("Error preparing insert attendance statement: " . print_r($errorInfo, true));
+                    return false;
+                }
 
                 foreach ($asistencia as $alumno_id => $presente) {
-                    $stmt_asistencia->bindParam(":tutoria_id", $id, PDO::PARAM_INT);
-                    $stmt_asistencia->bindParam(":alumno_id", $alumno_id, PDO::PARAM_INT);
-                    $stmt_asistencia->bindParam(":presente", $presente, PDO::PARAM_INT);
-                    $stmt_asistencia->execute();
+                    // Use bindValue instead of bindParam to avoid reference issues in loops
+                    $stmt_asistencia->bindValue(":tutoria_id", $id, PDO::PARAM_INT);
+                    $stmt_asistencia->bindValue(":alumno_id", (int)$alumno_id, PDO::PARAM_INT);
+                    $stmt_asistencia->bindValue(":presente", (int)$presente, PDO::PARAM_INT);
+                    
+                    if (!$stmt_asistencia->execute()) {
+                        $this->conn->rollBack();
+                        $errorInfo = $stmt_asistencia->errorInfo();
+                        error_log("Error inserting attendance record for alumno_id $alumno_id: " . print_r($errorInfo, true));
+                        return false;
+                    }
                 }
             }
 
@@ -135,6 +175,7 @@ class TutoriaGrupal
         } catch (Exception $e) {
             $this->conn->rollBack();
             error_log("Error updating group tutoring: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             return false;
         }
     }

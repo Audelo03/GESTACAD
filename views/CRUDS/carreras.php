@@ -152,7 +152,7 @@ window.addEventListener('load', function() {
             paginationControls.appendChild(li);
         };
 
-        addItem(currentPage - 1, '« Anterior', currentPage === 1);
+        addItem(currentPage - 1, 'ï¿½ Anterior', currentPage === 1);
 
         const startPage = Math.max(1, currentPage - 2);
         const endPage = Math.min(totalPages, currentPage + 2);
@@ -181,7 +181,7 @@ window.addEventListener('load', function() {
             addItem(totalPages, String(totalPages));
         }
 
-        addItem(currentPage + 1, 'Siguiente »', currentPage === totalPages);
+        addItem(currentPage + 1, 'Siguiente ï¿½', currentPage === totalPages);
     };
 
     const renderCarreras = (carreras) => {
@@ -244,7 +244,7 @@ window.addEventListener('load', function() {
                 showError('Error al cargar los datos: ' + (data.message || 'Error desconocido'));
             }
         } catch (error) {
-            showError('Error de conexión: ' + error.message);
+            showError('Error de conexiï¿½n: ' + error.message);
         } finally {
             isLoading = false;
         }
@@ -308,19 +308,19 @@ window.addEventListener('load', function() {
         if (deleteBtn) {
             const id = deleteBtn.dataset.id;
             Swal.fire({
-                title: '¿Estás seguro?',
-                text: '¡No podrás revertir esta acción!',
+                title: 'ï¿½Estï¿½s seguro?',
+                text: 'ï¿½No podrï¿½s revertir esta acciï¿½n!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, ¡elimínalo!',
+                confirmButtonText: 'Sï¿½, ï¿½elimï¿½nalo!',
                 cancelButtonText: 'Cancelar'
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
                         await dom.postForm('/GESTACAD/controllers/carrerasController.php?action=delete', { id });
-                        Swal.fire('¡Eliminado!', 'La carrera ha sido eliminada.', 'success');
+                        Swal.fire('ï¿½Eliminado!', 'La carrera ha sido eliminada.', 'success');
                         cargarCarreras(currentPage, searchTerm);
                     } catch (error) {
                         Swal.fire('Error', 'No se pudo eliminar la carrera.', 'error');
@@ -339,7 +339,7 @@ window.addEventListener('load', function() {
             await dom.postForm(url, formData);
             carreraModal?.hide();
             cargarCarreras(currentPage, searchTerm);
-            Swal.fire({ icon: 'success', title: '¡Guardado!', text: 'La carrera ha sido guardada correctamente.', timer: 1500, showConfirmButton: false });
+            Swal.fire({ icon: 'success', title: 'ï¿½Guardado!', text: 'La carrera ha sido guardada correctamente.', timer: 1500, showConfirmButton: false });
         } catch (error) {
             Swal.fire({ icon: 'error', title: 'Oops...', text: 'Error al guardar la carrera. Revise los datos e intente de nuevo.' });
         }
