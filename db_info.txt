@@ -1,0 +1,25 @@
+--- tutorias_eventos ---
+id | int(11) | PRI
+grupo_id | int(10) unsigned | MUL
+parcial_id | int(11) | MUL
+sesion_num | int(11) | 
+fecha | date | 
+tipo | enum('GRUPAL','INDIVIDUAL') | 
+actividad_id | int(11) | MUL
+actividad_nombre | varchar(150) | 
+actividad_descripcion | text | 
+evidencia_file_id | int(11) | 
+
+--- alumnos ---
+id_alumno | int(10) unsigned | PRI
+matricula | varchar(20) | UNI
+nombre | varchar(120) | MUL
+apellido_paterno | varchar(60) | 
+apellido_materno | varchar(60) | 
+estatus | tinyint(4) | MUL
+fecha_creacion | date | 
+fecha_movimiento | timestamp | 
+usuarios_id_usuario_movimiento | int(10) unsigned | MUL
+carreras_id_carrera | int(10) unsigned | MUL
+grupos_id_grupo | int(10) unsigned | MUL
+genero | char(1) | 

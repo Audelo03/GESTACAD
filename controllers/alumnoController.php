@@ -398,9 +398,18 @@ class AlumnoController
                                     <a href="gestionar_listas.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>"
                                         class="btn btn-outline-primary btn-sm" data-bs-toggle="tooltip" title="Gestionar Listas"><i
                                             class="bi bi-pencil-square"></i></a>
-                                    <a href="asistencia.php?id_grupo=<?= htmlspecialchars($id_grupo) ?>&fecha=<?= urlencode(date('Y-m-d')) ?>"
-                                        class="btn btn-outline-success btn-sm" data-bs-toggle="tooltip" title="Tomar Asistencia"><i
-                                            class="bi bi-list-check"></i></a>
+                                    <button type="button" class="btn btn-outline-success btn-sm btn-tutoria-grupal"
+                                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
+                                        data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
+                                        title="Lista Grupal">
+                                        <i class="bi bi-people-fill"></i> Grupal
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info btn-sm btn-tutoria-individual"
+                                        data-grupo-id="<?= htmlspecialchars($id_grupo) ?>"
+                                        data-grupo-nombre="<?= htmlspecialchars($grupo_nombre) ?>" data-bs-toggle="tooltip"
+                                        title="Tutoría Individual">
+                                        <i class="bi bi-person-fill"></i> Individual
+                                    </button>
                                 </div>
                                 <div id="lista-alumnos-<?= htmlspecialchars($id_grupo) ?>">
                                     <?php if (empty($alumnos)): ?>
