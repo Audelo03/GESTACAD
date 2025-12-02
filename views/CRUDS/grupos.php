@@ -16,82 +16,124 @@ $page_title = "Grupos";
 include __DIR__ . "/../objects/header.php";
 ?>
 
-<div class="container mt-4">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <button class="btn btn-success" id="btnNuevoGrupo">
-                <i class="bi bi-plus-circle"></i> Agregar Grupo
-            </button>
-        </div>
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchInput" placeholder="Buscar grupos...">
-                <button class="btn btn-outline-secondary" type="button" id="btnSearch">
-                    <i class="bi bi-search"></i>
-                </button>
-                <button class="btn btn-outline-secondary" type="button" id="btnClear">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Tutor</th>
-                    <th>Carrera</th>
-                    <th>Modalidad</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="gruposBody"></tbody>
-        </table>
-    </div>
-
-    <nav aria-label="Paginación de grupos" class="mt-3">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                    <label for="itemsPerPage" class="form-label me-2 mb-0">Mostrar:</label>
-                    <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto;">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span class="ms-2 text-muted" id="paginationInfo">Mostrando 0 de 0 registros</span>
+<div class="container mt-3 mt-md-4">
+    <!-- Header -->
+    <div class="card shadow-sm mb-3 mb-md-4 crud-header-card">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3">
+                <div>
+                    <h1 class="h4 h3-md mb-1 mb-md-2">
+                        <i class="bi bi-people me-2 text-primary"></i>
+                        Gestión de Grupos
+                    </h1>
+                    <p class="text-muted small mb-0 d-none d-md-block">Administra los grupos académicos</p>
+                </div>
+                <div class="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+                    <button class="btn btn-primary btn-lg w-100 w-md-auto" id="btnNuevoGrupo">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span class="d-none d-sm-inline">Agregar Grupo</span>
+                        <span class="d-sm-none">Nuevo</span>
+                    </button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <ul class="pagination justify-content-end mb-0" id="paginationControls">
-                    </ul>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-primary text-white">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Buscar grupos...">
+                <button class="btn btn-outline-primary" type="button" id="btnSearch">
+                    <i class="bi bi-search me-1 d-none d-sm-inline"></i>
+                    <span class="d-none d-sm-inline">Buscar</span>
+                    <span class="d-sm-none">Buscar</span>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="btnClear" title="Limpiar búsqueda">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Tabla Desktop -->
+    <div class="table-responsive d-none d-md-block">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 crud-table" id="tablaGrupos">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 80px;">ID</th>
+                            <th>Nombre</th>
+                            <th>Tutor</th>
+                            <th>Carrera</th>
+                            <th>Modalidad</th>
+                            <th class="text-center" style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gruposBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Móvil -->
+    <div class="d-md-none" id="gruposCardsContainer">
+        <div id="gruposCardsBody"></div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="card shadow-sm mt-3 mt-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="row align-items-center g-3">
+                <div class="col-12 col-md-6">
+                    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
+                        <label for="itemsPerPage" class="form-label mb-0 small fw-semibold">Mostrar:</label>
+                        <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto; min-width: 80px;">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-muted small" id="paginationInfo">Mostrando 0 de 0 registros</span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <nav aria-label="Paginación de grupos">
+                        <ul class="pagination justify-content-center justify-content-md-end mb-0 pagination-sm" id="paginationControls">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="grupoModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Formulario de Grupo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalLabel">
+                    <i class="bi bi-people me-2"></i>Formulario de Grupo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3 p-md-4">
                 <form id="formGrupo">
                     <input type="hidden" id="id_grupo" name="id_grupo">
-
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre del Grupo</label>
+                        <label for="nombre" class="form-label fw-semibold">
+                            <i class="bi bi-tag me-1 text-primary"></i>Nombre del Grupo
+                        </label>
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
-
                     <div class="mb-3">
-                        <label for="usuarios_id_usuario_tutor" class="form-label">Tutor Asignado</label>
+                        <label for="usuarios_id_usuario_tutor" class="form-label fw-semibold">
+                            <i class="bi bi-person-badge me-1 text-primary"></i>Tutor Asignado
+                        </label>
                         <select class="form-select" id="usuarios_id_usuario_tutor" name="usuarios_id_usuario_tutor" required>
                             <option value="">Seleccione un tutor</option>
                             <?php foreach ($tutores as $tutor) : ?>
@@ -99,9 +141,10 @@ include __DIR__ . "/../objects/header.php";
                             <?php endforeach; ?>
                         </select>
                     </div>
-
                     <div class="mb-3">
-                        <label for="carreras_id_carrera" class="form-label">Carrera</label>
+                        <label for="carreras_id_carrera" class="form-label fw-semibold">
+                            <i class="bi bi-mortarboard me-1 text-primary"></i>Carrera
+                        </label>
                         <select class="form-select" id="carreras_id_carrera" name="carreras_id_carrera" required>
                             <option value="">Seleccione una carrera</option>
                             <?php foreach ($carreras as $carrera) : ?>
@@ -109,9 +152,10 @@ include __DIR__ . "/../objects/header.php";
                             <?php endforeach; ?>
                         </select>
                     </div>
-
                     <div class="mb-3">
-                        <label for="modalidades_id_modalidad" class="form-label">Modalidad</label>
+                        <label for="modalidades_id_modalidad" class="form-label fw-semibold">
+                            <i class="bi bi-person-video3 me-1 text-primary"></i>Modalidad
+                        </label>
                         <select class="form-select" id="modalidades_id_modalidad" name="modalidades_id_modalidad" required>
                             <option value="">Seleccione una modalidad</option>
                             <?php foreach ($modalidades as $modalidad) : ?>
@@ -119,16 +163,21 @@ include __DIR__ . "/../objects/header.php";
                             <?php endforeach; ?>
                         </select>
                     </div>
-
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            <div class="modal-footer border-top p-3 p-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardar">
+                    <i class="bi bi-check-circle me-2"></i>Guardar
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<?php include __DIR__ . '/crud_helper_styles.php'; ?>
 
 <?php include __DIR__ . "/../objects/footer.php"; ?>
 
@@ -151,9 +200,14 @@ window.addEventListener('load', function() {
     let searchTerm = '';
     let isLoading = false;
 
+    const gruposCardsBody = document.getElementById('gruposCardsBody');
+    
     // REEMPLAZO DE dom.setHTML
     const renderSpinner = () => {
-        gruposBody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
+        gruposBody.innerHTML = '<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><div class="mt-2 text-muted">Cargando grupos...</div></td></tr>';
+        if (gruposCardsBody) {
+            gruposCardsBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><div class="mt-2 text-muted">Cargando grupos...</div></div>';
+        }
     };
 
     const updatePaginationInfo = () => {
@@ -217,44 +271,88 @@ window.addEventListener('load', function() {
         
         // Limpiamos contenido previo
         gruposBody.innerHTML = '';
+        if (gruposCardsBody) gruposCardsBody.innerHTML = '';
 
-        if (!grupos.length) {
-            gruposBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No se encontraron grupos</td></tr>';
+        if (!grupos || !Array.isArray(grupos) || grupos.length === 0) {
+            gruposBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-inbox me-2"></i>No se encontraron grupos</td></tr>';
+            if (gruposCardsBody) {
+                gruposCardsBody.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-inbox me-2"></i>No se encontraron grupos</div>';
+            }
             return;
         }
 
         // REEMPLAZO DE dom.appendHTML
         grupos.forEach((g) => {
             const tutorNombre = g.tutor_nombre ? `${g.tutor_nombre} ${g.tutor_apellido_paterno || ''}`.trim() : 'N/A';
+            
+            // Tabla desktop
             const row = `
-                <tr>
-                    <td>${g.id_grupo}</td>
-                    <td>${g.nombre}</td>
+                <tr class="align-middle">
+                    <td class="text-center fw-bold text-primary">${g.id_grupo}</td>
+                    <td><strong>${g.nombre}</strong></td>
                     <td>${tutorNombre}</td>
-                    <td>${g.carrera_nombre ?? ''}</td>
-                    <td>${g.modalidad_nombre ?? ''}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm btn-editar" 
-                            data-id="${g.id_grupo}" 
-                            data-nombre="${g.nombre}" 
-                            data-tutor="${g.usuarios_id_usuario_tutor ?? ''}" 
-                            data-carrera="${g.carreras_id_carrera ?? ''}" 
-                            data-modalidad="${g.modalidades_id_modalidad ?? ''}" 
-                            data-bs-toggle="tooltip" 
-                            data-bs-placement="top" 
-                            title="Editar Grupo">
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm btn-eliminar" 
-                            data-id="${g.id_grupo}" 
-                            data-bs-toggle="tooltip" 
-                            data-bs-placement="top" 
-                            title="Eliminar Grupo">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
+                    <td>${g.carrera_nombre ?? 'N/A'}</td>
+                    <td>${g.modalidad_nombre ?? 'N/A'}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-warning btn-editar" 
+                                data-id="${g.id_grupo}" 
+                                data-nombre="${g.nombre}" 
+                                data-tutor="${g.usuarios_id_usuario_tutor ?? ''}" 
+                                data-carrera="${g.carreras_id_carrera ?? ''}" 
+                                data-modalidad="${g.modalidades_id_modalidad ?? ''}" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top" 
+                                title="Editar Grupo">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-eliminar" 
+                                data-id="${g.id_grupo}" 
+                                data-bs-toggle="tooltip" 
+                                data-bs-placement="top" 
+                                title="Eliminar Grupo">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
             gruposBody.insertAdjacentHTML('beforeend', row);
+            
+            // Cards móvil
+            if (gruposCardsBody) {
+                const card = `
+                    <div class="card shadow-sm mb-3 crud-card-mobile">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-1 fw-bold text-truncate">${g.nombre}</h6>
+                                    <small class="text-muted">ID: ${g.id_grupo}</small>
+                                </div>
+                            </div>
+                            <div class="border-top pt-2">
+                                <div class="row g-2 small">
+                                    <div class="col-12"><strong>Tutor:</strong> ${tutorNombre}</div>
+                                    <div class="col-12"><strong>Carrera:</strong> ${g.carrera_nombre ?? 'N/A'}</div>
+                                    <div class="col-12"><strong>Modalidad:</strong> ${g.modalidad_nombre ?? 'N/A'}</div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-warning btn-editar w-100" 
+                                    data-id="${g.id_grupo}" 
+                                    data-nombre="${g.nombre}" 
+                                    data-tutor="${g.usuarios_id_usuario_tutor ?? ''}" 
+                                    data-carrera="${g.carreras_id_carrera ?? ''}" 
+                                    data-modalidad="${g.modalidades_id_modalidad ?? ''}">
+                                    <i class="bi bi-pencil-square me-2"></i>Editar
+                                </button>
+                                <button class="btn btn-danger btn-eliminar w-100" data-id="${g.id_grupo}">
+                                    <i class="bi bi-trash-fill me-2"></i>Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                gruposCardsBody.insertAdjacentHTML('beforeend', card);
+            }
         });
 
         if (typeof bootstrap !== 'undefined') {
@@ -266,8 +364,13 @@ window.addEventListener('load', function() {
     };
 
     const showError = (message) => {
-        gruposBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${message}</td></tr>`;
-        Swal.fire({ icon: 'error', title: 'Error', text: message });
+        gruposBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
+        if (gruposCardsBody) {
+            gruposCardsBody.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>${message}</div>`;
+        }
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'error', title: 'Error', text: message });
+        }
     };
 
     // REEMPLAZO DE dom.fetchJSON

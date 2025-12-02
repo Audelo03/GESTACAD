@@ -38,7 +38,12 @@ if (!function_exists('active')) {
 
     // Verificar si la página actual coincide con alguna de las páginas especificadas
     foreach ($pages_array as $page) {
+      // Coincidencia exacta
       if ($current_page === $page || $current_page === $page . '.php') {
+        return 'active';
+      }
+      // Coincidencia con rutas anidadas (ej: tutorias/pat)
+      if (strpos($current_page, $page) === 0 || strpos($current_page, $page . '/') === 0) {
         return 'active';
       }
     }
@@ -74,37 +79,33 @@ if (!isset($modificacion_ruta)) {
   <div id="slow" class="slow">
     <ul class="nav nav-pills flex-column mb-auto">
 
-      <?php if ($nivel == 1): ?>
+      <?php if ($nivel == 1): // ADMINISTRADOR ?>
+        <!-- Administrador: Dashboard, Alumnos, Estadísticas, Seguimientos -->
         <li class="nav-item mobile-hidden">
           <a href="/GESTACAD/dashboard" class="nav-link sidebar-link <?= active(['dashboard']); ?>" <?= active(['dashboard']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Panel Principal"' ?>>
             <i class="bi bi-speedometer2 me-2 sidebar-icon"></i> <span class="sidebar-text">Dashboard</span>
           </a>
         </li>
-      <?php endif; ?>
 
-      <li class="mobile-hidden">
-        <a href="/GESTACAD/listas" class="nav-link sidebar-link <?= active(['listas']); ?>" <?= active(['listas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Lista de Alumnos"' ?>>
-          <i class="bi bi-people me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos</span>
-        </a>
-      </li>
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/listas" class="nav-link sidebar-link <?= active(['listas']); ?>" <?= active(['listas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Lista de Alumnos"' ?>>
+            <i class="bi bi-people me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos</span>
+          </a>
+        </li>
 
-      <?php if ($nivel == 1): ?>
         <li class="mobile-hidden">
           <a href="/GESTACAD/estadisticas" class="nav-link sidebar-link <?= active(['estadisticas']); ?>"
             <?= active(['estadisticas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Estadísticas y Reportes"' ?>>
             <i class="bi bi-bar-chart-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Estadísticas</span>
           </a>
         </li>
-      <?php endif; ?>
 
-      <li class="mobile-hidden">
-        <a href="/GESTACAD/seguimientos" class="nav-link sidebar-link <?= active(['seguimientos']); ?>"
-          <?= active(['seguimientos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Seguimientos"' ?>>
-          <i class="bi bi-journal-text me-2 sidebar-icon"></i> <span class="sidebar-text">Seguimientos</span>
-        </a>
-      </li>
-
-      <?php if ($nivel == 1): ?>
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/seguimientos" class="nav-link sidebar-link <?= active(['seguimientos']); ?>"
+            <?= active(['seguimientos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Seguimientos"' ?>>
+            <i class="bi bi-journal-text me-2 sidebar-icon"></i> <span class="sidebar-text">Seguimientos</span>
+          </a>
+        </li>
 
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Gestión</h6>
 
@@ -146,9 +147,7 @@ if (!isset($modificacion_ruta)) {
             <i class="bi bi-person-rolodex me-2 sidebar-icon"></i> <span class="sidebar-text">Tipo de Seguimientos</span>
           </a>
         </li>
-      <?php endif; ?>
 
-      <?php if ($nivel <= 2): // Admin y Coordinador ?>
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Académico</h6>
 
         <li>
@@ -188,23 +187,156 @@ if (!isset($modificacion_ruta)) {
             <i class="bi bi-award me-2 sidebar-icon"></i> <span class="sidebar-text">Becas</span>
           </a>
         </li>
-      <?php endif; ?>
 
-      <?php if ($nivel <= 3): // Admin, Coordinador y Tutor ?>
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Tutorías</h6>
 
         <li>
-          <a href="/GESTACAD/tutorias/pat" class="nav-link sidebar-link <?= active(['pat']); ?>" <?= active(['pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Plan de Acción Tutorial"' ?>>
+          <a href="/GESTACAD/tutorias/pat" class="nav-link sidebar-link <?= active(['tutorias/pat', 'pat']); ?>" <?= active(['tutorias/pat', 'pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Plan de Acción Tutorial"' ?>>
             <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">PAT</span>
           </a>
         </li>
 
         <li>
-          <a href="/GESTACAD/tutorias/canalizacion" class="nav-link sidebar-link <?= active(['canalizacion']); ?>"
-            <?= active(['canalizacion']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Canalización de Alumnos"' ?>>
+          <a href="/GESTACAD/tutorias/canalizacion" class="nav-link sidebar-link <?= active(['tutorias/canalizacion', 'canalizacion']); ?>"
+            <?= active(['tutorias/canalizacion', 'canalizacion']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Canalización de Alumnos"' ?>>
             <i class="bi bi-arrow-right-circle me-2 sidebar-icon"></i> <span class="sidebar-text">Canalización</span>
           </a>
         </li>
+
+      <?php elseif ($nivel == 2): // COORDINADOR ?>
+        <!-- Coordinador: Dashboard, Alumnos (de su carrera), Estadísticas (de su carrera), Seguimientos -->
+        <li class="nav-item mobile-hidden">
+          <a href="/GESTACAD/dashboard" class="nav-link sidebar-link <?= active(['dashboard']); ?>" <?= active(['dashboard']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Panel Principal"' ?>>
+            <i class="bi bi-speedometer2 me-2 sidebar-icon"></i> <span class="sidebar-text">Dashboard</span>
+          </a>
+        </li>
+
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/listas" class="nav-link sidebar-link <?= active(['listas']); ?>" <?= active(['listas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Lista de Alumnos de mi Carrera"' ?>>
+            <i class="bi bi-people me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos</span>
+          </a>
+        </li>
+
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/estadisticas" class="nav-link sidebar-link <?= active(['estadisticas']); ?>"
+            <?= active(['estadisticas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Estadísticas de mi Carrera"' ?>>
+            <i class="bi bi-bar-chart-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Estadísticas</span>
+          </a>
+        </li>
+
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/seguimientos" class="nav-link sidebar-link <?= active(['seguimientos']); ?>"
+            <?= active(['seguimientos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Seguimientos"' ?>>
+            <i class="bi bi-journal-text me-2 sidebar-icon"></i> <span class="sidebar-text">Seguimientos</span>
+          </a>
+        </li>
+
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Gestión</h6>
+
+        <!-- Coordinador: CRUDs limitados a su carrera/división -->
+        <li>
+          <a href="/GESTACAD/alumnos" class="nav-link sidebar-link <?= active(['alumnos']); ?>" <?= active(['alumnos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Alumnos de mi Carrera"' ?>>
+            <i class="bi bi-person-workspace me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/grupos" class="nav-link sidebar-link <?= active(['grupos']); ?>" <?= active(['grupos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Grupos de mi Carrera"' ?>>
+            <i class="bi bi-person-video2 me-2 sidebar-icon"></i> <span class="sidebar-text">Grupos</span>
+          </a>
+        </li>
+
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Académico</h6>
+
+        <li>
+          <a href="/GESTACAD/divisiones" class="nav-link sidebar-link <?= active(['divisiones']); ?>" <?= active(['divisiones']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Divisiones"' ?>>
+            <i class="bi bi-building me-2 sidebar-icon"></i> <span class="sidebar-text">Divisiones</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/periodos" class="nav-link sidebar-link <?= active(['periodos']); ?>" <?= active(['periodos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Periodos"' ?>>
+            <i class="bi bi-calendar-range me-2 sidebar-icon"></i> <span class="sidebar-text">Periodos</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/asignaturas" class="nav-link sidebar-link <?= active(['asignaturas']); ?>"
+            <?= active(['asignaturas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Asignaturas"' ?>>
+            <i class="bi bi-journal-bookmark me-2 sidebar-icon"></i> <span class="sidebar-text">Asignaturas</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/clases" class="nav-link sidebar-link <?= active(['clases']); ?>" <?= active(['clases']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Clases"' ?>>
+            <i class="bi bi-easel me-2 sidebar-icon"></i> <span class="sidebar-text">Clases</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/inscripciones" class="nav-link sidebar-link <?= active(['inscripciones']); ?>"
+            <?= active(['inscripciones']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Inscripciones"' ?>>
+            <i class="bi bi-pencil-square me-2 sidebar-icon"></i> <span class="sidebar-text">Inscripciones</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/becas" class="nav-link sidebar-link <?= active(['becas']); ?>" <?= active(['becas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Becas"' ?>>
+            <i class="bi bi-award me-2 sidebar-icon"></i> <span class="sidebar-text">Becas</span>
+          </a>
+        </li>
+
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Tutorías</h6>
+
+        <li>
+          <a href="/GESTACAD/tutorias/pat" class="nav-link sidebar-link <?= active(['tutorias/pat', 'pat']); ?>" <?= active(['tutorias/pat', 'pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Plan de Acción Tutorial"' ?>>
+            <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">PAT</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/tutorias/canalizacion" class="nav-link sidebar-link <?= active(['tutorias/canalizacion', 'canalizacion']); ?>"
+            <?= active(['tutorias/canalizacion', 'canalizacion']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Canalización de Alumnos"' ?>>
+            <i class="bi bi-arrow-right-circle me-2 sidebar-icon"></i> <span class="sidebar-text">Canalización</span>
+          </a>
+        </li>
+
+      <?php elseif ($nivel == 3): // TUTOR ?>
+        <!-- Tutor: Solo grupos/alumnos, seguimientos, tutorías PAT, canalización, becas -->
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/listas" class="nav-link sidebar-link <?= active(['listas']); ?>" <?= active(['listas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Mis Grupos y Alumnos"' ?>>
+            <i class="bi bi-people me-2 sidebar-icon"></i> <span class="sidebar-text">Mis Grupos</span>
+          </a>
+        </li>
+
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/seguimientos" class="nav-link sidebar-link <?= active(['seguimientos']); ?>"
+            <?= active(['seguimientos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Seguimientos"' ?>>
+            <i class="bi bi-journal-text me-2 sidebar-icon"></i> <span class="sidebar-text">Seguimientos</span>
+          </a>
+        </li>
+
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Tutorías</h6>
+
+        <li>
+          <a href="/GESTACAD/tutorias/pat" class="nav-link sidebar-link <?= active(['tutorias/pat', 'pat']); ?>" <?= active(['tutorias/pat', 'pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Plan de Acción Tutorial"' ?>>
+            <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">PAT</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/tutorias/canalizacion" class="nav-link sidebar-link <?= active(['tutorias/canalizacion', 'canalizacion']); ?>"
+            <?= active(['tutorias/canalizacion', 'canalizacion']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Canalización de Alumnos"' ?>>
+            <i class="bi bi-arrow-right-circle me-2 sidebar-icon"></i> <span class="sidebar-text">Canalización</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/becas" class="nav-link sidebar-link <?= active(['becas']); ?>" <?= active(['becas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Gestión de Becas"' ?>>
+            <i class="bi bi-award me-2 sidebar-icon"></i> <span class="sidebar-text">Becas</span>
+          </a>
+        </li>
+
       <?php endif; ?>
 
       <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Tú</h6>
@@ -245,46 +377,72 @@ if (!isset($modificacion_ruta)) {
   </div>
 </nav>
 
-<!-- Barra de navegación inferior (solo móvil) -->
+<!-- Barra de navegación inferior (solo móvil) - Máximo 5 elementos por rol -->
 <nav id="mobile-bottom-nav" class="d-lg-none">
-  <?php if ($nivel != 3): // No mostrar dashboard a tutores ?>
-  <a href="/GESTACAD/dashboard" class="bottom-nav-item <?= active(['dashboard']) ? 'active' : '' ?>">
-    <i class="bi bi-house-door-fill"></i>
-    <span>Dashboard</span>
-  </a>
-  <?php endif; ?>
-  <a href="/GESTACAD/listas" class="bottom-nav-item <?= active(['listas', 'alumnos']) ? 'active' : '' ?>">
-    <i class="bi bi-people-fill"></i>
-    <span>Alumnos</span>
-  </a>
-  <?php if ($nivel == 1): // Solo administradores ven estadísticas ?>
-  <a href="/GESTACAD/estadisticas" class="bottom-nav-item <?= active(['estadisticas']) ? 'active' : '' ?>">
-    <i class="bi bi-bar-chart-line-fill"></i>
-    <span>Estadísticas</span>
-  </a>
-  <?php endif; ?>
-  <a href="/GESTACAD/seguimientos" class="bottom-nav-item <?= active(['seguimientos']) ? 'active' : '' ?>">
-    <i class="bi bi-journal-text"></i>
-    <span>Seguimientos</span>
-  </a>
-  <?php if ($nivel <= 3): // Admin, Coordinador y Tutor ven tutorías ?>
-  <a href="/GESTACAD/tutorias/pat" class="bottom-nav-item <?= active(['pat']) ? 'active' : '' ?>">
-    <i class="bi bi-clipboard-check"></i>
-    <span>Tutorías</span>
-  </a>
-  <?php endif; ?>
-  <a href="/GESTACAD/profile" class="bottom-nav-item <?= active(['profile']) ? 'active' : '' ?>">
-    <i class="bi bi-person-circle"></i>
-    <span>Perfil</span>
-  </a>
-  <button id="bottom-nav-config" type="button" class="bottom-nav-item">
-    <i class="bi bi-gear-fill"></i>
-    <span>Configuración</span>
-  </button>
-  <?php if ($nivel == 1): // Solo administradores ven gestión ?>
-  <button id="bottom-nav-manage" type="button" class="bottom-nav-item">
-    <i class="bi bi-columns-gap"></i>
-    <span>Gestión</span>
-  </button>
+  <?php if ($nivel == 1): // ADMINISTRADOR: Dashboard, Estadísticas, Alumnos, Configuración, Gestión ?>
+    <a href="/GESTACAD/dashboard" class="bottom-nav-item <?= active(['dashboard']) ? 'active' : '' ?>">
+      <i class="bi bi-house-door-fill"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/GESTACAD/estadisticas" class="bottom-nav-item <?= active(['estadisticas']) ? 'active' : '' ?>">
+      <i class="bi bi-bar-chart-line-fill"></i>
+      <span>Estadísticas</span>
+    </a>
+    <a href="/GESTACAD/listas" class="bottom-nav-item <?= active(['listas', 'alumnos']) ? 'active' : '' ?>">
+      <i class="bi bi-people-fill"></i>
+      <span>Alumnos</span>
+    </a>
+    <button id="bottom-nav-config" type="button" class="bottom-nav-item">
+      <i class="bi bi-gear-fill"></i>
+      <span>Configuración</span>
+    </button>
+    <button id="bottom-nav-manage" type="button" class="bottom-nav-item">
+      <i class="bi bi-columns-gap"></i>
+      <span>Gestión</span>
+    </button>
+
+  <?php elseif ($nivel == 2): // COORDINADOR: Dashboard, Estadísticas, Alumnos, Seguimientos, Configuración ?>
+    <a href="/GESTACAD/dashboard" class="bottom-nav-item <?= active(['dashboard']) ? 'active' : '' ?>">
+      <i class="bi bi-house-door-fill"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/GESTACAD/estadisticas" class="bottom-nav-item <?= active(['estadisticas']) ? 'active' : '' ?>">
+      <i class="bi bi-bar-chart-line-fill"></i>
+      <span>Estadísticas</span>
+    </a>
+    <a href="/GESTACAD/listas" class="bottom-nav-item <?= active(['listas', 'alumnos']) ? 'active' : '' ?>">
+      <i class="bi bi-people-fill"></i>
+      <span>Alumnos</span>
+    </a>
+    <a href="/GESTACAD/seguimientos" class="bottom-nav-item <?= active(['seguimientos']) ? 'active' : '' ?>">
+      <i class="bi bi-journal-text"></i>
+      <span>Seguimientos</span>
+    </a>
+    <button id="bottom-nav-config" type="button" class="bottom-nav-item">
+      <i class="bi bi-gear-fill"></i>
+      <span>Configuración</span>
+    </button>
+
+  <?php elseif ($nivel == 3): // TUTOR: Alumnos, Seguimientos, Tutorías PAT, Perfil, Configuración ?>
+    <a href="/GESTACAD/listas" class="bottom-nav-item <?= active(['listas', 'alumnos']) ? 'active' : '' ?>">
+      <i class="bi bi-people-fill"></i>
+      <span>Alumnos</span>
+    </a>
+    <a href="/GESTACAD/seguimientos" class="bottom-nav-item <?= active(['seguimientos']) ? 'active' : '' ?>">
+      <i class="bi bi-journal-text"></i>
+      <span>Seguimientos</span>
+    </a>
+    <a href="/GESTACAD/tutorias/pat" class="bottom-nav-item <?= active(['tutorias/pat', 'pat']) ? 'active' : '' ?>">
+      <i class="bi bi-clipboard-check"></i>
+      <span>Tutorías</span>
+    </a>
+    <a href="/GESTACAD/profile" class="bottom-nav-item <?= active(['profile']) ? 'active' : '' ?>">
+      <i class="bi bi-person-circle"></i>
+      <span>Perfil</span>
+    </a>
+    <button id="bottom-nav-config" type="button" class="bottom-nav-item">
+      <i class="bi bi-gear-fill"></i>
+      <span>Configuración</span>
+    </button>
   <?php endif; ?>
 </nav>

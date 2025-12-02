@@ -15,100 +15,147 @@ $page_title = "Alumnos";
 include __DIR__ . "/../objects/header.php"; // Se agregó el punto y coma faltante aquí
 ?>
 
-<div class="container mt-4">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <button class="btn btn-success" id="btnNuevoAlumno">
-                <i class="bi bi-plus-circle"></i> Agregar Alumno
-            </button>
-        </div>
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchInput" placeholder="Buscar alumnos...">
-                <button class="btn btn-outline-secondary" type="button" id="btnSearch">
-                    <i class="bi bi-search"></i>
-                </button>
-                <button class="btn btn-outline-secondary" type="button" id="btnClear">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-        <table id="alumnosTable" class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Matrícula</th>
-                    <th>Nombre Completo</th>
-                    <th>Carrera</th>
-                    <th>Grupo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="alumnosBody"></tbody>
-        </table>
-    </div>
-
-    <nav aria-label="Paginación de alumnos" class="mt-3">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                    <label for="itemsPerPage" class="form-label me-2 mb-0">Mostrar:</label>
-                    <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto;">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span class="ms-2 text-muted" id="paginationInfo">Mostrando 0 de 0 registros</span>
+<div class="container mt-3 mt-md-4">
+    <!-- Header -->
+    <div class="card shadow-sm mb-3 mb-md-4 crud-header-card">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3">
+                <div>
+                    <h1 class="h4 h3-md mb-1 mb-md-2">
+                        <i class="bi bi-person-badge me-2 text-primary"></i>
+                        Gestión de Alumnos
+                    </h1>
+                    <p class="text-muted small mb-0 d-none d-md-block">Administra los alumnos del sistema</p>
+                </div>
+                <div class="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+                    <button class="btn btn-primary btn-lg w-100 w-md-auto" id="btnNuevoAlumno">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span class="d-none d-sm-inline">Agregar Alumno</span>
+                        <span class="d-sm-none">Nuevo</span>
+                    </button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <ul class="pagination justify-content-end mb-0" id="paginationControls">
-                    </ul>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-primary text-white">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Buscar alumnos...">
+                <button class="btn btn-outline-primary" type="button" id="btnSearch">
+                    <i class="bi bi-search me-1 d-none d-sm-inline"></i>
+                    <span class="d-none d-sm-inline">Buscar</span>
+                    <span class="d-sm-none">Buscar</span>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="btnClear" title="Limpiar búsqueda">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Tabla Desktop -->
+    <div class="table-responsive d-none d-md-block">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table id="alumnosTable" class="table table-hover mb-0 crud-table">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 80px;">ID</th>
+                            <th>Matrícula</th>
+                            <th>Nombre Completo</th>
+                            <th>Carrera</th>
+                            <th>Grupo</th>
+                            <th class="text-center" style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alumnosBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Móvil -->
+    <div class="d-md-none" id="alumnosCardsContainer">
+        <div id="alumnosCardsBody"></div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="card shadow-sm mt-3 mt-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="row align-items-center g-3">
+                <div class="col-12 col-md-6">
+                    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
+                        <label for="itemsPerPage" class="form-label mb-0 small fw-semibold">Mostrar:</label>
+                        <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto; min-width: 80px;">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-muted small" id="paginationInfo">Mostrando 0 de 0 registros</span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <nav aria-label="Paginación de alumnos">
+                        <ul class="pagination justify-content-center justify-content-md-end mb-0 pagination-sm" id="paginationControls">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="alumnoModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Formulario de Alumno</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalLabel">
+                    <i class="bi bi-person-badge me-2"></i>Formulario de Alumno
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3 p-md-4">
                 <form id="formAlumno">
                     <input type="hidden" id="id_alumno" name="id_alumno">
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="matricula" class="form-label">Matrícula</label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="matricula" class="form-label fw-semibold">
+                                <i class="bi bi-123 me-1 text-primary"></i>Matrícula
+                            </label>
                             <input type="text" id="matricula" name="matricula" class="form-control" required>
                         </div>
-                        <div class="col-md-6">
-                            <label for="nombre" class="form-label">Nombre(s)</label>
+                        <div class="col-12 col-md-6">
+                            <label for="nombre" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1 text-primary"></i>Nombre(s)
+                            </label>
                             <input type="text" id="nombre" name="nombre" class="form-control" required>
                         </div>
                     </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-6">
+                            <label for="apellido_paterno" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1 text-primary"></i>Apellido Paterno
+                            </label>
                             <input type="text" id="apellido_paterno" name="apellido_paterno" class="form-control" required>
                         </div>
-                        <div class="col-md-6">
-                            <label for="apellido_materno" class="form-label">Apellido Materno</label>
+                        <div class="col-12 col-md-6">
+                            <label for="apellido_materno" class="form-label fw-semibold">
+                                <i class="bi bi-person me-1 text-primary"></i>Apellido Materno
+                            </label>
                             <input type="text" id="apellido_materno" name="apellido_materno" class="form-control">
                         </div>
                     </div>
-
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <label for="carreras_id_carrera" class="form-label">Carrera</label>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="carreras_id_carrera" class="form-label fw-semibold">
+                                <i class="bi bi-mortarboard me-1 text-primary"></i>Carrera
+                            </label>
                             <select id="carreras_id_carrera" name="carreras_id_carrera" class="form-select" required>
                                 <option value="">Seleccione una carrera</option>
                                 <?php foreach ($carreras as $carrera): ?>
@@ -116,8 +163,10 @@ include __DIR__ . "/../objects/header.php"; // Se agregó el punto y coma faltan
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label for="grupos_id_grupo" class="form-label">Grupo</label>
+                        <div class="col-12 col-md-6">
+                            <label for="grupos_id_grupo" class="form-label fw-semibold">
+                                <i class="bi bi-people me-1 text-primary"></i>Grupo
+                            </label>
                             <select id="grupos_id_grupo" name="grupos_id_grupo" class="form-select" required>
                                 <option value="">Seleccione un grupo</option>
                                 <?php foreach ($grupos as $grupo): ?>
@@ -128,13 +177,19 @@ include __DIR__ . "/../objects/header.php"; // Se agregó el punto y coma faltan
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardar">Guardar Cambios</button>
+            <div class="modal-footer border-top p-3 p-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardar">
+                    <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<?php include __DIR__ . '/crud_helper_styles.php'; ?>
 
 
 <?php include __DIR__ . "/../objects/footer.php"; ?>
@@ -158,9 +213,14 @@ window.addEventListener('load', function() {
     let searchTerm = '';
     let isLoading = false;
 
+    const alumnosCardsBody = document.getElementById('alumnosCardsBody');
+    
     // Renderizado estándar sin objeto 'dom'
     const renderSpinner = () => {
-        alumnosBody.innerHTML = '<tr><td colspan="6" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
+        alumnosBody.innerHTML = '<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><div class="mt-2 text-muted">Cargando alumnos...</div></td></tr>';
+        if (alumnosCardsBody) {
+            alumnosCardsBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><div class="mt-2 text-muted">Cargando alumnos...</div></div>';
+        }
     };
 
     const updatePaginationInfo = () => {
@@ -224,31 +284,69 @@ window.addEventListener('load', function() {
     const renderAlumnos = (alumnos) => {
         if (!alumnosBody) return;
         alumnosBody.innerHTML = ''; // Limpiar contenido previo
+        if (alumnosCardsBody) alumnosCardsBody.innerHTML = '';
 
-        if (!alumnos.length) {
-            alumnosBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No se encontraron alumnos</td></tr>';
+        if (!alumnos || !Array.isArray(alumnos) || alumnos.length === 0) {
+            alumnosBody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-inbox me-2"></i>No se encontraron alumnos</td></tr>';
+            if (alumnosCardsBody) {
+                alumnosCardsBody.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-inbox me-2"></i>No se encontraron alumnos</div>';
+            }
             return;
         }
 
         alumnos.forEach((a) => {
             const nombreCompleto = `${a.nombre} ${a.apellido_paterno} ${a.apellido_materno ?? ''}`.trim();
+            const initials = (a.nombre ? a.nombre[0] : '') + (a.apellido_paterno ? a.apellido_paterno[0] : '');
+            
+            // Tabla desktop
             const row = `
-                <tr>
-                    <td>${a.id_alumno}</td>
-                    <td>${a.matricula}</td>
+                <tr class="align-middle">
+                    <td class="text-center fw-bold text-primary">${a.id_alumno}</td>
+                    <td><span class="badge bg-secondary">${a.matricula}</span></td>
                     <td>${nombreCompleto}</td>
-                    <td>${a.carrera_nombre ?? ''}</td>
-                    <td>${a.grupo_nombre ?? ''}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm btn-editar" data-id="${a.id_alumno}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Alumno">
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm btn-eliminar" data-id="${a.id_alumno}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Alumno">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
+                    <td>${a.carrera_nombre ?? 'N/A'}</td>
+                    <td>${a.grupo_nombre ?? 'N/A'}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-warning btn-editar" data-id="${a.id_alumno}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Alumno">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-eliminar" data-id="${a.id_alumno}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Alumno">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
             alumnosBody.insertAdjacentHTML('beforeend', row);
+            
+            // Cards móvil
+            if (alumnosCardsBody) {
+                const card = `
+                    <div class="card shadow-sm mb-3 crud-card-mobile">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-start mb-3 gap-3">
+                                <div class="user-avatar flex-shrink-0">
+                                    <span class="avatar-initials">${initials.toUpperCase()}</span>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-1 fw-bold text-truncate">${nombreCompleto}</h6>
+                                    <small class="text-muted d-block"><i class="bi bi-123 me-1"></i>${a.matricula}</small>
+                                    <small class="text-muted d-block"><i class="bi bi-mortarboard me-1"></i>${a.carrera_nombre ?? 'N/A'}</small>
+                                    <small class="text-muted d-block"><i class="bi bi-people me-1"></i>${a.grupo_nombre ?? 'N/A'}</small>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-warning btn-editar w-100" data-id="${a.id_alumno}">
+                                    <i class="bi bi-pencil-square me-2"></i>Editar
+                                </button>
+                                <button class="btn btn-danger btn-eliminar w-100" data-id="${a.id_alumno}">
+                                    <i class="bi bi-trash-fill me-2"></i>Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                alumnosCardsBody.insertAdjacentHTML('beforeend', card);
+            }
         });
 
         if (typeof bootstrap !== 'undefined') {
@@ -260,8 +358,13 @@ window.addEventListener('load', function() {
     };
 
     const showError = (message) => {
-        alumnosBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${message}</td></tr>`;
-        Swal.fire({ icon: 'error', title: 'Error', text: message });
+        alumnosBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
+        if (alumnosCardsBody) {
+            alumnosCardsBody.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>${message}</div>`;
+        }
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'error', title: 'Error', text: message });
+        }
     };
 
     // Fetch estándar en lugar de dom.fetchJSON

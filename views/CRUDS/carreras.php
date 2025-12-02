@@ -11,81 +11,123 @@ $page_title = "Carreras";
 include __DIR__ . "/../objects/header.php";
 ?>
 
-<div class="container mt-4">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <button class="btn btn-success" id="btnNuevaCarrera">
-                <i class="bi bi-plus-circle"></i> Agregar Carrera
-            </button>
-        </div>
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchInput" placeholder="Buscar carreras...">
-                <button class="btn btn-outline-secondary" type="button" id="btnSearch">
-                    <i class="bi bi-search"></i>
-                </button>
-                <button class="btn btn-outline-secondary" type="button" id="btnClear">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="tablaCarreras">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Coordinador</th>
-                    <th>Fecha De Creación</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="carrerasBody"></tbody>
-        </table>
-    </div>
-
-    <!-- Controles de paginación -->
-    <nav aria-label="Paginación de carreras" class="mt-3">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <div class="d-flex align-items-center">
-                    <label for="itemsPerPage" class="form-label me-2 mb-0">Mostrar:</label>
-                    <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto;">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                    <span class="ms-2 text-muted" id="paginationInfo">Mostrando 0 de 0 registros</span>
+<div class="container mt-3 mt-md-4">
+    <!-- Header -->
+    <div class="card shadow-sm mb-3 mb-md-4 crud-header-card">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3">
+                <div>
+                    <h1 class="h4 h3-md mb-1 mb-md-2">
+                        <i class="bi bi-mortarboard me-2 text-primary"></i>
+                        Gestión de Carreras
+                    </h1>
+                    <p class="text-muted small mb-0 d-none d-md-block">Administra las carreras académicas</p>
+                </div>
+                <div class="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+                    <button class="btn btn-primary btn-lg w-100 w-md-auto" id="btnNuevaCarrera">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span class="d-none d-sm-inline">Agregar Carrera</span>
+                        <span class="d-sm-none">Nuevo</span>
+                    </button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <ul class="pagination justify-content-end mb-0" id="paginationControls">
-                    <!-- Los controles se generarán dinámicamente -->
-                </ul>
+        </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-primary text-white">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Buscar carreras...">
+                <button class="btn btn-outline-primary" type="button" id="btnSearch">
+                    <i class="bi bi-search me-1 d-none d-sm-inline"></i>
+                    <span class="d-none d-sm-inline">Buscar</span>
+                    <span class="d-sm-none">Buscar</span>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="btnClear" title="Limpiar búsqueda">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Tabla Desktop -->
+    <div class="table-responsive d-none d-md-block">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 crud-table" id="tablaCarreras">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 80px;">ID</th>
+                            <th>Nombre</th>
+                            <th>Coordinador</th>
+                            <th>Fecha Creación</th>
+                            <th class="text-center" style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="carrerasBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Móvil -->
+    <div class="d-md-none" id="carrerasCardsContainer">
+        <div id="carrerasCardsBody"></div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="card shadow-sm mt-3 mt-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="row align-items-center g-3">
+                <div class="col-12 col-md-6">
+                    <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center gap-2">
+                        <label for="itemsPerPage" class="form-label mb-0 small fw-semibold">Mostrar:</label>
+                        <select class="form-select form-select-sm" id="itemsPerPage" style="width: auto; min-width: 80px;">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-muted small" id="paginationInfo">Mostrando 0 de 0 registros</span>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <nav aria-label="Paginación de carreras">
+                        <ul class="pagination justify-content-center justify-content-md-end mb-0 pagination-sm" id="paginationControls">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="carreraModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Formulario de Carrera</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalLabel">
+                    <i class="bi bi-mortarboard me-2"></i>Formulario de Carrera
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3 p-md-4">
                 <form id="formCarrera">
                     <input type="hidden" id="id_carrera" name="id">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre de la Carrera</label>
+                        <label for="nombre" class="form-label fw-semibold">
+                            <i class="bi bi-tag me-1 text-primary"></i>Nombre de la Carrera
+                        </label>
                         <input type="text" id="nombre" name="nombre" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="coordinador_id" class="form-label">Coordinador</label>
+                        <label for="coordinador_id" class="form-label fw-semibold">
+                            <i class="bi bi-person-badge me-1 text-primary"></i>Coordinador
+                        </label>
                         <select id="coordinador_id" name="usuario_id" class="form-select" required>
                             <option value="">Seleccione un coordinador</option>
                             <?php foreach ($coordinadores as $coordinador): ?>
@@ -95,13 +137,19 @@ include __DIR__ . "/../objects/header.php";
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            <div class="modal-footer border-top p-3 p-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardar">
+                    <i class="bi bi-check-circle me-2"></i>Guardar
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<?php include __DIR__ . '/crud_helper_styles.php'; ?>
 
 <?php include __DIR__ . "/../objects/footer.php";?>
 <script>
@@ -123,8 +171,13 @@ window.addEventListener('load', function() {
     let searchTerm = '';
     let isLoading = false;
 
+    const carrerasCardsBody = document.getElementById('carrerasCardsBody');
+    
     const renderSpinner = () => {
-        dom.setHTML(carrerasBody, '<tr><td colspan="5" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>');
+        carrerasBody.innerHTML = '<tr><td colspan="5" class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><div class="mt-2 text-muted">Cargando carreras...</div></td></tr>';
+        if (carrerasCardsBody) {
+            carrerasCardsBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div><div class="mt-2 text-muted">Cargando carreras...</div></div>';
+        }
     };
 
     const updatePaginationInfo = () => {
@@ -186,40 +239,90 @@ window.addEventListener('load', function() {
 
     const renderCarreras = (carreras) => {
         if (!carrerasBody) return;
-        if (!carreras.length) {
-            dom.setHTML(carrerasBody, '<tr><td colspan="5" class="text-center text-muted">No se encontraron carreras</td></tr>');
+        
+        carrerasBody.innerHTML = '';
+        if (carrerasCardsBody) carrerasCardsBody.innerHTML = '';
+        
+        if (!carreras || !Array.isArray(carreras) || carreras.length === 0) {
+            carrerasBody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted"><i class="bi bi-inbox me-2"></i>No se encontraron carreras</td></tr>';
+            if (carrerasCardsBody) {
+                carrerasCardsBody.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-inbox me-2"></i>No se encontraron carreras</div>';
+            }
             return;
         }
 
-        carrerasBody.innerHTML = '';
         carreras.forEach((c) => {
             const coordinadorNombre = c.coordinador_nombre ? `${c.coordinador_nombre} ${c.coordinador_apellido_paterno || ''}`.trim() : 'N/A';
+            const fechaCreacion = c.fecha_creacion ? new Date(c.fecha_creacion).toLocaleDateString('es-MX') : 'N/A';
+            
+            // Tabla desktop
             const row = `
-                <tr>
-                    <td>${c.id_carrera}</td>
-                    <td>${c.nombre}</td>
+                <tr class="align-middle">
+                    <td class="text-center fw-bold text-primary">${c.id_carrera}</td>
+                    <td><strong>${c.nombre}</strong></td>
                     <td>${coordinadorNombre}</td>
-                    <td>${c.fecha_creacion}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm btn-editar" data-id="${c.id_carrera}" data-nombre="${c.nombre}" data-coordinador="${c.coordinador_id ?? ''}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Carrera">
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm btn-eliminar" data-id="${c.id_carrera}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Carrera">
-                            <i class="bi bi-trash-fill"></i>
-                        </button>
+                    <td>${fechaCreacion}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-warning btn-editar" data-id="${c.id_carrera}" data-nombre="${c.nombre}" data-coordinador="${c.coordinador_id ?? ''}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Carrera">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-eliminar" data-id="${c.id_carrera}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Carrera">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
-            dom.appendHTML(carrerasBody, row);
+            carrerasBody.insertAdjacentHTML('beforeend', row);
+            
+            // Cards móvil
+            if (carrerasCardsBody) {
+                const card = `
+                    <div class="card shadow-sm mb-3 crud-card-mobile">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-1 fw-bold text-truncate">${c.nombre}</h6>
+                                    <small class="text-muted">ID: ${c.id_carrera}</small>
+                                </div>
+                            </div>
+                            <div class="border-top pt-2">
+                                <div class="row g-2 small">
+                                    <div class="col-12"><strong>Coordinador:</strong> ${coordinadorNombre}</div>
+                                    <div class="col-12"><strong>Fecha Creación:</strong> ${fechaCreacion}</div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-warning btn-editar w-100" data-id="${c.id_carrera}" data-nombre="${c.nombre}" data-coordinador="${c.coordinador_id ?? ''}">
+                                    <i class="bi bi-pencil-square me-2"></i>Editar
+                                </button>
+                                <button class="btn btn-danger btn-eliminar w-100" data-id="${c.id_carrera}">
+                                    <i class="bi bi-trash-fill me-2"></i>Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                carrerasCardsBody.insertAdjacentHTML('beforeend', card);
+            }
         });
 
-        if (typeof initTooltips === 'function') {
-            initTooltips();
+        // Inicializar tooltips
+        if (typeof bootstrap !== 'undefined') {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         }
     };
 
     const showError = (message) => {
-        dom.setHTML(carrerasBody, `<tr><td colspan="5" class="text-center text-danger">${message}</td></tr>`);
-        Swal.fire({ icon: 'error', title: 'Error', text: message });
+        carrerasBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle me-2"></i>${message}</td></tr>`;
+        if (carrerasCardsBody) {
+            carrerasCardsBody.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>${message}</div>`;
+        }
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({ icon: 'error', title: 'Error', text: message });
+        }
     };
 
     const cargarCarreras = async (page = 1, search = '') => {
@@ -232,7 +335,9 @@ window.addEventListener('load', function() {
         const params = new URLSearchParams({ action: 'paginated', page, limit: itemsPerPage, search });
 
         try {
-            const data = await dom.fetchJSON(`/GESTACAD/controllers/carrerasController.php?${params}`);
+            const response = await fetch(`/GESTACAD/controllers/carrerasController.php?${params}`);
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            const data = await response.json();
             if (data.success) {
                 totalItems = data.total;
                 totalPages = data.totalPages;
@@ -319,9 +424,19 @@ window.addEventListener('load', function() {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        await dom.postForm('/GESTACAD/controllers/carrerasController.php?action=delete', { id });
-                        Swal.fire('�Eliminado!', 'La carrera ha sido eliminada.', 'success');
-                        cargarCarreras(currentPage, searchTerm);
+                        const formDataDelete = new FormData();
+                        formDataDelete.append('id', id);
+                        const responseDelete = await fetch('/GESTACAD/controllers/carrerasController.php?action=delete', {
+                            method: 'POST',
+                            body: formDataDelete
+                        });
+                        const dataDelete = await responseDelete.json();
+                        if (dataDelete.success || responseDelete.ok) {
+                            Swal.fire('�Eliminado!', 'La carrera ha sido eliminada.', 'success');
+                            cargarCarreras(currentPage, searchTerm);
+                        } else {
+                            throw new Error(dataDelete.message || 'Error al eliminar');
+                        }
                     } catch (error) {
                         Swal.fire('Error', 'No se pudo eliminar la carrera.', 'error');
                     }
@@ -334,12 +449,20 @@ window.addEventListener('load', function() {
         const idField = document.getElementById('id_carrera');
         const isUpdate = idField && idField.value;
         const url = isUpdate ? '/GESTACAD/controllers/carrerasController.php?action=update' : '/GESTACAD/controllers/carrerasController.php?action=store';
-        const formData = dom.serializeForm(form);
+        const formData = new FormData(form);
         try {
-            await dom.postForm(url, formData);
-            carreraModal?.hide();
-            cargarCarreras(currentPage, searchTerm);
-            Swal.fire({ icon: 'success', title: '�Guardado!', text: 'La carrera ha sido guardada correctamente.', timer: 1500, showConfirmButton: false });
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (response.ok) {
+                carreraModal?.hide();
+                cargarCarreras(currentPage, searchTerm);
+                Swal.fire({ icon: 'success', title: '�Guardado!', text: 'La carrera ha sido guardada correctamente.', timer: 1500, showConfirmButton: false });
+            } else {
+                throw new Error(data.message || 'Error del servidor');
+            }
         } catch (error) {
             Swal.fire({ icon: 'error', title: 'Oops...', text: 'Error al guardar la carrera. Revise los datos e intente de nuevo.' });
         }

@@ -9,11 +9,57 @@ class Beca
         $this->conn = $db;
     }
 
+    /**
+     * Obtiene todas las becas del catálogo (para administradores y coordinadores)
+     */
     public function getAll()
     {
         $sql = "SELECT * FROM " . $this->table . " WHERE activo = 1";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtiene las becas asignadas a alumnos de grupos específicos (para tutores)
+     * @param array $grupos_ids Array de IDs de grupos
+     * @return array Becas de alumnos con información del alumno y la beca
+     */
+    public function getBecasByGrupos($grupos_ids)
+    {
+        if (empty($grupos_ids)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($grupos_ids), '?'));
+        
+        $sql = "SELECT 
+                    ab.id,
+                    ab.alumno_id,
+                    ab.beca_id,
+                    ab.periodo_id,
+                    ab.porcentaje,
+                    ab.monto,
+                    ab.fecha_asignacion,
+                    a.matricula,
+                    a.nombre as alumno_nombre,
+                    a.apellido_paterno as alumno_apellido_paterno,
+                    a.apellido_materno as alumno_apellido_materno,
+                    cb.clave as beca_clave,
+                    cb.nombre as beca_nombre,
+                    pe.nombre as periodo_nombre,
+                    g.nombre as grupo_nombre
+                FROM alumno_beca ab
+                INNER JOIN alumnos a ON ab.alumno_id = a.id_alumno
+                INNER JOIN cat_becas cb ON ab.beca_id = cb.id
+                INNER JOIN periodos_escolares pe ON ab.periodo_id = pe.id
+                INNER JOIN grupos g ON a.grupos_id_grupo = g.id_grupo
+                WHERE a.grupos_id_grupo IN ($placeholders)
+                AND cb.activo = 1
+                ORDER BY ab.fecha_asignacion DESC, a.apellido_paterno, a.apellido_materno, a.nombre";
+        
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute($grupos_ids);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

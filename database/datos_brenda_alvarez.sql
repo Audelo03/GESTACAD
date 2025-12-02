@@ -449,3 +449,4 @@ WHERE alumno_id = @alumno_id;
 SELECT 'Script ejecutado correctamente. Los datos están listos para el análisis de inferencias.' AS 'Mensaje Final';
 
 
+

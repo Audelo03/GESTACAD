@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../config/db.php";
 require_once __DIR__ . "/../models/Beca.php";
+require_once __DIR__ . "/../models/Usuario.php";
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -10,15 +11,29 @@ class BecasController
 {
 
     public $beca;
+    private $usuario;
 
     public function __construct($conn)
     {
         $this->beca = new Beca($conn);
+        $this->usuario = new Usuario($conn);
     }
 
     public function index()
     {
-        echo json_encode($this->beca->getAll());
+        // Verificar el nivel del usuario
+        $nivel = isset($_SESSION['usuario_nivel']) ? (int)$_SESSION['usuario_nivel'] : null;
+        $usuario_id = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : null;
+
+        // Si es tutor (nivel 3), mostrar solo las becas de sus alumnos
+        if ($nivel == 3 && $usuario_id) {
+            $grupos_ids = $this->usuario->getGruposIdByUsuarioId($usuario_id);
+            $becas = $this->beca->getBecasByGrupos($grupos_ids);
+            echo json_encode($becas);
+        } else {
+            // Administrador y Coordinador: mostrar catálogo de becas
+            echo json_encode($this->beca->getAll());
+        }
     }
 
     public function store()

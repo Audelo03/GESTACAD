@@ -8,105 +8,168 @@ $page_title = "Inscripciones";
 include __DIR__ . "/../objects/header.php";
 ?>
 
-<div class="container mt-4">
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <button class="btn btn-success" id="btnNuevaInscripcion">
-                <i class="bi bi-plus-circle"></i> Inscribir Alumno
-            </button>
-        </div>
-        <div class="col-md-6">
-            <select id="filtroClase" class="form-select">
-                <option value="">Filtrar por Clase...</option>
-            </select>
+<div class="container mt-3 mt-md-4">
+    <!-- Header -->
+    <div class="card shadow-sm mb-3 mb-md-4 crud-header-card">
+        <div class="card-body p-3 p-md-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3">
+                <div>
+                    <h1 class="h4 h3-md mb-1 mb-md-2">
+                        <i class="bi bi-clipboard-check me-2 text-primary"></i>
+                        Gestión de Inscripciones
+                    </h1>
+                    <p class="text-muted small mb-0 d-none d-md-block">Administra las inscripciones de alumnos a clases</p>
+                </div>
+                <div class="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+                    <button class="btn btn-primary btn-lg w-100 w-md-auto" id="btnNuevaInscripcion">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span class="d-none d-sm-inline">Inscribir Alumno</span>
+                        <span class="d-sm-none">Nuevo</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Alumno</th>
-                    <th>Clase</th>
-                    <th>Estado</th>
-                    <th>Calificaciones</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="inscripcionesBody"></tbody>
-        </table>
+    <!-- Filtro -->
+    <div class="card shadow-sm mb-3 mb-md-4">
+        <div class="card-body p-3 p-md-4">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="filtroClase" class="form-label fw-semibold">
+                        <i class="bi bi-funnel me-1 text-primary"></i>Filtrar por Clase
+                    </label>
+                    <select id="filtroClase" class="form-select">
+                        <option value="">Todas las clases</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla Desktop -->
+    <div class="table-responsive d-none d-md-block">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0 crud-table" id="tablaInscripciones">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 80px;">ID</th>
+                            <th>Alumno</th>
+                            <th>Clase</th>
+                            <th class="text-center" style="width: 100px;">Estado</th>
+                            <th>Calificaciones</th>
+                            <th class="text-center" style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inscripcionesBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards Móvil -->
+    <div class="d-md-none" id="inscripcionesCardsContainer">
+        <div id="inscripcionesCardsBody"></div>
     </div>
 </div>
 
-<div class="modal fade" id="inscripcionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="inscripcionModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Inscribir Alumno</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalLabel">
+                    <i class="bi bi-clipboard-check me-2"></i>Inscribir Alumno
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3 p-md-4">
                 <form id="formInscripcion">
                     <div class="mb-3">
-                        <label for="clase_id" class="form-label">Clase</label>
+                        <label for="clase_id" class="form-label fw-semibold">
+                            <i class="bi bi-book me-1 text-primary"></i>Clase
+                        </label>
                         <select id="clase_id" name="clase_id" class="form-select" required></select>
                     </div>
                     <div class="mb-3">
-                        <label for="alumno_id" class="form-label">Alumno</label>
+                        <label for="alumno_id" class="form-label fw-semibold">
+                            <i class="bi bi-person-badge me-1 text-primary"></i>Alumno
+                        </label>
                         <select id="alumno_id" name="alumno_id" class="form-select" required></select>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            <div class="modal-footer border-top p-3 p-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardar">
+                    <i class="bi bi-check-circle me-2"></i>Guardar
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="calificacionesModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="calificacionesModal" tabindex="-1" aria-labelledby="calModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Calificaciones</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold" id="calModalLabel">
+                    <i class="bi bi-journal-check me-2"></i>Calificaciones
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3 p-md-4">
                 <form id="formCalificaciones">
                     <input type="hidden" id="cal_id" name="id">
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Parcial 1</label>
-                            <input type="number" step="0.01" id="cal_parcial1" name="cal_parcial1" class="form-control">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-1-circle me-1 text-primary"></i>Parcial 1
+                            </label>
+                            <input type="number" step="0.01" min="0" max="100" id="cal_parcial1" name="cal_parcial1" class="form-control">
                         </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Parcial 2</label>
-                            <input type="number" step="0.01" id="cal_parcial2" name="cal_parcial2" class="form-control">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-2-circle me-1 text-primary"></i>Parcial 2
+                            </label>
+                            <input type="number" step="0.01" min="0" max="100" id="cal_parcial2" name="cal_parcial2" class="form-control">
                         </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Parcial 3</label>
-                            <input type="number" step="0.01" id="cal_parcial3" name="cal_parcial3" class="form-control">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-3-circle me-1 text-primary"></i>Parcial 3
+                            </label>
+                            <input type="number" step="0.01" min="0" max="100" id="cal_parcial3" name="cal_parcial3" class="form-control">
                         </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">Parcial 4</label>
-                            <input type="number" step="0.01" id="cal_parcial4" name="cal_parcial4" class="form-control">
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-4-circle me-1 text-primary"></i>Parcial 4
+                            </label>
+                            <input type="number" step="0.01" min="0" max="100" id="cal_parcial4" name="cal_parcial4" class="form-control">
                         </div>
-                        <div class="col-12 mb-3">
-                            <label class="form-label">Final</label>
-                            <input type="number" step="0.01" id="cal_final" name="cal_final" class="form-control">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                <i class="bi bi-star me-1 text-primary"></i>Calificación Final
+                            </label>
+                            <input type="number" step="0.01" min="0" max="100" id="cal_final" name="cal_final" class="form-control">
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btnGuardarCalificaciones">Guardar</button>
+            <div class="modal-footer border-top p-3 p-md-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btnGuardarCalificaciones">
+                    <i class="bi bi-check-circle me-2"></i>Guardar
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<?php include __DIR__ . '/crud_helper_styles.php'; ?>
 
 <?php include __DIR__ . "/../objects/footer.php"; ?>
 
@@ -153,39 +216,116 @@ include __DIR__ . "/../objects/header.php";
             }
         };
 
+        const inscripcionesCardsBody = document.getElementById('inscripcionesCardsBody');
+        
         const renderTable = (data) => {
             tbody.innerHTML = '';
+            if (inscripcionesCardsBody) inscripcionesCardsBody.innerHTML = '';
+            
             if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay registros</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted"><i class="bi bi-inbox me-2"></i>No hay registros</td></tr>';
+                if (inscripcionesCardsBody) {
+                    inscripcionesCardsBody.innerHTML = '<div class="alert alert-info mb-0"><i class="bi bi-inbox me-2"></i>No hay registros</div>';
+                }
                 return;
             }
+            
             data.forEach(item => {
+                const estadoBadge = item.estado === 'Activo' || item.estado === 'activo' 
+                    ? '<span class="badge bg-success">Activo</span>' 
+                    : '<span class="badge bg-secondary">' + (item.estado || 'N/A') + '</span>';
+                
+                // Tabla desktop
                 tbody.innerHTML += `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.alumno_nombre} ${item.alumno_apellido}</td>
-                    <td>${item.asignatura_nombre} (${item.seccion})</td>
-                    <td>${item.estado}</td>
+                <tr class="align-middle">
+                    <td class="text-center fw-bold text-primary">${item.id}</td>
+                    <td><strong>${item.alumno_nombre} ${item.alumno_apellido}</strong></td>
+                    <td>${item.asignatura_nombre}<br><small class="text-muted">Sección: ${item.seccion || 'N/A'}</small></td>
+                    <td class="text-center">${estadoBadge}</td>
                     <td>
-                        P1: ${item.cal_parcial1 || '-'} | P2: ${item.cal_parcial2 || '-'} <br>
-                        P3: ${item.cal_parcial3 || '-'} | P4: ${item.cal_parcial4 || '-'} <br>
-                        Final: ${item.cal_final || '-'}
+                        <small>
+                            <strong>P1:</strong> ${item.cal_parcial1 || '-'} | 
+                            <strong>P2:</strong> ${item.cal_parcial2 || '-'}<br>
+                            <strong>P3:</strong> ${item.cal_parcial3 || '-'} | 
+                            <strong>P4:</strong> ${item.cal_parcial4 || '-'}<br>
+                            <strong>Final:</strong> <span class="fw-bold text-primary">${item.cal_final || '-'}</span>
+                        </small>
                     </td>
-                    <td>
-                        <button class="btn btn-sm btn-info btn-calificaciones" 
-                            data-id="${item.id}" 
-                            data-p1="${item.cal_parcial1}"
-                            data-p2="${item.cal_parcial2}"
-                            data-p3="${item.cal_parcial3}"
-                            data-p4="${item.cal_parcial4}"
-                            data-final="${item.cal_final}">
-                            <i class="bi bi-journal-check"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger btn-eliminar" data-id="${item.id}"><i class="bi bi-trash"></i></button>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-info btn-calificaciones" 
+                                data-id="${item.id}" 
+                                data-p1="${item.cal_parcial1 || ''}"
+                                data-p2="${item.cal_parcial2 || ''}"
+                                data-p3="${item.cal_parcial3 || ''}"
+                                data-p4="${item.cal_parcial4 || ''}"
+                                data-final="${item.cal_final || ''}"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Calificaciones">
+                                <i class="bi bi-journal-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger btn-eliminar" 
+                                data-id="${item.id}"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                title="Dar de baja">
+                                <i class="bi bi-trash-fill"></i>
+                            </button>
+                        </div>
                     </td>
-                </tr>
-            `;
+                </tr>`;
+                
+                // Cards móvil
+                if (inscripcionesCardsBody) {
+                    inscripcionesCardsBody.innerHTML += `
+                    <div class="card shadow-sm mb-3 crud-card-mobile">
+                        <div class="card-body p-3">
+                            <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-1 fw-bold text-truncate">${item.alumno_nombre} ${item.alumno_apellido}</h6>
+                                    <small class="text-muted d-block">ID: ${item.id}</small>
+                                    <small class="text-muted d-block">${item.asignatura_nombre}</small>
+                                </div>
+                                <div class="text-end flex-shrink-0 ms-2">
+                                    ${estadoBadge}
+                                </div>
+                            </div>
+                            <div class="border-top pt-2 mb-3">
+                                <div class="row g-2 small">
+                                    <div class="col-6"><strong>P1:</strong> ${item.cal_parcial1 || '-'}</div>
+                                    <div class="col-6"><strong>P2:</strong> ${item.cal_parcial2 || '-'}</div>
+                                    <div class="col-6"><strong>P3:</strong> ${item.cal_parcial3 || '-'}</div>
+                                    <div class="col-6"><strong>P4:</strong> ${item.cal_parcial4 || '-'}</div>
+                                    <div class="col-12"><strong>Final:</strong> <span class="fw-bold text-primary">${item.cal_final || '-'}</span></div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-info btn-calificaciones w-100" 
+                                    data-id="${item.id}" 
+                                    data-p1="${item.cal_parcial1 || ''}"
+                                    data-p2="${item.cal_parcial2 || ''}"
+                                    data-p3="${item.cal_parcial3 || ''}"
+                                    data-p4="${item.cal_parcial4 || ''}"
+                                    data-final="${item.cal_final || ''}">
+                                    <i class="bi bi-journal-check me-2"></i>Calificaciones
+                                </button>
+                                <button class="btn btn-danger btn-eliminar w-100" data-id="${item.id}">
+                                    <i class="bi bi-trash-fill me-2"></i>Dar de Baja
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                }
             });
+            
+            // Inicializar tooltips
+            if (typeof bootstrap !== 'undefined') {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }
         };
 
         const loadData = async () => {
