@@ -35,7 +35,7 @@ include __DIR__ . "/../objects/header.php";
                     </button>
                     <?php endif; ?>
                     <button class="btn btn-warning btn-lg w-100 w-md-auto" id="btnInscribirAlumnoBeca" data-bs-toggle="modal" data-bs-target="#modalInscribirBeca">
-                        <i class="bi bi-award me-2"></i>
+                        <i class="bi bi-plus-circle me-2"></i>
                         <span class="d-none d-sm-inline">Inscribir Alumno en Beca</span>
                         <span class="d-sm-none">Inscribir</span>
                     </button>

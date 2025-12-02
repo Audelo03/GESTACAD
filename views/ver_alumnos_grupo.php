@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../controllers/authController.php';
 require_once __DIR__ . '/../controllers/alumnoController.php';
+require_once __DIR__ . '/../models/RiesgoDesercion.php';
+require_once __DIR__ . '/../models/Periodo.php';
 require_once __DIR__ . '/../config/db.php';
 
 $auth = new AuthController($conn);
@@ -15,6 +17,19 @@ if ($id_grupo === 0) {
 $alumnoController = new AlumnoController($conn);
 $alumnos = $alumnoController->getAlumnosByGrupo($id_grupo);
 $nombre_grupo = $alumnoController->getNombreGrupo($id_grupo);
+
+// Obtener periodo activo y verificar alumnos marcados como riesgo
+$periodoModel = new Periodo($conn);
+$periodo_activo = $periodoModel->getActive();
+$periodo_id = $periodo_activo ? $periodo_activo['id'] : null;
+
+$riesgoModel = new RiesgoDesercion($conn);
+$alumnos_marcados = [];
+if ($periodo_id) {
+    foreach ($alumnos as $alumno) {
+        $alumnos_marcados[$alumno['id_alumno']] = $riesgoModel->estaMarcado($alumno['id_alumno'], $periodo_id);
+    }
+}
 
 $page_title = "Alumnos del Grupo: " . htmlspecialchars($nombre_grupo);
 include 'objects/header.php';
@@ -153,6 +168,21 @@ include 'objects/header.php';
                                                         <i class="bi bi-arrow-right-circle me-2"></i>Canalizar
                                                     </a>
                                                 </li>
+                                                <?php if ($periodo_id): ?>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item btn-toggle-riesgo" 
+                                                       href="#"
+                                                       data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                       data-periodo-id="<?= $periodo_id ?>"
+                                                       data-marcado="<?= $alumnos_marcados[$alumno['id_alumno']] ? '1' : '0' ?>">
+                                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                        <span class="text-toggle-riesgo">
+                                                            <?= $alumnos_marcados[$alumno['id_alumno']] ? 'Desmarcar de Riesgo' : 'Marcar como Riesgo' ?>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                                <?php endif; ?>
                                             </ul>
                                         </div>
                                     </div>
@@ -255,6 +285,21 @@ include 'objects/header.php';
                                                 <i class="bi bi-arrow-right-circle me-2"></i>Canalizar
                                             </a>
                                         </li>
+                                        <?php if ($periodo_id): ?>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item btn-toggle-riesgo" 
+                                               href="#"
+                                               data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                               data-periodo-id="<?= $periodo_id ?>"
+                                               data-marcado="<?= $alumnos_marcados[$alumno['id_alumno']] ? '1' : '0' ?>">
+                                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                <span class="text-toggle-riesgo">
+                                                    <?= $alumnos_marcados[$alumno['id_alumno']] ? 'Desmarcar de Riesgo' : 'Marcar como Riesgo' ?>
+                                                </span>
+                                            </a>
+                                        </li>
+                                        <?php endif; ?>
                                     </ul>
                                 </div>
                             </div>
@@ -2526,6 +2571,83 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.style.zIndex = '';
                 card.style.position = '';
             }
+        });
+    });
+
+    // Manejar toggle de riesgo de deserción
+    document.querySelectorAll('.btn-toggle-riesgo').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const alumnoId = this.getAttribute('data-alumno-id');
+            const periodoId = this.getAttribute('data-periodo-id');
+            const estaMarcado = this.getAttribute('data-marcado') === '1';
+            const btnText = this.querySelector('.text-toggle-riesgo');
+            const icon = this.querySelector('i');
+            
+            if (!alumnoId || !periodoId) {
+                alert('Error: No se pudo obtener la información del alumno');
+                return;
+            }
+            
+            // Deshabilitar botón mientras procesa
+            this.style.pointerEvents = 'none';
+            const originalText = btnText.textContent;
+            btnText.textContent = 'Procesando...';
+            
+            // Enviar petición
+            const formData = new FormData();
+            formData.append('alumno_id', alumnoId);
+            formData.append('periodo_id', periodoId);
+            formData.append('nivel', 'MEDIO');
+            formData.append('motivo', 'Marcado manualmente desde lista de alumnos');
+            formData.append('fuente', 'Manual');
+            
+            fetch('/GESTACAD/controllers/riesgoController.php?action=toggle', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    // Actualizar estado
+                    const nuevoEstado = data.marcado;
+                    this.setAttribute('data-marcado', nuevoEstado ? '1' : '0');
+                    btnText.textContent = nuevoEstado ? 'Desmarcar de Riesgo' : 'Marcar como Riesgo';
+                    
+                    if (nuevoEstado) {
+                        icon.className = 'bi bi-exclamation-triangle-fill me-2 text-danger';
+                        btnText.classList.add('text-danger');
+                        btnText.classList.remove('text-success');
+                    } else {
+                        icon.className = 'bi bi-exclamation-triangle-fill me-2';
+                        btnText.classList.remove('text-danger');
+                        btnText.classList.add('text-success');
+                    }
+                    
+                    // Mostrar mensaje de éxito
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+                    alertDiv.style.zIndex = '9999';
+                    alertDiv.innerHTML = `
+                        <i class="bi bi-check-circle me-2"></i>${data.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alertDiv);
+                    setTimeout(() => alertDiv.remove(), 3000);
+                } else {
+                    alert('Error: ' + (data.message || 'No se pudo actualizar el riesgo'));
+                    btnText.textContent = originalText;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al procesar la solicitud');
+                btnText.textContent = originalText;
+            })
+            .finally(() => {
+                this.style.pointerEvents = '';
+            });
         });
     });
 });

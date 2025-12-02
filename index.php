@@ -72,6 +72,8 @@ $viewMap = [
     'estadisticas' => 'views/estadisticas.php',
     'listas' => 'views/listas.php',
     'seguimientos' => 'views/seguimientos.php',
+    'alumnos-riesgo' => 'views/alumnos_riesgo.php',
+    'alumnos_riesgo' => 'views/alumnos_riesgo.php',
 
     // Gestión de seguimientos
     'crear-seguimiento' => 'views/crear_seguimiento.php',

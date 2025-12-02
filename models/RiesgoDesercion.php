@@ -34,5 +34,54 @@ class RiesgoDesercion
         $stmt->bindParam(":fuente", $data['fuente']);
         return $stmt->execute();
     }
+
+    public function getByAlumnoAndPeriodo($alumno_id, $periodo_id)
+    {
+        $sql = "SELECT * FROM " . $this->table . " 
+                WHERE alumno_id = :alumno_id AND periodo_id = :periodo_id 
+                LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":alumno_id", $alumno_id, PDO::PARAM_INT);
+        $stmt->bindParam(":periodo_id", $periodo_id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function toggleRiesgo($alumno_id, $periodo_id, $nivel = 'MEDIO', $motivo = null, $fuente = 'Manual')
+    {
+        $existente = $this->getByAlumnoAndPeriodo($alumno_id, $periodo_id);
+        
+        if ($existente) {
+            // Si existe, actualizar: cambiar posible a 0 si estaba en 1, o a 1 si estaba en 0
+            $nuevo_posible = $existente['posible'] ? 0 : 1;
+            $sql = "UPDATE " . $this->table . " 
+                    SET posible = :posible, nivel = :nivel, motivo = :motivo, fuente = :fuente, fecha_detectado = NOW()
+                    WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":posible", $nuevo_posible, PDO::PARAM_INT);
+            $stmt->bindParam(":nivel", $nivel);
+            $stmt->bindParam(":motivo", $motivo);
+            $stmt->bindParam(":fuente", $fuente);
+            $stmt->bindParam(":id", $existente['id'], PDO::PARAM_INT);
+            return $stmt->execute();
+        } else {
+            // Si no existe, crear nuevo registro
+            $sql = "INSERT INTO " . $this->table . " (alumno_id, periodo_id, posible, nivel, motivo, fuente) 
+                    VALUES (:alumno_id, :periodo_id, 1, :nivel, :motivo, :fuente)";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":alumno_id", $alumno_id, PDO::PARAM_INT);
+            $stmt->bindParam(":periodo_id", $periodo_id, PDO::PARAM_INT);
+            $stmt->bindParam(":nivel", $nivel);
+            $stmt->bindParam(":motivo", $motivo);
+            $stmt->bindParam(":fuente", $fuente);
+            return $stmt->execute();
+        }
+    }
+
+    public function estaMarcado($alumno_id, $periodo_id)
+    {
+        $registro = $this->getByAlumnoAndPeriodo($alumno_id, $periodo_id);
+        return $registro && $registro['posible'] == 1;
+    }
 }
 ?>

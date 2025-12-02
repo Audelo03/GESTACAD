@@ -133,6 +133,13 @@ if (!isset($modificacion_ruta)) {
           </a>
         </li>
 
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/alumnos-riesgo" class="nav-link sidebar-link <?= active(['alumnos-riesgo', 'alumnos_riesgo']); ?>"
+            <?= active(['alumnos-riesgo', 'alumnos_riesgo']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Alumnos en Riesgo"' ?>>
+            <i class="bi bi-exclamation-triangle-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos en Riesgo</span>
+          </a>
+        </li>
+
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Gestión</h6>
 
         <li>
@@ -263,6 +270,13 @@ if (!isset($modificacion_ruta)) {
           </a>
         </li>
 
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/alumnos-riesgo" class="nav-link sidebar-link <?= active(['alumnos-riesgo', 'alumnos_riesgo']); ?>"
+            <?= active(['alumnos-riesgo', 'alumnos_riesgo']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Alumnos en Riesgo"' ?>>
+            <i class="bi bi-exclamation-triangle-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos en Riesgo</span>
+          </a>
+        </li>
+
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Gestión</h6>
 
         <!-- Coordinador: CRUDs limitados a su carrera/división -->
@@ -334,7 +348,7 @@ if (!isset($modificacion_ruta)) {
         </li>
 
       <?php elseif ($nivel == 3): // TUTOR ?>
-        <!-- Tutor: Solo grupos/alumnos, seguimientos, tutorías PAT, canalización, becas -->
+        <!-- Tutor: Solo grupos/alumnos, seguimientos, alumnos en riesgo, tutorías PAT, canalización, becas -->
         <li class="mobile-hidden">
           <a href="/GESTACAD/listas" class="nav-link sidebar-link <?= active(['listas']); ?>" <?= active(['listas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Mis Grupos y Alumnos"' ?>>
             <i class="bi bi-people me-2 sidebar-icon"></i> <span class="sidebar-text">Mis Grupos</span>
@@ -366,6 +380,13 @@ if (!isset($modificacion_ruta)) {
           <a href="/GESTACAD/tutorias/canalizacion" class="nav-link sidebar-link <?= active(['tutorias/canalizacion', 'canalizacion']); ?>"
             <?= active(['tutorias/canalizacion', 'canalizacion']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Canalización de Alumnos"' ?>>
             <i class="bi bi-arrow-right-circle me-2 sidebar-icon"></i> <span class="sidebar-text">Canalización</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/GESTACAD/alumnos-riesgo" class="nav-link sidebar-link <?= active(['alumnos-riesgo', 'alumnos_riesgo']); ?>"
+            <?= active(['alumnos-riesgo', 'alumnos_riesgo']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Alumnos en Riesgo"' ?>>
+            <i class="bi bi-exclamation-triangle-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Alumnos en Riesgo</span>
           </a>
         </li>
 
@@ -415,7 +436,7 @@ if (!isset($modificacion_ruta)) {
   </div>
 </nav>
 
-<!-- Barra de navegación inferior (solo móvil) - Máximo 5 elementos por rol -->
+<!-- Barra de navegación inferior (solo móvil) -->
 <nav id="mobile-bottom-nav" class="d-lg-none">
   <?php if ($nivel == 1): // ADMINISTRADOR: Dashboard, Estadísticas, Alumnos, Configuración, Gestión ?>
     <a href="/GESTACAD/dashboard" class="bottom-nav-item <?= active(['dashboard']) ? 'active' : '' ?>">
