@@ -69,8 +69,8 @@ include 'tutorias/tutorias_modals.php';
                     <i class="bi bi-calendar-plus-fill me-2"></i>
                     <span class="d-none d-sm-inline">Pasar lista / Editar la de hoy</span>
                     <span class="d-sm-none">Pasar lista grupal</span>
-                    <small class="d-block d-sm-inline d-md-none mt-1">(<?= date('d/m/Y') ?>)</small>
-                    <span class="d-none d-md-inline"> (<?= date('d/m/Y') ?>)</span>
+                    <small class="d-block d-sm-inline d-md-none mt-1" id="fecha-boton-mobile">(<?= date('d/m/Y') ?>)</small>
+                    <span class="d-none d-md-inline" id="fecha-boton-desktop"> (<?= date('d/m/Y') ?>)</span>
                 </button>
                 
                 <div class="d-grid d-md-flex gap-2 w-100 w-md-auto">
@@ -123,6 +123,7 @@ include 'tutorias/tutorias_modals.php';
                         <thead>
                             <tr>
                                 <th>Fecha</th>
+                                <th>Actividad</th>
                                 <th>Asistencia</th>
                                 <th>Tutor</th>
                                 <th>Acciones</th>
@@ -132,6 +133,9 @@ include 'tutorias/tutorias_modals.php';
                             <?php foreach ($tutoriasGrupales as $tutoria): ?>
                                 <tr>
                                     <td><?= htmlspecialchars(date("d/m/Y", strtotime($tutoria['fecha']))) ?></td>
+                                    <td>
+                                        <strong><?= htmlspecialchars($tutoria['actividad_nombre'] ?? 'Sin actividad') ?></strong>
+                                    </td>
                                     <td>
                                         <span class="badge bg-info">
                                             <?= $tutoria['total_presentes'] ?? 0 ?> / <?= $tutoria['total_alumnos'] ?? 0 ?>
@@ -164,11 +168,17 @@ include 'tutorias/tutorias_modals.php';
                         <div class="card mb-3 border-start border-primary border-3">
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
+                                    <div class="flex-grow-1">
                                         <h6 class="card-title mb-1 fw-bold">
                                             <i class="bi bi-calendar3 me-2 text-primary"></i>
                                             <?= htmlspecialchars(date("d/m/Y", strtotime($tutoria['fecha']))) ?>
                                         </h6>
+                                        <?php if (!empty($tutoria['actividad_nombre'])): ?>
+                                        <p class="card-text mb-1">
+                                            <i class="bi bi-clipboard-check me-1 text-success"></i>
+                                            <strong><?= htmlspecialchars($tutoria['actividad_nombre']) ?></strong>
+                                        </p>
+                                        <?php endif; ?>
                                         <p class="card-text text-muted small mb-2">
                                             <i class="bi bi-person-badge me-1"></i>
                                             <?= htmlspecialchars(($tutoria['tutor_nombre'] ?? '') . ' ' . ($tutoria['tutor_apellido'] ?? '')) ?>

@@ -11,6 +11,8 @@
         initTutoriaForms();
         setDefaultDates();
         initIndividualTutoriaSelects();
+        initPatActividadSelect();
+        updateButtonDate();
     });
 
     /**
@@ -74,10 +76,48 @@
     }
 
     /**
+     * Get local date string in YYYY-MM-DD format (not UTC)
+     */
+    function getLocalDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    /**
+     * Get local date string in d/m/Y format (not UTC) for display
+     */
+    function getLocalDateDisplayString() {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    /**
+     * Update the date displayed in the button for today's tutoring
+     */
+    function updateButtonDate() {
+        const todayDisplay = getLocalDateDisplayString();
+        const fechaMobile = document.getElementById('fecha-boton-mobile');
+        const fechaDesktop = document.getElementById('fecha-boton-desktop');
+        
+        if (fechaMobile) {
+            fechaMobile.textContent = `(${todayDisplay})`;
+        }
+        if (fechaDesktop) {
+            fechaDesktop.textContent = ` (${todayDisplay})`;
+        }
+    }
+
+    /**
      * Set default dates to today and make them readonly
      */
     function setDefaultDates() {
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         const grupalFecha = document.getElementById('grupal-fecha');
         const individualFecha = document.getElementById('individual-fecha');
         
@@ -92,6 +132,62 @@
     }
 
     /**
+     * Load PAT activities for the current tutor
+     */
+    function loadPatActividades() {
+        const select = document.getElementById('grupal-actividad-pat-select');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Cargando actividades...</option>';
+
+        fetch('/GESTACAD/controllers/tutoriasController.php?action=getPatTutorActividades')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data.length > 0) {
+                    let options = '<option value="">Seleccionar una actividad del PAT...</option>';
+                    data.data.forEach(actividad => {
+                        options += `<option value="${actividad.id}" data-nombre="${escapeHtml(actividad.nombre)}" data-descripcion="${escapeHtml(actividad.descripcion || '')}">${escapeHtml(actividad.nombre)}</option>`;
+                    });
+                    select.innerHTML = options;
+                } else {
+                    select.innerHTML = '<option value="">No hay actividades PAT disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading PAT activities:', error);
+                select.innerHTML = '<option value="">Error al cargar actividades</option>';
+            });
+    }
+
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /**
+     * Initialize PAT activity select handler
+     */
+    function initPatActividadSelect() {
+        const select = document.getElementById('grupal-actividad-pat-select');
+        const nombreInput = document.getElementById('grupal-actividad-nombre');
+        const descripcionInput = document.getElementById('grupal-actividad-descripcion');
+
+        if (select && nombreInput && descripcionInput) {
+            select.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value && selectedOption.dataset.nombre) {
+                    nombreInput.value = selectedOption.dataset.nombre;
+                    descripcionInput.value = selectedOption.dataset.descripcion || '';
+                }
+            });
+        }
+    }
+
+    /**
      * Open group tutoring modal
      */
     function openModalTutoriaGrupal(grupoId, grupoNombre) {
@@ -101,24 +197,35 @@
         const modalLabel = document.getElementById('modalTutoriaGrupalLabel');
         const fechaInput = document.getElementById('grupal-fecha');
         const submitBtn = document.querySelector('#formTutoriaGrupal button[type="submit"]');
+        const actividadNombreInput = document.getElementById('grupal-actividad-nombre');
+        const actividadDescripcionInput = document.getElementById('grupal-actividad-descripcion');
+        const actividadPatSelect = document.getElementById('grupal-actividad-pat-select');
         
         if (grupoIdInput) grupoIdInput.value = grupoId;
         if (grupoNombreSpan) grupoNombreSpan.textContent = grupoNombre;
         if (modalLabel) modalLabel.innerHTML = `<i class="bi bi-people-fill me-2"></i>Lista Grupal - ${grupoNombre}`;
         
         // Set today's date and make it readonly
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         if (fechaInput) {
             fechaInput.value = today;
             fechaInput.setAttribute('readonly', 'readonly');
         }
         if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-save me-1"></i>Guardar Tutoría Grupal';
 
+        // Clear activity fields
+        if (actividadNombreInput) actividadNombreInput.value = '';
+        if (actividadDescripcionInput) actividadDescripcionInput.value = '';
+        if (actividadPatSelect) actividadPatSelect.value = '';
+
         // Clear any existing tutoria ID
         const tutoriaIdInput = document.getElementById('grupal-tutoria-id');
         if (tutoriaIdInput) {
             tutoriaIdInput.remove();
         }
+
+        // Load PAT activities
+        loadPatActividades();
 
         // Load students for attendance
         loadAlumnosForGrupal(grupoId);
@@ -132,7 +239,7 @@
      * Open group tutoring modal for today (check if exists and edit if so)
      */
     function openModalTutoriaGrupalToday(grupoId, grupoNombre) {
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         
         // Check if a tutoring session exists for today
         fetch(`/GESTACAD/controllers/tutoriasController.php?action=getGrupalByGrupoAndDate&grupo_id=${grupoId}&fecha=${today}`)
@@ -164,6 +271,7 @@
         const fechaInput = document.getElementById('grupal-fecha');
         const actividadNombreInput = document.getElementById('grupal-actividad-nombre');
         const actividadDescripcionInput = document.getElementById('grupal-actividad-descripcion');
+        const actividadPatSelect = document.getElementById('grupal-actividad-pat-select');
         const submitBtn = document.querySelector('#formTutoriaGrupal button[type="submit"]');
         
         if (grupoIdInput) grupoIdInput.value = grupoId;
@@ -175,6 +283,7 @@
         }
         if (actividadNombreInput) actividadNombreInput.value = tutoria.actividad_nombre || '';
         if (actividadDescripcionInput) actividadDescripcionInput.value = tutoria.actividad_descripcion || '';
+        if (actividadPatSelect) actividadPatSelect.value = ''; // Don't auto-select PAT activity in edit mode
         if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-save me-1"></i>Actualizar Tutoría Grupal';
         
         // Add hidden input for tutoria ID
@@ -190,6 +299,9 @@
             }
             tutoriaIdInput.value = tutoria.id;
         }
+        
+        // Load PAT activities
+        loadPatActividades();
         
         // Load students and mark present ones
         loadAlumnosForGrupalEdit(grupoId, tutoria.asistencia || []);
@@ -309,7 +421,7 @@
         if (grupoNombreSpan) grupoNombreSpan.textContent = grupoNombre;
         
         // Set today's date and make it readonly
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         if (fechaInput) {
             fechaInput.value = today;
             fechaInput.setAttribute('readonly', 'readonly');

@@ -89,5 +89,44 @@ class Beca
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    /**
+     * Asignar una beca a un alumno
+     * @param array $data - Contiene alumno_id, beca_id, periodo_id, porcentaje, monto
+     * @return int|false - Retorna el ID de la asignación o false en caso de error
+     */
+    public function asignarBecaAlumno($data)
+    {
+        try {
+            $sql = "INSERT INTO alumno_beca (alumno_id, beca_id, periodo_id, porcentaje, monto, fecha_asignacion) 
+                    VALUES (:alumno_id, :beca_id, :periodo_id, :porcentaje, :monto, CURDATE())";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(":alumno_id", $data['alumno_id'], PDO::PARAM_INT);
+            $stmt->bindParam(":beca_id", $data['beca_id'], PDO::PARAM_INT);
+            $stmt->bindParam(":periodo_id", $data['periodo_id'], PDO::PARAM_INT);
+            $stmt->bindParam(":porcentaje", $data['porcentaje']);
+            $stmt->bindParam(":monto", $data['monto']);
+            
+            if ($stmt->execute()) {
+                return $this->conn->lastInsertId();
+            }
+            return false;
+        } catch (Exception $e) {
+            error_log("Error asignando beca: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtener todas las becas activas del catálogo
+     */
+    public function getBecasActivas()
+    {
+        $sql = "SELECT * FROM " . $this->table . " WHERE activo = 1 ORDER BY nombre";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

@@ -191,8 +191,14 @@ if (!isset($modificacion_ruta)) {
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Tutorías</h6>
 
         <li>
+          <a href="/GESTACAD/tutorias/mi-pat" class="nav-link sidebar-link <?= active(['tutorias/mi-pat', 'mi-pat']); ?>" <?= active(['tutorias/mi-pat', 'mi-pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Mi Plan de Acción Tutorial"' ?>>
+            <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">Mi PAT</span>
+          </a>
+        </li>
+
+        <li>
           <a href="/GESTACAD/tutorias/pat" class="nav-link sidebar-link <?= active(['tutorias/pat', 'pat']); ?>" <?= active(['tutorias/pat', 'pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Plan de Acción Tutorial"' ?>>
-            <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">PAT</span>
+            <i class="bi bi-clipboard-data me-2 sidebar-icon"></i> <span class="sidebar-text">PAT General</span>
           </a>
         </li>
 
@@ -319,8 +325,14 @@ if (!isset($modificacion_ruta)) {
         <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Tutorías</h6>
 
         <li>
+          <a href="/GESTACAD/tutorias/mi-pat" class="nav-link sidebar-link <?= active(['tutorias/mi-pat', 'mi-pat']); ?>" <?= active(['tutorias/mi-pat', 'mi-pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Mi Plan de Acción Tutorial"' ?>>
+            <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">Mi PAT</span>
+          </a>
+        </li>
+
+        <li>
           <a href="/GESTACAD/tutorias/pat" class="nav-link sidebar-link <?= active(['tutorias/pat', 'pat']); ?>" <?= active(['tutorias/pat', 'pat']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Plan de Acción Tutorial"' ?>>
-            <i class="bi bi-clipboard-check me-2 sidebar-icon"></i> <span class="sidebar-text">PAT</span>
+            <i class="bi bi-clipboard-data me-2 sidebar-icon"></i> <span class="sidebar-text">PAT General</span>
           </a>
         </li>
 

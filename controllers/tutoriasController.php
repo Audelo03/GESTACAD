@@ -3,6 +3,8 @@ require_once __DIR__ . "/../config/db.php";
 require_once __DIR__ . "/../models/TutoriaGrupal.php";
 require_once __DIR__ . "/../models/TutoriaIndividual.php";
 require_once __DIR__ . "/../models/Alumno.php";
+require_once __DIR__ . "/../models/PatTutorActividad.php";
+require_once __DIR__ . "/../models/ActividadPAT.php";
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -13,6 +15,8 @@ class TutoriasController
     private $tutoriaGrupal;
     private $tutoriaIndividual;
     private $alumno;
+    private $patTutorActividad;
+    private $actividadPAT;
     private $conn;
 
     public function __construct($conn)
@@ -21,6 +25,8 @@ class TutoriasController
         $this->tutoriaGrupal = new TutoriaGrupal($conn);
         $this->tutoriaIndividual = new TutoriaIndividual($conn);
         $this->alumno = new Alumno($conn);
+        $this->patTutorActividad = new PatTutorActividad($conn);
+        $this->actividadPAT = new ActividadPAT($conn);
     }
 
     /**
@@ -465,6 +471,249 @@ class TutoriasController
         } catch (Exception $e) {
             error_log("Error uploading file: " . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Get all PAT activities for the current tutor
+     */
+    public function getPatTutorActividades()
+    {
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['usuario_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+
+        try {
+            $actividades = $this->patTutorActividad->getByUsuario($_SESSION['usuario_id']);
+            echo json_encode(['success' => true, 'data' => $actividades]);
+        } catch (Exception $e) {
+            error_log("Error in getPatTutorActividades: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Create a new PAT activity for the current tutor
+     */
+    public function createPatTutorActividad()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        if (!isset($_SESSION['usuario_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+
+        try {
+            if (!isset($_POST['nombre']) || empty(trim($_POST['nombre']))) {
+                echo json_encode(['success' => false, 'message' => 'El nombre de la actividad es requerido']);
+                return;
+            }
+
+            $data = [
+                'usuario_id' => $_SESSION['usuario_id'],
+                'nombre' => trim($_POST['nombre']),
+                'descripcion' => isset($_POST['descripcion']) ? trim($_POST['descripcion']) : ''
+            ];
+
+            $id = $this->patTutorActividad->create($data);
+
+            if ($id) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Actividad PAT creada exitosamente',
+                    'id' => $id
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al crear la actividad PAT']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in createPatTutorActividad: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Update an existing PAT activity
+     */
+    public function updatePatTutorActividad()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        if (!isset($_SESSION['usuario_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+
+        if (!isset($_POST['id'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de actividad no proporcionado']);
+            return;
+        }
+
+        try {
+            if (!isset($_POST['nombre']) || empty(trim($_POST['nombre']))) {
+                echo json_encode(['success' => false, 'message' => 'El nombre de la actividad es requerido']);
+                return;
+            }
+
+            $data = [
+                'usuario_id' => $_SESSION['usuario_id'],
+                'nombre' => trim($_POST['nombre']),
+                'descripcion' => isset($_POST['descripcion']) ? trim($_POST['descripcion']) : ''
+            ];
+
+            $success = $this->patTutorActividad->update($_POST['id'], $data);
+
+            if ($success) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Actividad PAT actualizada exitosamente'
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al actualizar la actividad PAT']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in updatePatTutorActividad: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete a PAT activity
+     */
+    public function deletePatTutorActividad()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        if (!isset($_SESSION['usuario_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+
+        if (!isset($_POST['id'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de actividad no proporcionado']);
+            return;
+        }
+
+        try {
+            $success = $this->patTutorActividad->delete($_POST['id'], $_SESSION['usuario_id']);
+
+            if ($success) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Actividad PAT eliminada exitosamente'
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al eliminar la actividad PAT']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in deletePatTutorActividad: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Get all general PAT activities (catalog)
+     */
+    public function getPatGeneralActividades()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $actividades = $this->actividadPAT->getAll();
+            echo json_encode(['success' => true, 'data' => $actividades]);
+        } catch (Exception $e) {
+            error_log("Error in getPatGeneralActividades: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Copy a general PAT activity to tutor's personal PAT
+     */
+    public function copiarPatATutor()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        if (!isset($_SESSION['usuario_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+            return;
+        }
+
+        if (!isset($_POST['actividad_id'])) {
+            echo json_encode(['success' => false, 'message' => 'ID de actividad no proporcionado']);
+            return;
+        }
+
+        try {
+            // Get the general PAT activity
+            $actividades = $this->actividadPAT->getAll();
+            $actividad = null;
+            foreach ($actividades as $act) {
+                if ($act['id'] == $_POST['actividad_id']) {
+                    $actividad = $act;
+                    break;
+                }
+            }
+
+            if (!$actividad) {
+                echo json_encode(['success' => false, 'message' => 'Actividad no encontrada']);
+                return;
+            }
+
+            // Check if tutor already has this activity
+            $tutorActividades = $this->patTutorActividad->getByUsuario($_SESSION['usuario_id']);
+            foreach ($tutorActividades as $tutorAct) {
+                if ($tutorAct['nombre'] === $actividad['nombre']) {
+                    echo json_encode(['success' => false, 'message' => 'Ya tienes esta actividad en tu PAT']);
+                    return;
+                }
+            }
+
+            // Copy to tutor's PAT
+            $data = [
+                'usuario_id' => $_SESSION['usuario_id'],
+                'nombre' => $actividad['nombre'],
+                'descripcion' => $actividad['descripcion'] ?? ''
+            ];
+
+            $id = $this->patTutorActividad->create($data);
+
+            if ($id) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Actividad añadida a tu PAT exitosamente',
+                    'id' => $id
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al añadir la actividad']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in copiarPatATutor: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
 }

@@ -63,14 +63,14 @@ include 'objects/header.php';
             </div>
             
             <!-- Vista de tabla para desktop -->
-            <div class="table-responsive d-none d-md-block" style="max-height: 600px; overflow-y: auto;">
+            <div class="table-responsive d-none d-md-block" style="max-height: 600px; overflow-y: auto; position: relative;">
                 <table class="table table-hover table-striped mb-0">
-                    <thead class="table-light sticky-top">
+                        <thead class="table-light sticky-top">
                         <tr>
                             <th style="width: 50px;">#</th>
                             <th>Matrícula</th>
                             <th>Nombre Completo</th>
-                            <th style="min-width: 300px;">Acciones</th>
+                            <th style="min-width: 200px; width: 200px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaAlumnosBody">
@@ -81,10 +81,10 @@ include 'objects/header.php';
                                 <td><?= $index + 1 ?></td>
                                 <td><strong><?= htmlspecialchars($alumno['matricula']) ?></strong></td>
                                 <td><?= htmlspecialchars($alumno['nombre_completo']) ?></td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
+                                <td style="position: relative;">
+                                    <div class="d-flex gap-1 flex-wrap">
                                         <button type="button"
-                                                class="btn btn-primary btn-inscribir-alumno"
+                                                class="btn btn-primary btn-sm btn-inscribir-alumno"
                                                 data-alumno-id="<?= $alumno['id_alumno'] ?>"
                                                 data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
                                                 data-bs-toggle="modal"
@@ -93,32 +93,57 @@ include 'objects/header.php';
                                             <i class="bi bi-plus-circle me-1"></i>Inscribir
                                         </button>
                                         <button type="button"
-                                                class="btn btn-warning btn-editar-clases-alumno"
-                                                data-alumno-id="<?= $alumno['id_alumno'] ?>"
-                                                data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalEditarClasesAlumno"
-                                                title="Editar clases inscritas">
-                                            <i class="bi bi-pencil-square me-1"></i>Editar
-                                        </button>
-                                        <button type="button"
-                                                class="btn btn-success btn-calificaciones-alumno"
+                                                class="btn btn-success btn-sm btn-calificaciones-alumno"
                                                 data-alumno-id="<?= $alumno['id_alumno'] ?>"
                                                 data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
                                                 data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
                                                 title="Capturar Calificaciones">
                                             <i class="bi bi-journal-check me-1"></i>Calif.
                                         </button>
-                                        <button type="button"
-                                                class="btn btn-info btn-inferencias-alumno"
-                                                data-alumno-id="<?= $alumno['id_alumno'] ?>"
-                                                data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
-                                                data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalInferenciasAlumno"
-                                                title="Ver Análisis de Inferencias">
-                                            <i class="bi bi-graph-up-arrow me-1"></i>Inferencias
-                                        </button>
+                                        <div class="btn-group btn-group-sm" style="position: static;">
+                                            <button type="button" 
+                                                    class="btn btn-outline-secondary dropdown-toggle" 
+                                                    data-bs-toggle="dropdown" 
+                                                    data-bs-auto-close="true"
+                                                    aria-expanded="false"
+                                                    title="Más acciones">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end" style="z-index: 1050; position: absolute;">
+                                                <li>
+                                                    <a class="dropdown-item btn-editar-clases-alumno" 
+                                                       href="#"
+                                                       data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                       data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#modalEditarClasesAlumno">
+                                                        <i class="bi bi-pencil-square me-2"></i>Editar Clases
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item btn-inferencias-alumno" 
+                                                       href="#"
+                                                       data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                       data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                       data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#modalInferenciasAlumno">
+                                                        <i class="bi bi-graph-up-arrow me-2"></i>Ver Inferencias
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item btn-inscribir-beca" 
+                                                       href="#"
+                                                       data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                       data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#modalInscribirBeca">
+                                                        <i class="bi bi-award me-2"></i>Inscribir en Beca
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -128,7 +153,7 @@ include 'objects/header.php';
             </div>
 
             <!-- Vista de cards para móvil -->
-            <div class="d-md-none" id="cardsAlumnosContainer" style="max-height: 600px; overflow-y: auto;">
+            <div class="d-md-none" id="cardsAlumnosContainer" style="max-height: 600px; overflow-y: auto; position: relative;">
                 <?php foreach ($alumnos as $index => $alumno): ?>
                     <div class="card mb-3 fila-alumno-card" 
                          data-matricula="<?= htmlspecialchars(strtolower($alumno['matricula'])) ?>"
@@ -145,38 +170,71 @@ include 'objects/header.php';
                                 <span class="badge bg-secondary">#<?= $index + 1 ?></span>
                             </div>
                             <div class="d-grid gap-2 mt-3">
-                                <button type="button"
-                                        class="btn btn-primary btn-inscribir-alumno"
-                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
-                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalInscribirAlumno">
-                                    <i class="bi bi-plus-circle me-2"></i>Inscribir en Clase
-                                </button>
-                                <button type="button"
-                                        class="btn btn-warning btn-editar-clases-alumno"
-                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
-                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalEditarClasesAlumno">
-                                    <i class="bi bi-pencil-square me-2"></i>Editar Clases
-                                </button>
-                                <button type="button"
-                                        class="btn btn-success btn-calificaciones-alumno"
-                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
-                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
-                                        data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>">
-                                    <i class="bi bi-journal-check me-2"></i>Capturar Calificaciones
-                                </button>
-                                <button type="button"
-                                        class="btn btn-info btn-inferencias-alumno"
-                                        data-alumno-id="<?= $alumno['id_alumno'] ?>"
-                                        data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
-                                        data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalInferenciasAlumno">
-                                    <i class="bi bi-graph-up-arrow me-2"></i>Ver Inferencias
-                                </button>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <button type="button"
+                                                class="btn btn-primary w-100 btn-inscribir-alumno"
+                                                data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalInscribirAlumno">
+                                            <i class="bi bi-plus-circle me-1"></i>Inscribir
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button"
+                                                class="btn btn-success w-100 btn-calificaciones-alumno"
+                                                data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>">
+                                            <i class="bi bi-journal-check me-1"></i>Calif.
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="dropdown" style="position: static;">
+                                    <button class="btn btn-outline-secondary w-100 dropdown-toggle" 
+                                            type="button" 
+                                            id="dropdownMenuButton<?= $alumno['id_alumno'] ?>" 
+                                            data-bs-toggle="dropdown" 
+                                            data-bs-auto-close="true"
+                                            aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical me-1"></i>Más acciones
+                                    </button>
+                                    <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton<?= $alumno['id_alumno'] ?>" style="z-index: 9999 !important; position: absolute !important;">
+                                        <li>
+                                            <a class="dropdown-item btn-editar-clases-alumno" 
+                                               href="#"
+                                               data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                               data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#modalEditarClasesAlumno">
+                                                <i class="bi bi-pencil-square me-2"></i>Editar Clases
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item btn-inferencias-alumno" 
+                                               href="#"
+                                               data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                               data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                               data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#modalInferenciasAlumno">
+                                                <i class="bi bi-graph-up-arrow me-2"></i>Ver Inferencias
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item btn-inscribir-beca" 
+                                               href="#"
+                                               data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                               data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#modalInscribirBeca">
+                                                <i class="bi bi-award me-2"></i>Inscribir en Beca
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -213,6 +271,67 @@ include 'objects/header.php';
                 <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary w-100 w-sm-auto" id="btnConfirmarInscripcion">
                     <i class="bi bi-check-circle me-1"></i>Inscribir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para inscribir alumno en beca -->
+<div class="modal fade" id="modalInscribirBeca" tabindex="-1" aria-labelledby="modalInscribirBecaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold" id="modalInscribirBecaLabel">
+                    Inscribir Alumno en Beca
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formInscribirBeca">
+                    <input type="hidden" id="beca-alumno-id" name="alumno_id">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Alumno:</label>
+                        <p id="beca-alumno-nombre" class="mb-0"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="selectBeca" class="form-label fw-bold">
+                            Seleccionar Beca <span class="text-danger">*</span>
+                        </label>
+                        <select id="selectBeca" name="beca_id" class="form-select" required>
+                            <option value="">Cargando becas...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="selectPeriodoBeca" class="form-label fw-bold">
+                            Periodo Escolar <span class="text-danger">*</span>
+                        </label>
+                        <select id="selectPeriodoBeca" name="periodo_id" class="form-select" required>
+                            <option value="">Cargando periodos...</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="porcentajeBeca" class="form-label fw-bold">
+                                Porcentaje (%)
+                            </label>
+                            <input type="number" id="porcentajeBeca" name="porcentaje" class="form-control" 
+                                   min="0" max="100" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="montoBeca" class="form-label fw-bold">
+                                Monto ($)
+                            </label>
+                            <input type="number" id="montoBeca" name="monto" class="form-control" 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning w-100 w-sm-auto" id="btnConfirmarInscripcionBeca">
+                    Asignar Beca
                 </button>
             </div>
         </div>
@@ -615,6 +734,151 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // ========== MODAL INSCRIBIR EN BECA ==========
+    const modalInscribirBeca = document.getElementById('modalInscribirBeca');
+    const formInscribirBeca = document.getElementById('formInscribirBeca');
+    const btnConfirmarBeca = document.getElementById('btnConfirmarInscripcionBeca');
+    const inputAlumnoIdBeca = document.getElementById('beca-alumno-id');
+    const nombreAlumnoBeca = document.getElementById('beca-alumno-nombre');
+    const selectBeca = document.getElementById('selectBeca');
+    const selectPeriodoBeca = document.getElementById('selectPeriodoBeca');
+
+    // Event listeners para botones de inscribir en beca
+    document.querySelectorAll('.btn-inscribir-beca').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Cerrar dropdown si está abierto
+            const dropdown = this.closest('.dropdown');
+            if (dropdown) {
+                const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown.querySelector('[data-bs-toggle="dropdown"]'));
+                if (dropdownInstance) dropdownInstance.hide();
+            }
+            const alumnoId = this.getAttribute('data-alumno-id');
+            const alumnoNombre = this.getAttribute('data-alumno-nombre');
+            inputAlumnoIdBeca.value = alumnoId;
+            nombreAlumnoBeca.textContent = alumnoNombre;
+            cargarBecas();
+            cargarPeriodos();
+        });
+    });
+
+    // Cargar becas disponibles
+    function cargarBecas() {
+        selectBeca.innerHTML = '<option value="">Cargando becas...</option>';
+        
+        fetch('/GESTACAD/controllers/becasController.php?action=getBecasActivas')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.data.length > 0) {
+                    selectBeca.innerHTML = '<option value="">Seleccione una beca...</option>';
+                    data.data.forEach(beca => {
+                        const option = document.createElement('option');
+                        option.value = beca.id;
+                        option.textContent = `${beca.clave} - ${beca.nombre}`;
+                        selectBeca.appendChild(option);
+                    });
+                } else {
+                    selectBeca.innerHTML = '<option value="">No hay becas disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar becas:', error);
+                selectBeca.innerHTML = '<option value="">Error al cargar becas</option>';
+            });
+    }
+
+    // Cargar periodos disponibles
+    function cargarPeriodos() {
+        selectPeriodoBeca.innerHTML = '<option value="">Cargando periodos...</option>';
+        
+        fetch('/GESTACAD/controllers/periodosController.php?action=index')
+            .then(response => response.json())
+            .then(periodos => {
+                if (periodos && periodos.length > 0) {
+                    selectPeriodoBeca.innerHTML = '<option value="">Seleccione un periodo...</option>';
+                    periodos.forEach(periodo => {
+                        const option = document.createElement('option');
+                        option.value = periodo.id;
+                        option.textContent = periodo.nombre;
+                        selectPeriodoBeca.appendChild(option);
+                    });
+                } else {
+                    selectPeriodoBeca.innerHTML = '<option value="">No hay periodos disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar periodos:', error);
+                selectPeriodoBeca.innerHTML = '<option value="">Error al cargar periodos</option>';
+            });
+    }
+
+    // Confirmar inscripción en beca
+    btnConfirmarBeca.addEventListener('click', function() {
+        const alumnoId = inputAlumnoIdBeca.value;
+        const becaId = selectBeca.value;
+        const periodoId = selectPeriodoBeca.value;
+
+        if (!alumnoId || !becaId || !periodoId) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Datos incompletos',
+                    text: 'Por favor, complete todos los campos requeridos.'
+                });
+            } else {
+                alert('Por favor, complete todos los campos requeridos.');
+            }
+            return;
+        }
+
+        const formData = new FormData(formInscribirBeca);
+
+        btnConfirmarBeca.disabled = true;
+        btnConfirmarBeca.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Asignando...';
+
+        fetch('/GESTACAD/controllers/becasController.php?action=asignarBecaAlumno', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: data.message || 'La beca ha sido asignada correctamente.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    alert(data.message || 'La beca ha sido asignada correctamente.');
+                }
+                const bsModal = bootstrap.Modal.getInstance(modalInscribirBeca);
+                if (bsModal) bsModal.hide();
+                formInscribirBeca.reset();
+            } else {
+                throw new Error(data.message || 'Error al asignar la beca');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo asignar la beca.'
+                });
+            } else {
+                alert('Error: ' + error.message);
+            }
+        })
+        .finally(() => {
+            btnConfirmarBeca.disabled = false;
+            btnConfirmarBeca.innerHTML = 'Asignar Beca';
+        });
+    });
+
     // ========== MODAL EDITAR CLASES ==========
     const modalEditarClases = document.getElementById('modalEditarClasesAlumno');
     const nombreAlumnoEditar = document.getElementById('editar-clases-alumno-nombre');
@@ -623,7 +887,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let alumnoIdClasesActual = null;
 
     document.querySelectorAll('.btn-editar-clases-alumno').forEach(function(btn) {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Cerrar dropdown si está abierto
+            const dropdown = this.closest('.dropdown');
+            if (dropdown) {
+                const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown.querySelector('[data-bs-toggle="dropdown"]'));
+                if (dropdownInstance) dropdownInstance.hide();
+            }
             const alumnoId = this.getAttribute('data-alumno-id');
             const alumnoNombre = this.getAttribute('data-alumno-nombre');
             nombreAlumnoEditar.textContent = alumnoNombre;
@@ -1524,6 +1795,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const btn = e.target.closest('.btn-inferencias-alumno');
         if (btn) {
             e.preventDefault();
+            // Cerrar dropdown si está abierto
+            const dropdown = btn.closest('.dropdown');
+            if (dropdown) {
+                const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown.querySelector('[data-bs-toggle="dropdown"]'));
+                if (dropdownInstance) dropdownInstance.hide();
+            }
             const alumnoId = btn.getAttribute('data-alumno-id');
             const alumnoNombre = btn.getAttribute('data-alumno-nombre');
             const alumnoMatricula = btn.getAttribute('data-alumno-matricula');
@@ -1898,6 +2175,200 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // ============================================
+    // CORREGIR POSICIONAMIENTO DE DROPDOWNS EN TABLA Y CARDS
+    // ============================================
+    // Función para corregir el posicionamiento de dropdowns
+    function corregirDropdown(dropdownMenu, toggle, container) {
+        if (!dropdownMenu) return;
+        
+        // Forzar z-index muy alto
+        dropdownMenu.style.zIndex = '99999';
+        dropdownMenu.style.position = 'absolute';
+        
+        // Obtener posiciones
+        const toggleRect = toggle.getBoundingClientRect();
+        const containerRect = container ? container.getBoundingClientRect() : null;
+        const menuRect = dropdownMenu.getBoundingClientRect();
+        
+        // Calcular si hay espacio abajo
+        const espacioAbajo = containerRect ? (containerRect.bottom - toggleRect.bottom) : (window.innerHeight - toggleRect.bottom);
+        const espacioArriba = containerRect ? (toggleRect.top - containerRect.top) : toggleRect.top;
+        const alturaMenu = menuRect.height;
+        
+        // Si no hay espacio abajo pero sí arriba, mostrar arriba
+        if (espacioAbajo < alturaMenu && espacioArriba > alturaMenu) {
+            dropdownMenu.style.top = 'auto';
+            dropdownMenu.style.bottom = '100%';
+            dropdownMenu.style.marginBottom = '0.125rem';
+            dropdownMenu.style.marginTop = '0';
+        }
+        
+        // Asegurar que el dropdown esté visible
+        requestAnimationFrame(function() {
+            dropdownMenu.style.zIndex = '99999';
+        });
+    }
+
+    // Para dropdowns en la tabla
+    document.querySelectorAll('.table-responsive .dropdown-toggle').forEach(function(toggle) {
+        toggle.addEventListener('show.bs.dropdown', function() {
+            const dropdownMenu = this.nextElementSibling;
+            if (dropdownMenu) {
+                dropdownMenu.style.zIndex = '99999';
+            }
+        });
+        
+        toggle.addEventListener('shown.bs.dropdown', function() {
+            const dropdownMenu = this.nextElementSibling;
+            const container = document.querySelector('.table-responsive');
+            corregirDropdown(dropdownMenu, this, container);
+        });
+    });
+
+    // Para dropdowns en las cards móviles - Solución más robusta
+    document.querySelectorAll('#cardsAlumnosContainer .dropdown-toggle').forEach(function(toggle) {
+        let originalParent = null;
+        let movedToBody = false;
+        
+        toggle.addEventListener('show.bs.dropdown', function() {
+            const dropdownMenu = this.nextElementSibling;
+            if (!dropdownMenu) return;
+            
+            // Guardar referencia al padre original
+            originalParent = dropdownMenu.parentElement;
+            
+            // Mover el dropdown al body temporalmente para evitar problemas de overflow
+            document.body.appendChild(dropdownMenu);
+            movedToBody = true;
+            
+            // Calcular posición absoluta basada en el botón
+            const toggleRect = this.getBoundingClientRect();
+            dropdownMenu.style.position = 'fixed';
+            dropdownMenu.style.top = (toggleRect.bottom + window.scrollY) + 'px';
+            dropdownMenu.style.left = toggleRect.left + 'px';
+            dropdownMenu.style.width = toggleRect.width + 'px';
+            dropdownMenu.style.zIndex = '99999';
+            dropdownMenu.style.maxHeight = '200px';
+            dropdownMenu.style.overflowY = 'auto';
+            
+            // Agregar clase a la card padre para aumentar su z-index
+            const card = this.closest('.card');
+            if (card) {
+                card.style.zIndex = '10';
+                card.style.position = 'relative';
+            }
+        });
+        
+        toggle.addEventListener('shown.bs.dropdown', function() {
+            const dropdownMenu = this.nextElementSibling;
+            if (!dropdownMenu) return;
+            
+            // Ajustar posición si es necesario
+            const toggleRect = this.getBoundingClientRect();
+            const menuRect = dropdownMenu.getBoundingClientRect();
+            const containerRect = document.getElementById('cardsAlumnosContainer').getBoundingClientRect();
+            
+            // Si el menú se sale del contenedor, ajustar
+            if (menuRect.bottom > containerRect.bottom) {
+                dropdownMenu.style.top = (toggleRect.top + window.scrollY - menuRect.height) + 'px';
+            }
+            
+            dropdownMenu.style.zIndex = '99999';
+        });
+        
+        toggle.addEventListener('hidden.bs.dropdown', function() {
+            const dropdownMenu = this.nextElementSibling;
+            
+            // Devolver el dropdown a su posición original
+            if (movedToBody && originalParent && dropdownMenu) {
+                originalParent.appendChild(dropdownMenu);
+                dropdownMenu.style.position = '';
+                dropdownMenu.style.top = '';
+                dropdownMenu.style.left = '';
+                dropdownMenu.style.width = '';
+                dropdownMenu.style.maxHeight = '';
+                dropdownMenu.style.overflowY = '';
+                movedToBody = false;
+            }
+            
+            // Restaurar z-index de la card
+            const card = this.closest('.card');
+            if (card) {
+                card.style.zIndex = '';
+                card.style.position = '';
+            }
+        });
+    });
 });
 </script>
+
+<style>
+/* Estilos para dropdowns dentro de tablas con overflow */
+.table-responsive {
+    position: relative;
+}
+
+.table-responsive .dropdown-menu {
+    z-index: 9999 !important;
+    position: absolute !important;
+}
+
+.table-responsive .btn-group {
+    position: static;
+}
+
+/* Asegurar que el dropdown se muestre por encima de las filas siguientes */
+.table tbody tr td {
+    position: relative;
+}
+
+.table tbody tr td .dropdown-menu {
+    position: absolute !important;
+    z-index: 9999 !important;
+}
+
+/* Para cards móviles */
+#cardsAlumnosContainer {
+    position: relative;
+}
+
+#cardsAlumnosContainer .dropdown {
+    position: static;
+}
+
+#cardsAlumnosContainer .dropdown-menu {
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+#cardsAlumnosContainer .dropdown.show .dropdown-menu {
+    z-index: 99999 !important;
+}
+
+/* Asegurar que las cards no interfieran con el dropdown */
+#cardsAlumnosContainer .card {
+    position: relative;
+    z-index: 1;
+    transition: z-index 0s;
+}
+
+#cardsAlumnosContainer .card:has(.dropdown.show) {
+    z-index: 10 !important;
+}
+
+/* Para móvil */
+@media (max-width: 767.98px) {
+    .dropdown-menu {
+        z-index: 9999 !important;
+        position: absolute !important;
+    }
+    
+    /* Asegurar que el dropdown esté por encima de las cards siguientes */
+    #cardsAlumnosContainer .card {
+        position: relative;
+    }
+}
+</style>
 

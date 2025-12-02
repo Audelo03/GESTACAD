@@ -20,15 +20,23 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="grupal-actividad-nombre" class="form-label">Nombre de la Actividad</label>
+                        <label for="grupal-actividad-pat-select" class="form-label">Seleccionar Actividad del PAT (Opcional)</label>
+                        <select class="form-select" id="grupal-actividad-pat-select">
+                            <option value="">Seleccionar una actividad del PAT...</option>
+                        </select>
+                        <small class="text-muted">O puedes escribir una actividad personalizada abajo</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="grupal-actividad-nombre" class="form-label">Nombre de la Actividad <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="grupal-actividad-nombre" name="actividad_nombre"
-                            required maxlength="200">
+                            required maxlength="200" placeholder="Nombre de la actividad">
                     </div>
 
                     <div class="mb-3">
                         <label for="grupal-actividad-descripcion" class="form-label">Descripción de la Actividad</label>
                         <textarea class="form-control" id="grupal-actividad-descripcion" name="actividad_descripcion"
-                            rows="3"></textarea>
+                            rows="3" placeholder="Descripción de la actividad"></textarea>
                     </div>
 
                     <div class="mb-3">

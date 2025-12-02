@@ -63,10 +63,21 @@
     }
 
     /**
+     * Get local date string in YYYY-MM-DD format (not UTC)
+     */
+    function getLocalDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    /**
      * Set default dates to today
      */
     function setDefaultDates() {
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateString();
         const grupalFecha = document.getElementById('grupal-fecha');
         const individualFecha = document.getElementById('individual-fecha');
         

@@ -11,14 +11,42 @@ class ActividadPAT
 
     public function getAll()
     {
-        $sql = "SELECT a.*, p.numero as parcial_numero, c.nombre as carrera_nombre, g.nombre as grupo_nombre 
-                FROM " . $this->table . " a
-                LEFT JOIN parciales p ON a.parcial_id = p.id
-                LEFT JOIN carreras c ON a.carrera_id = c.id
-                LEFT JOIN grupos g ON a.grupo_id = g.id_grupo";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT 
+                        a.id,
+                        a.carrera_id,
+                        a.grupo_id,
+                        a.parcial_id,
+                        a.sesion_num,
+                        a.nombre,
+                        a.descripcion,
+                        COALESCE(p.numero, a.parcial_id) as parcial_numero,
+                        c.nombre as carrera_nombre,
+                        g.nombre as grupo_nombre
+                    FROM " . $this->table . " a
+                    LEFT JOIN parciales p ON a.parcial_id = p.id
+                    LEFT JOIN carreras c ON a.carrera_id = c.id_carrera
+                    LEFT JOIN grupos g ON a.grupo_id = g.id_grupo
+                    ORDER BY a.parcial_id, a.sesion_num, a.nombre";
+            
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Asegurar que los valores NULL se manejen correctamente
+            foreach ($result as &$row) {
+                $row['carrera_id'] = $row['carrera_id'] ?? null;
+                $row['grupo_id'] = $row['grupo_id'] ?? null;
+                $row['descripcion'] = $row['descripcion'] ?? null;
+                $row['carrera_nombre'] = $row['carrera_nombre'] ?? null;
+                $row['grupo_nombre'] = $row['grupo_nombre'] ?? null;
+            }
+            
+            return $result;
+        } catch (Exception $e) {
+            error_log("Error in ActividadPAT::getAll(): " . $e->getMessage());
+            return [];
+        }
     }
 
     public function create($data)

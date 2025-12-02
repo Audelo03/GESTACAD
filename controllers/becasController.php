@@ -73,6 +73,64 @@ class BecasController
         }
         exit;
     }
+
+    /**
+     * Obtener todas las becas activas para el select
+     */
+    public function getBecasActivas()
+    {
+        header('Content-Type: application/json');
+        try {
+            $becas = $this->beca->getBecasActivas();
+            echo json_encode(['success' => true, 'data' => $becas]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Asignar una beca a un alumno
+     */
+    public function asignarBecaAlumno()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+            return;
+        }
+
+        try {
+            // Validar campos requeridos
+            if (!isset($_POST['alumno_id']) || !isset($_POST['beca_id']) || !isset($_POST['periodo_id'])) {
+                echo json_encode(['success' => false, 'message' => 'Datos incompletos']);
+                return;
+            }
+
+            $data = [
+                'alumno_id' => (int)$_POST['alumno_id'],
+                'beca_id' => (int)$_POST['beca_id'],
+                'periodo_id' => (int)$_POST['periodo_id'],
+                'porcentaje' => isset($_POST['porcentaje']) ? (float)$_POST['porcentaje'] : 0.00,
+                'monto' => isset($_POST['monto']) ? (float)$_POST['monto'] : 0.00
+            ];
+
+            $id = $this->beca->asignarBecaAlumno($data);
+
+            if ($id) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Beca asignada exitosamente',
+                    'id' => $id
+                ]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error al asignar la beca']);
+            }
+        } catch (Exception $e) {
+            error_log("Error in asignarBecaAlumno: " . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
 }
 
 if (isset($_GET['action'])) {

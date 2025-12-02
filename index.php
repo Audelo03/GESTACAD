@@ -102,6 +102,7 @@ $viewMap = [
     // Tutorías y Seguimiento
     'tutorias' => 'views/tutorias/dashboard.php',
     'tutorias/pat' => 'views/tutorias/pat.php',
+    'tutorias/mi-pat' => 'views/tutorias/mi_pat.php',
     'tutorias/canalizacion' => 'views/tutorias/canalizacion.php',
 
     // Becas
