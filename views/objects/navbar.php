@@ -36,6 +36,11 @@ if (!isset($modificacion_ruta)) {
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                <?php 
+                // Ocultar el botón de perfil para tutores (nivel 3)
+                $nivel_usuario = isset($_SESSION['usuario_nivel']) ? (int)$_SESSION['usuario_nivel'] : 0;
+                if ($nivel_usuario != 3): // No mostrar para tutor
+                ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarUserDropdown"
                         role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -62,6 +67,7 @@ if (!isset($modificacion_ruta)) {
                         </li>
                     </ul>
                 </li>
+                <?php endif; ?>
             </ul>
         </div>
     </div>

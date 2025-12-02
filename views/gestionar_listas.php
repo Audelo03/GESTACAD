@@ -308,7 +308,7 @@ include 'tutorias/tutorias_modals.php';
                     </p>
                     <div class="mb-3">
                         <strong><?= htmlspecialchars($nombre_grupo) ?></strong><br>
-                        <small class="text-muted">Fecha: <?= htmlspecialchars(date('d/m/Y', strtotime($fecha))) ?></small><br>
+                        <small class="text-muted" id="qrFechaDisplay">Fecha: <?= htmlspecialchars(date('d/m/Y', strtotime($fecha))) ?></small><br>
                         <small class="text-danger" id="qrExpiraEn">
                             <i class="bi bi-clock me-1"></i>
                             Expira en: <span id="qrTiempoRestante">5:00</span>
@@ -340,10 +340,29 @@ include 'objects/footer.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Función para obtener fecha local en formato YYYY-MM-DD (no UTC)
+    function getLocalDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    
+    // Función para obtener fecha local en formato d/m/Y para mostrar
+    function getLocalDateDisplayString() {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+    
     // Variables globales para QR
     const idGrupo = <?= json_encode($id_grupo) ?>;
     const nombreGrupo = <?= json_encode($nombre_grupo) ?>;
-    const fecha = <?= json_encode($fecha) ?>;
+    // Usar fecha local del navegador en lugar de la fecha del servidor
+    const fecha = getLocalDateString();
     let urlQRBase = '';
     let qrCodeInstance = null;
     let qrExpiraEn = null;
@@ -359,6 +378,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Función para generar nuevo token
     async function generarNuevoToken() {
+        // Asegurarse de usar la fecha local actual al generar el QR
+        const fechaLocal = getLocalDateString();
+        
         const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
         qrModal.show();
         
@@ -369,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const formData = new FormData();
             formData.append('grupo_id', idGrupo);
-            formData.append('fecha', fecha);
+            formData.append('fecha', fechaLocal);
             
             const response = await fetch('/GESTACAD/controllers/asistenciaTokenController.php?action=generarToken', {
                 method: 'POST',
@@ -382,6 +404,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 urlQRBase = result.url;
                 // Calcular la fecha de expiración directamente: 5 minutos desde ahora
                 qrExpiraEn = new Date(Date.now() + 5 * 60 * 1000);
+                
+                // Actualizar la fecha mostrada en el modal con la fecha local
+                const fechaDisplayElement = document.getElementById('qrFechaDisplay');
+                if (fechaDisplayElement) {
+                    fechaDisplayElement.textContent = `Fecha: ${getLocalDateDisplayString()}`;
+                }
                 
                 // Generar QR
                 const qrContainer = document.getElementById('qrcode');
@@ -485,7 +513,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (canvas) {
             const url = canvas.toDataURL('image/png');
             const link = document.createElement('a');
-            link.download = `QR_Asistencia_${nombreGrupo}_${fecha}.png`;
+            // Usar fecha local para el nombre del archivo
+            const fechaLocal = getLocalDateString();
+            link.download = `QR_Asistencia_${nombreGrupo}_${fechaLocal}.png`;
             link.href = url;
             link.click();
         }

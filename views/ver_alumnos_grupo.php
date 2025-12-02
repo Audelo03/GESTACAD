@@ -142,6 +142,17 @@ include 'objects/header.php';
                                                         <i class="bi bi-award me-2"></i>Inscribir en Beca
                                                     </a>
                                                 </li>
+                                                <li>
+                                                    <a class="dropdown-item btn-canalizar-alumno" 
+                                                       href="#"
+                                                       data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                                       data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                                       data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#modalCanalizarAlumno">
+                                                        <i class="bi bi-arrow-right-circle me-2"></i>Canalizar
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -231,6 +242,17 @@ include 'objects/header.php';
                                                data-bs-toggle="modal"
                                                data-bs-target="#modalInscribirBeca">
                                                 <i class="bi bi-award me-2"></i>Inscribir en Beca
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item btn-canalizar-alumno" 
+                                               href="#"
+                                               data-alumno-id="<?= $alumno['id_alumno'] ?>"
+                                               data-alumno-nombre="<?= htmlspecialchars($alumno['nombre_completo']) ?>"
+                                               data-alumno-matricula="<?= htmlspecialchars($alumno['matricula']) ?>"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#modalCanalizarAlumno">
+                                                <i class="bi bi-arrow-right-circle me-2"></i>Canalizar
                                             </a>
                                         </li>
                                     </ul>
@@ -332,6 +354,72 @@ include 'objects/header.php';
                 <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-warning w-100 w-sm-auto" id="btnConfirmarInscripcionBeca">
                     Asignar Beca
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para canalizar alumno -->
+<div class="modal fade" id="modalCanalizarAlumno" tabindex="-1" aria-labelledby="modalCanalizarAlumnoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="modalCanalizarAlumnoLabel">
+                    <i class="bi bi-arrow-right-circle me-2"></i>
+                    Canalizar Alumno
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCanalizarAlumno">
+                    <input type="hidden" id="canalizar-alumno-id" name="alumno_id">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Alumno:</label>
+                        <div class="alert alert-info mb-0">
+                            <strong id="canalizar-alumno-nombre">-</strong>
+                            <br>
+                            <small class="text-muted">Matrícula: <span id="canalizar-alumno-matricula">-</span></small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="canalizar-periodo-id" class="form-label fw-bold">
+                                Periodo Escolar <span class="text-danger">*</span>
+                            </label>
+                            <select id="canalizar-periodo-id" name="periodo_id" class="form-select" required>
+                                <option value="">Cargando periodos...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="canalizar-area-id" class="form-label fw-bold">
+                                Área de Canalización <span class="text-danger">*</span>
+                            </label>
+                            <select id="canalizar-area-id" name="area_id" class="form-select" required>
+                                <option value="">Cargando áreas...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="canalizar-observacion" class="form-label fw-bold">
+                            Observación / Motivo <span class="text-danger">*</span>
+                        </label>
+                        <textarea id="canalizar-observacion" 
+                                  name="observacion" 
+                                  class="form-control" 
+                                  rows="4" 
+                                  required
+                                  placeholder="Describe el motivo de la canalización, situación del alumno, y cualquier información relevante..."></textarea>
+                        <small class="text-muted">Proporciona información detallada sobre la situación que requiere la canalización</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary w-100 w-sm-auto" id="btnConfirmarCanalizacion">
+                    <i class="bi bi-check-circle me-1"></i>Guardar Canalización
                 </button>
             </div>
         </div>
@@ -876,6 +964,145 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             btnConfirmarBeca.disabled = false;
             btnConfirmarBeca.innerHTML = 'Asignar Beca';
+        });
+    });
+
+    // ========== MODAL CANALIZAR ALUMNO ==========
+    const modalCanalizarAlumno = document.getElementById('modalCanalizarAlumno');
+    const formCanalizarAlumno = document.getElementById('formCanalizarAlumno');
+    const btnConfirmarCanalizacion = document.getElementById('btnConfirmarCanalizacion');
+    const inputAlumnoIdCanalizar = document.getElementById('canalizar-alumno-id');
+    const nombreAlumnoCanalizar = document.getElementById('canalizar-alumno-nombre');
+    const matriculaAlumnoCanalizar = document.getElementById('canalizar-alumno-matricula');
+    const selectPeriodoCanalizar = document.getElementById('canalizar-periodo-id');
+    const selectAreaCanalizar = document.getElementById('canalizar-area-id');
+    const observacionCanalizar = document.getElementById('canalizar-observacion');
+
+    // Event listeners para botones de canalizar
+    document.querySelectorAll('.btn-canalizar-alumno').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Cerrar dropdown si está abierto
+            const dropdown = this.closest('.dropdown');
+            if (dropdown) {
+                const dropdownInstance = bootstrap.Dropdown.getInstance(dropdown.querySelector('[data-bs-toggle="dropdown"]'));
+                if (dropdownInstance) dropdownInstance.hide();
+            }
+            const alumnoId = this.getAttribute('data-alumno-id');
+            const alumnoNombre = this.getAttribute('data-alumno-nombre');
+            const alumnoMatricula = this.getAttribute('data-alumno-matricula');
+            
+            inputAlumnoIdCanalizar.value = alumnoId;
+            nombreAlumnoCanalizar.textContent = alumnoNombre || '-';
+            matriculaAlumnoCanalizar.textContent = alumnoMatricula || '-';
+            
+            cargarPeriodosCanalizar();
+            cargarAreasCanalizar();
+        });
+    });
+
+    // Cargar periodos para canalización
+    function cargarPeriodosCanalizar() {
+        selectPeriodoCanalizar.innerHTML = '<option value="">Cargando periodos...</option>';
+        
+        fetch('/GESTACAD/controllers/periodosController.php?action=index')
+            .then(response => response.json())
+            .then(periodos => {
+                if (periodos && periodos.length > 0) {
+                    selectPeriodoCanalizar.innerHTML = '<option value="">Seleccione un periodo...</option>';
+                    periodos.forEach(periodo => {
+                        const option = document.createElement('option');
+                        option.value = periodo.id;
+                        option.textContent = periodo.nombre;
+                        selectPeriodoCanalizar.appendChild(option);
+                    });
+                } else {
+                    selectPeriodoCanalizar.innerHTML = '<option value="">No hay periodos disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar periodos:', error);
+                selectPeriodoCanalizar.innerHTML = '<option value="">Error al cargar periodos</option>';
+            });
+    }
+
+    // Cargar áreas de canalización
+    function cargarAreasCanalizar() {
+        selectAreaCanalizar.innerHTML = '<option value="">Cargando áreas...</option>';
+        
+        fetch('/GESTACAD/controllers/canalizacionController.php?action=getAreas')
+            .then(response => response.json())
+            .then(areas => {
+                if (areas && areas.length > 0) {
+                    selectAreaCanalizar.innerHTML = '<option value="">Seleccione un área...</option>';
+                    areas.forEach(area => {
+                        const option = document.createElement('option');
+                        option.value = area.id;
+                        option.textContent = area.nombre;
+                        selectAreaCanalizar.appendChild(option);
+                    });
+                } else {
+                    selectAreaCanalizar.innerHTML = '<option value="">No hay áreas disponibles</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar áreas:', error);
+                selectAreaCanalizar.innerHTML = '<option value="">Error al cargar áreas</option>';
+            });
+    }
+
+    // Confirmar canalización
+    btnConfirmarCanalizacion.addEventListener('click', function() {
+        if (!formCanalizarAlumno.checkValidity()) {
+            formCanalizarAlumno.reportValidity();
+            return;
+        }
+
+        const formData = new FormData(formCanalizarAlumno);
+
+        btnConfirmarCanalizacion.disabled = true;
+        btnConfirmarCanalizacion.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
+
+        fetch('/GESTACAD/controllers/canalizacionController.php?action=store', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: data.message || 'Canalización registrada exitosamente.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    alert(data.message || 'Canalización registrada exitosamente.');
+                }
+                const bsModal = bootstrap.Modal.getInstance(modalCanalizarAlumno);
+                if (bsModal) bsModal.hide();
+                formCanalizarAlumno.reset();
+            } else {
+                throw new Error(data.message || 'Error al registrar la canalización');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'No se pudo registrar la canalización.'
+                });
+            } else {
+                alert('Error: ' + error.message);
+            }
+        })
+        .finally(() => {
+            btnConfirmarCanalizacion.disabled = false;
+            btnConfirmarCanalizacion.innerHTML = '<i class="bi bi-check-circle me-1"></i>Guardar Canalización';
         });
     });
 

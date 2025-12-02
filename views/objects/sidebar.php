@@ -53,6 +53,32 @@ if (!function_exists('active')) {
 if (isset($_SESSION))
   $nivel = (int) $_SESSION["usuario_nivel"];
 
+// Obtener grupos del tutor si es nivel 3 (TUTOR)
+$grupos_tutor = [];
+if ($nivel == 3 && isset($_SESSION['usuario_id'])) {
+    // Verificar si $conn está disponible, si no, intentar obtenerlo
+    if (!isset($conn)) {
+        if (file_exists(__DIR__ . '/../config/db.php')) {
+            require_once __DIR__ . '/../config/db.php';
+        }
+    }
+    if (isset($conn)) {
+        try {
+            $sql = "SELECT g.id_grupo, g.nombre
+                    FROM grupos g
+                    WHERE g.usuarios_id_usuario_tutor = :usuario_id AND g.estatus = 1
+                    ORDER BY g.nombre ASC";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(":usuario_id", $_SESSION['usuario_id'], PDO::PARAM_INT);
+            $stmt->execute();
+            $grupos_tutor = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            // Si hay error, dejar array vacío
+            $grupos_tutor = [];
+        }
+    }
+}
+
 // Debug: Mostrar información del usuario (remover en producción)
 // if (isset($_SESSION["usuario_nivel"])) {
 //   echo "<!-- DEBUG: Nivel de usuario: " . $_SESSION["usuario_nivel"] . " (tipo: " . gettype($_SESSION["usuario_nivel"]) . ") -->";
@@ -435,7 +461,7 @@ if (!isset($modificacion_ruta)) {
       <span>Configuración</span>
     </button>
 
-  <?php elseif ($nivel == 3): // TUTOR: Alumnos, Seguimientos, Tutorías PAT, Perfil, Configuración ?>
+  <?php elseif ($nivel == 3): // TUTOR: Alumnos, Seguimientos, [BOTÓN PRINCIPAL TOMAR LISTA], Mi PAT, Configuración ?>
     <a href="/GESTACAD/listas" class="bottom-nav-item <?= active(['listas', 'alumnos']) ? 'active' : '' ?>">
       <i class="bi bi-people-fill"></i>
       <span>Alumnos</span>
@@ -444,13 +470,14 @@ if (!isset($modificacion_ruta)) {
       <i class="bi bi-journal-text"></i>
       <span>Seguimientos</span>
     </a>
-    <a href="/GESTACAD/tutorias/pat" class="bottom-nav-item <?= active(['tutorias/pat', 'pat']) ? 'active' : '' ?>">
+    <button id="bottom-nav-tomar-lista" type="button" class="bottom-nav-item bottom-nav-item-primary" 
+            data-bs-toggle="modal" data-bs-target="#modalSeleccionarGrupoLista">
+      <i class="bi bi-calendar-plus-fill"></i>
+      <span>Tomar Lista</span>
+    </button>
+    <a href="/GESTACAD/tutorias/mi-pat" class="bottom-nav-item <?= active(['tutorias/mi-pat', 'mi-pat']) ? 'active' : '' ?>">
       <i class="bi bi-clipboard-check"></i>
-      <span>Tutorías</span>
-    </a>
-    <a href="/GESTACAD/profile" class="bottom-nav-item <?= active(['profile']) ? 'active' : '' ?>">
-      <i class="bi bi-person-circle"></i>
-      <span>Perfil</span>
+      <span>Mi PAT</span>
     </a>
     <button id="bottom-nav-config" type="button" class="bottom-nav-item">
       <i class="bi bi-gear-fill"></i>
@@ -458,3 +485,79 @@ if (!isset($modificacion_ruta)) {
     </button>
   <?php endif; ?>
 </nav>
+
+<?php if ($nivel == 3 && !empty($grupos_tutor)): ?>
+<!-- Modal para seleccionar grupo y tomar lista -->
+<div class="modal fade" id="modalSeleccionarGrupoLista" tabindex="-1" aria-labelledby="modalSeleccionarGrupoListaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalSeleccionarGrupoListaLabel">
+          <i class="bi bi-calendar-plus-fill me-2"></i>
+          Seleccionar Grupo para Tomar Lista
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted mb-3">Selecciona el grupo para el cual deseas tomar la lista de asistencia grupal:</p>
+        <div class="list-group">
+          <?php foreach ($grupos_tutor as $grupo): ?>
+            <button type="button" 
+                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center grupo-seleccionar-lista"
+                    data-grupo-id="<?= htmlspecialchars($grupo['id_grupo']) ?>"
+                    data-grupo-nombre="<?= htmlspecialchars($grupo['nombre']) ?>">
+              <div>
+                <i class="bi bi-people-fill text-primary me-2"></i>
+                <strong><?= htmlspecialchars($grupo['nombre']) ?></strong>
+              </div>
+              <i class="bi bi-chevron-right text-muted"></i>
+            </button>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar la selección de grupo para tomar lista
+    const botonesGrupo = document.querySelectorAll('.grupo-seleccionar-lista');
+    const modalSeleccionar = document.getElementById('modalSeleccionarGrupoLista');
+    
+    botonesGrupo.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const grupoId = this.getAttribute('data-grupo-id');
+            const grupoNombre = this.getAttribute('data-grupo-nombre');
+            
+            // Cerrar el modal de selección
+            if (modalSeleccionar) {
+                const bsModal = bootstrap.Modal.getInstance(modalSeleccionar);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            }
+            
+            // Intentar abrir el modal de tutoría grupal directamente
+            // Si no está disponible (modales no cargados), redirigir
+            const modalTutoriaGrupal = document.getElementById('modalTutoriaGrupal');
+            if (modalTutoriaGrupal) {
+                // Disparar evento para que el código de tutorias.js lo maneje
+                // Simular click en botón con las clases correctas
+                const tempBtn = document.createElement('button');
+                tempBtn.className = 'btn-tutoria-grupal-today';
+                tempBtn.setAttribute('data-grupo-id', grupoId);
+                tempBtn.setAttribute('data-grupo-nombre', grupoNombre);
+                tempBtn.style.display = 'none';
+                document.body.appendChild(tempBtn);
+                tempBtn.click();
+                document.body.removeChild(tempBtn);
+            } else {
+                // Si el modal no está disponible, redirigir
+                window.location.href = `/GESTACAD/gestionar-listas?id_grupo=${grupoId}`;
+            }
+        });
+    });
+});
+</script>
+<?php endif; ?>

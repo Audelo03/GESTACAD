@@ -441,7 +441,7 @@ class AlumnoController
                                                             title="Ver seguimientos">
                                                             <i class="bi bi-card-list me-1 d-md-none"></i>
                                                             <span class="d-none d-md-inline"><i class="bi bi-card-list"></i></span>
-                                                            <span class="d-md-none">Ver seguimiento</span>
+                                                            <span class="d-md-none">Ver seguimientos</span>
                                                         </a>
                                                     </div>
                                                 </li>

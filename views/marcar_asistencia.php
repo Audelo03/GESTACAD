@@ -48,21 +48,45 @@ if ($tutoriaExistente && isset($tutoriaExistente['asistencia'])) {
         }
     }
 }
-
-include 'objects/header.php';
 ?>
-
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-header bg-primary text-white text-center">
-                    <h3 class="mb-0">
-                        <i class="bi bi-check-circle me-2"></i>
-                        Marcar Asistencia
-                    </h3>
-                </div>
-                <div class="card-body p-4">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title><?php echo $page_title ?? 'Marcar Asistencia'; ?></title>
+    <link rel="icon" type="image/png" href="/GESTACAD/public/images/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.min.css">
+    <link href="/GESTACAD/public/css/theme.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bs-body-bg, #f8f9fa);
+        }
+        .card-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="card-container">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white text-center">
+            <h3 class="mb-0">
+                <i class="bi bi-check-circle me-2"></i>
+                Marcar Asistencia
+            </h3>
+        </div>
+        <div class="card-body p-4">
                     <!-- Información del grupo -->
                     <div class="alert alert-info mb-4">
                         <div class="d-flex align-items-center">
@@ -100,20 +124,16 @@ include 'objects/header.php';
 
                     <!-- Mensaje de éxito/error -->
                     <div id="mensajeResultado" class="mt-4"></div>
-                </div>
-            </div>
 
-            <!-- Información adicional -->
-            <div class="card mt-3 border-0 bg-light">
-                <div class="card-body text-center">
-                    <small class="text-muted">
-                        <i class="bi bi-shield-check me-1"></i>
-                        Tu asistencia se registrará de forma segura. Solo puedes marcar tu propia asistencia.
-                    </small>
+                    <!-- Información adicional -->
+                    <div class="mt-3 pt-3 border-top text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Tu asistencia se registrará de forma segura. Solo puedes marcar tu propia asistencia.
+                        </small>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -493,6 +513,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<?php include 'objects/footer.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.1/dist/sweetalert2.all.min.js"></script>
+</body>
+</html>
 

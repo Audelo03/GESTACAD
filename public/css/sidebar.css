@@ -378,6 +378,32 @@
   #mobile-bottom-nav .bottom-nav-item:active {
     background: rgba(255, 255, 255, 0.05);
   }
+
+  /* Botón principal destacado para tomar lista (solo tutor) */
+  #mobile-bottom-nav .bottom-nav-item-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-radius: 16px;
+    margin: -8px 4px;
+    min-height: 64px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    z-index: 10;
+    position: relative;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item-primary i {
+    font-size: 1.5rem;
+    margin-bottom: 2px;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item-primary span {
+    font-weight: 600;
+    font-size: 0.7rem;
+  }
+
+  #mobile-bottom-nav .bottom-nav-item-primary:active {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: scale(0.95);
+  }
 }
 
 /* ========================================

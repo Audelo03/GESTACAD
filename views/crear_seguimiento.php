@@ -30,7 +30,7 @@ $errors = [];
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_usuario_movimiento = $_SESSION['usuario_id'];
+    $id_usuario_movimiento = (int)$_SESSION['usuario_id'];
     $descripcion = trim($_POST['descripcion'] ?? '');
     $estatus = filter_input(INPUT_POST, 'estatus', FILTER_VALIDATE_INT);
     $fecha_movimiento = $_POST['fecha_movimiento'] ?? date('Y-m-d');
@@ -54,18 +54,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Manejar tutor_id según el nivel del usuario
     $tutor_id = null;
     if ($_SESSION['usuario_nivel'] == 3) { 
-        $tutor_id = $id_usuario_movimiento;
+        $tutor_id = (int)$id_usuario_movimiento;
     }
 
     if (empty($errors)) {
         $seguimientoController = new SeguimientoController($conn);
         $resultado = $seguimientoController->crear(
-            $id_alumno,
-            $id_usuario_movimiento,
+            (int)$id_alumno,
+            (int)$id_usuario_movimiento,
             $descripcion,
             (int)$estatus,
             $fecha_movimiento,
-            $fecha_compromiso,
+            $fecha_compromiso ?: null,
             (int)$tipo_seguimiento_id,
             $tutor_id
         );

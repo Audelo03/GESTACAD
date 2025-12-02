@@ -26,15 +26,20 @@ include __DIR__ . "/../objects/header.php";
                         <?= $es_tutor ? "Becas asignadas a los alumnos de tus grupos" : "Administra el catálogo de becas" ?>
                     </p>
                 </div>
-                <?php if (!$es_tutor): ?>
                 <div class="d-flex flex-column flex-md-row gap-2 w-100 w-md-auto">
+                    <?php if (!$es_tutor): ?>
                     <button class="btn btn-primary btn-lg w-100 w-md-auto" id="btnNuevaBeca">
                         <i class="bi bi-plus-circle me-2"></i>
                         <span class="d-none d-sm-inline">Agregar Beca</span>
                         <span class="d-sm-none">Nuevo</span>
                     </button>
+                    <?php endif; ?>
+                    <button class="btn btn-warning btn-lg w-100 w-md-auto" id="btnInscribirAlumnoBeca" data-bs-toggle="modal" data-bs-target="#modalInscribirBeca">
+                        <i class="bi bi-award me-2"></i>
+                        <span class="d-none d-sm-inline">Inscribir Alumno en Beca</span>
+                        <span class="d-sm-none">Inscribir</span>
+                    </button>
                 </div>
-                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -123,6 +128,70 @@ include __DIR__ . "/../objects/header.php";
     </div>
 </div>
 <?php endif; ?>
+
+<!-- Modal para inscribir alumno en beca -->
+<div class="modal fade" id="modalInscribirBeca" tabindex="-1" aria-labelledby="modalInscribirBecaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold" id="modalInscribirBecaLabel">
+                    Inscribir Alumno en Beca
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formInscribirBeca">
+                    <div class="mb-3">
+                        <label for="selectAlumnoBeca" class="form-label fw-bold">
+                            Seleccionar Alumno <span class="text-danger">*</span>
+                        </label>
+                        <select id="selectAlumnoBeca" name="alumno_id" class="form-select" required>
+                            <option value="">Cargando alumnos...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="selectBeca" class="form-label fw-bold">
+                            Seleccionar Beca <span class="text-danger">*</span>
+                        </label>
+                        <select id="selectBeca" name="beca_id" class="form-select" required>
+                            <option value="">Cargando becas...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="selectPeriodoBeca" class="form-label fw-bold">
+                            Periodo Escolar <span class="text-danger">*</span>
+                        </label>
+                        <select id="selectPeriodoBeca" name="periodo_id" class="form-select" required>
+                            <option value="">Cargando periodos...</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="porcentajeBeca" class="form-label fw-bold">
+                                Porcentaje (%)
+                            </label>
+                            <input type="number" id="porcentajeBeca" name="porcentaje" class="form-control" 
+                                   min="0" max="100" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="montoBeca" class="form-label fw-bold">
+                                Monto ($)
+                            </label>
+                            <input type="number" id="montoBeca" name="monto" class="form-control" 
+                                   min="0" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer flex-column flex-sm-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-sm-auto" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning w-100 w-sm-auto" id="btnConfirmarInscripcionBeca">
+                    Asignar Beca
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include __DIR__ . '/crud_helper_styles.php'; ?>
 
@@ -356,5 +425,267 @@ include __DIR__ . "/../objects/header.php";
         }
 
         loadData();
+
+        // ========== MODAL INSCRIBIR EN BECA ==========
+        const modalInscribirBeca = document.getElementById('modalInscribirBeca');
+        const formInscribirBeca = document.getElementById('formInscribirBeca');
+        const btnConfirmarBeca = document.getElementById('btnConfirmarInscripcionBeca');
+        const selectAlumnoBeca = document.getElementById('selectAlumnoBeca');
+        const selectBecaModal = document.getElementById('selectBeca');
+        const selectPeriodoBeca = document.getElementById('selectPeriodoBeca');
+        
+        let select2Alumno = null;
+        let select2Beca = null;
+        let select2Periodo = null;
+
+        // Cargar datos cuando se abre el modal
+        if (modalInscribirBeca) {
+            modalInscribirBeca.addEventListener('show.bs.modal', function() {
+                cargarAlumnos();
+                cargarBecasModal();
+                cargarPeriodos();
+            });
+            
+            // Limpiar Select2 cuando se cierra el modal
+            modalInscribirBeca.addEventListener('hidden.bs.modal', function() {
+                if (select2Alumno && typeof $ !== 'undefined' && $(selectAlumnoBeca).hasClass('select2-hidden-accessible')) {
+                    $(selectAlumnoBeca).select2('destroy');
+                    select2Alumno = null;
+                }
+                if (select2Beca && typeof $ !== 'undefined' && $(selectBecaModal).hasClass('select2-hidden-accessible')) {
+                    $(selectBecaModal).select2('destroy');
+                    select2Beca = null;
+                }
+                if (select2Periodo && typeof $ !== 'undefined' && $(selectPeriodoBeca).hasClass('select2-hidden-accessible')) {
+                    $(selectPeriodoBeca).select2('destroy');
+                    select2Periodo = null;
+                }
+                // Limpiar el formulario
+                if (formInscribirBeca) {
+                    formInscribirBeca.reset();
+                }
+            });
+        }
+
+        // Cargar alumnos disponibles
+        async function cargarAlumnos() {
+            if (!selectAlumnoBeca) return;
+            selectAlumnoBeca.innerHTML = '<option value="">Cargando alumnos...</option>';
+            
+            try {
+                const response = await fetch('/GESTACAD/controllers/alumnoController.php?action=index');
+                const alumnos = await response.json();
+                
+                if (alumnos && alumnos.length > 0) {
+                    selectAlumnoBeca.innerHTML = '<option value="">Seleccione un alumno...</option>';
+                    alumnos.forEach(alumno => {
+                        const option = document.createElement('option');
+                        option.value = alumno.id_alumno;
+                        const nombreCompleto = `${alumno.nombre || ''} ${alumno.apellido_paterno || ''} ${alumno.apellido_materno || ''}`.trim();
+                        option.textContent = `${alumno.matricula || ''} - ${nombreCompleto || 'N/A'}`;
+                        selectAlumnoBeca.appendChild(option);
+                    });
+                    
+                    // Inicializar Select2 después de cargar las opciones
+                    if (typeof $ !== 'undefined') {
+                        // Destruir Select2 si ya existe
+                        if (select2Alumno && $(selectAlumnoBeca).hasClass('select2-hidden-accessible')) {
+                            $(selectAlumnoBeca).select2('destroy');
+                        }
+                        
+                        $(selectAlumnoBeca).select2({
+                            theme: 'bootstrap-5',
+                            dropdownParent: $(modalInscribirBeca),
+                            placeholder: 'Buscar alumno...',
+                            width: '100%',
+                            language: {
+                                noResults: function() {
+                                    return "No se encontraron resultados";
+                                },
+                                searching: function() {
+                                    return "Buscando...";
+                                }
+                            }
+                        });
+                        select2Alumno = selectAlumnoBeca;
+                    }
+                } else {
+                    selectAlumnoBeca.innerHTML = '<option value="">No hay alumnos disponibles</option>';
+                }
+            } catch (error) {
+                console.error('Error al cargar alumnos:', error);
+                selectAlumnoBeca.innerHTML = '<option value="">Error al cargar alumnos</option>';
+            }
+        }
+
+        // Cargar becas disponibles
+        async function cargarBecasModal() {
+            if (!selectBecaModal) return;
+            selectBecaModal.innerHTML = '<option value="">Cargando becas...</option>';
+            
+            try {
+                const response = await fetch('/GESTACAD/controllers/becasController.php?action=getBecasActivas');
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    selectBecaModal.innerHTML = '<option value="">Seleccione una beca...</option>';
+                    data.data.forEach(beca => {
+                        const option = document.createElement('option');
+                        option.value = beca.id;
+                        option.textContent = `${beca.clave} - ${beca.nombre}`;
+                        selectBecaModal.appendChild(option);
+                    });
+                    
+                    // Inicializar Select2 después de cargar las opciones
+                    if (typeof $ !== 'undefined') {
+                        // Destruir Select2 si ya existe
+                        if (select2Beca && $(selectBecaModal).hasClass('select2-hidden-accessible')) {
+                            $(selectBecaModal).select2('destroy');
+                        }
+                        
+                        $(selectBecaModal).select2({
+                            theme: 'bootstrap-5',
+                            dropdownParent: $(modalInscribirBeca),
+                            placeholder: 'Buscar beca...',
+                            width: '100%',
+                            language: {
+                                noResults: function() {
+                                    return "No se encontraron resultados";
+                                },
+                                searching: function() {
+                                    return "Buscando...";
+                                }
+                            }
+                        });
+                        select2Beca = selectBecaModal;
+                    }
+                } else {
+                    selectBecaModal.innerHTML = '<option value="">No hay becas disponibles</option>';
+                }
+            } catch (error) {
+                console.error('Error al cargar becas:', error);
+                selectBecaModal.innerHTML = '<option value="">Error al cargar becas</option>';
+            }
+        }
+
+        // Cargar periodos disponibles
+        async function cargarPeriodos() {
+            if (!selectPeriodoBeca) return;
+            selectPeriodoBeca.innerHTML = '<option value="">Cargando periodos...</option>';
+            
+            try {
+                const response = await fetch('/GESTACAD/controllers/periodosController.php?action=index');
+                const periodos = await response.json();
+                
+                if (periodos && periodos.length > 0) {
+                    selectPeriodoBeca.innerHTML = '<option value="">Seleccione un periodo...</option>';
+                    periodos.forEach(periodo => {
+                        const option = document.createElement('option');
+                        option.value = periodo.id;
+                        option.textContent = periodo.nombre;
+                        selectPeriodoBeca.appendChild(option);
+                    });
+                    
+                    // Inicializar Select2 después de cargar las opciones
+                    if (typeof $ !== 'undefined') {
+                        // Destruir Select2 si ya existe
+                        if (select2Periodo && $(selectPeriodoBeca).hasClass('select2-hidden-accessible')) {
+                            $(selectPeriodoBeca).select2('destroy');
+                        }
+                        
+                        $(selectPeriodoBeca).select2({
+                            theme: 'bootstrap-5',
+                            dropdownParent: $(modalInscribirBeca),
+                            placeholder: 'Buscar periodo...',
+                            width: '100%',
+                            language: {
+                                noResults: function() {
+                                    return "No se encontraron resultados";
+                                },
+                                searching: function() {
+                                    return "Buscando...";
+                                }
+                            }
+                        });
+                        select2Periodo = selectPeriodoBeca;
+                    }
+                } else {
+                    selectPeriodoBeca.innerHTML = '<option value="">No hay periodos disponibles</option>';
+                }
+            } catch (error) {
+                console.error('Error al cargar periodos:', error);
+                selectPeriodoBeca.innerHTML = '<option value="">Error al cargar periodos</option>';
+            }
+        }
+
+        // Confirmar inscripción en beca
+        if (btnConfirmarBeca) {
+            btnConfirmarBeca.addEventListener('click', async function() {
+                // Obtener valores de Select2 si están inicializados
+                const alumnoId = select2Alumno && typeof $ !== 'undefined' ? $(selectAlumnoBeca).val() : (selectAlumnoBeca ? selectAlumnoBeca.value : '');
+                const becaId = select2Beca && typeof $ !== 'undefined' ? $(selectBecaModal).val() : (selectBecaModal ? selectBecaModal.value : '');
+                const periodoId = select2Periodo && typeof $ !== 'undefined' ? $(selectPeriodoBeca).val() : (selectPeriodoBeca ? selectPeriodoBeca.value : '');
+
+                if (!alumnoId || !becaId || !periodoId) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Datos incompletos',
+                            text: 'Por favor, complete todos los campos requeridos.'
+                        });
+                    } else {
+                        alert('Por favor, complete todos los campos requeridos.');
+                    }
+                    return;
+                }
+
+                const formData = new FormData(formInscribirBeca);
+
+                btnConfirmarBeca.disabled = true;
+                btnConfirmarBeca.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Asignando...';
+
+                try {
+                    const response = await fetch('/GESTACAD/controllers/becasController.php?action=asignarBecaAlumno', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: data.message || 'La beca ha sido asignada correctamente.',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            alert(data.message || 'La beca ha sido asignada correctamente.');
+                        }
+                        const bsModal = bootstrap.Modal.getInstance(modalInscribirBeca);
+                        if (bsModal) bsModal.hide();
+                        formInscribirBeca.reset();
+                        loadData(); // Recargar la tabla
+                    } else {
+                        throw new Error(data.message || 'Error al asignar la beca');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message || 'No se pudo asignar la beca.'
+                        });
+                    } else {
+                        alert('Error: ' + error.message);
+                    }
+                } finally {
+                    btnConfirmarBeca.disabled = false;
+                    btnConfirmarBeca.innerHTML = 'Asignar Beca';
+                }
+            });
+        }
     });
 </script>
