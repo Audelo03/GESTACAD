@@ -70,6 +70,7 @@ $viewMap = [
     'alumnos_paginados' => 'views/alumnos_paginados.php',
     'asistencia' => 'views/asistencia.php',
     'estadisticas' => 'views/estadisticas.php',
+    'reportes' => 'views/reportes.php',
     'listas' => 'views/listas.php',
     'seguimientos' => 'views/seguimientos.php',
     'alumnos-riesgo' => 'views/alumnos_riesgo.php',

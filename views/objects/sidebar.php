@@ -119,10 +119,19 @@ if (!isset($modificacion_ruta)) {
           </a>
         </li>
 
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Estadísticas</h6>
+
         <li class="mobile-hidden">
           <a href="/GESTACAD/estadisticas" class="nav-link sidebar-link <?= active(['estadisticas']); ?>"
-            <?= active(['estadisticas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Estadísticas y Reportes"' ?>>
+            <?= active(['estadisticas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Estadísticas"' ?>>
             <i class="bi bi-bar-chart-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Estadísticas</span>
+          </a>
+        </li>
+
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/reportes" class="nav-link sidebar-link <?= active(['reportes']); ?>"
+            <?= active(['reportes']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Reportes por Parcial y Grupo"' ?>>
+            <i class="bi bi-file-earmark-bar-graph me-2 sidebar-icon"></i> <span class="sidebar-text">Reportes</span>
           </a>
         </li>
 
@@ -256,10 +265,19 @@ if (!isset($modificacion_ruta)) {
           </a>
         </li>
 
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Estadísticas</h6>
+
         <li class="mobile-hidden">
           <a href="/GESTACAD/estadisticas" class="nav-link sidebar-link <?= active(['estadisticas']); ?>"
             <?= active(['estadisticas']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Estadísticas de mi Carrera"' ?>>
             <i class="bi bi-bar-chart-fill me-2 sidebar-icon"></i> <span class="sidebar-text">Estadísticas</span>
+          </a>
+        </li>
+
+        <li class="mobile-hidden">
+          <a href="/GESTACAD/reportes" class="nav-link sidebar-link <?= active(['reportes']); ?>"
+            <?= active(['reportes']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Reportes por Parcial y Grupo"' ?>>
+            <i class="bi bi-file-earmark-bar-graph me-2 sidebar-icon"></i> <span class="sidebar-text">Reportes</span>
           </a>
         </li>
 
@@ -359,6 +377,15 @@ if (!isset($modificacion_ruta)) {
           <a href="/GESTACAD/seguimientos" class="nav-link sidebar-link <?= active(['seguimientos']); ?>"
             <?= active(['seguimientos']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Seguimientos"' ?>>
             <i class="bi bi-journal-text me-2 sidebar-icon"></i> <span class="sidebar-text">Seguimientos</span>
+          </a>
+        </li>
+
+        <h6 class="text-uppercase text-secondary fw-bold small mt-3 mb-2 sidebar-section-title">Estadísticas</h6>
+
+        <li>
+          <a href="/GESTACAD/reportes" class="nav-link sidebar-link <?= active(['reportes']); ?>"
+            <?= active(['reportes']) ? '' : 'data-bs-toggle="tooltip" data-bs-placement="right" title="Reportes por Parcial y Grupo"' ?>>
+            <i class="bi bi-file-earmark-bar-graph me-2 sidebar-icon"></i> <span class="sidebar-text">Reportes</span>
           </a>
         </li>
 
