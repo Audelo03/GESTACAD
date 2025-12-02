@@ -236,11 +236,12 @@ include __DIR__ . "/../objects/header.php";
                     : '<span class="badge bg-secondary">' + (item.estado || 'N/A') + '</span>';
                 
                 // Tabla desktop
+                const nombreCompleto = `${item.alumno_nombre || ''} ${item.alumno_apellido || ''} ${item.alumno_apellido_materno || ''}`.trim();
                 tbody.innerHTML += `
                 <tr class="align-middle">
                     <td class="text-center fw-bold text-primary">${item.id}</td>
-                    <td><strong>${item.alumno_nombre} ${item.alumno_apellido}</strong></td>
-                    <td>${item.asignatura_nombre}<br><small class="text-muted">Sección: ${item.seccion || 'N/A'}</small></td>
+                    <td><strong>${nombreCompleto || 'N/A'}</strong><br><small class="text-muted">${item.matricula || ''}</small></td>
+                    <td>${item.asignatura_nombre || 'N/A'}<br><small class="text-muted">Sección: ${item.seccion || 'N/A'}</small></td>
                     <td class="text-center">${estadoBadge}</td>
                     <td>
                         <small>
@@ -278,14 +279,16 @@ include __DIR__ . "/../objects/header.php";
                 
                 // Cards móvil
                 if (inscripcionesCardsBody) {
+                    const nombreCompleto = `${item.alumno_nombre || ''} ${item.alumno_apellido || ''} ${item.alumno_apellido_materno || ''}`.trim();
                     inscripcionesCardsBody.innerHTML += `
                     <div class="card shadow-sm mb-3 crud-card-mobile">
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-start mb-3 gap-2">
                                 <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-1 fw-bold text-truncate">${item.alumno_nombre} ${item.alumno_apellido}</h6>
+                                    <h6 class="mb-1 fw-bold text-truncate">${nombreCompleto || 'N/A'}</h6>
                                     <small class="text-muted d-block">ID: ${item.id}</small>
-                                    <small class="text-muted d-block">${item.asignatura_nombre}</small>
+                                    <small class="text-muted d-block">${item.matricula || ''}</small>
+                                    <small class="text-muted d-block">${item.asignatura_nombre || 'N/A'}</small>
                                 </div>
                                 <div class="text-end flex-shrink-0 ms-2">
                                     ${estadoBadge}

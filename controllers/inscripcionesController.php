@@ -93,8 +93,36 @@ class InscripcionesController
         exit;
     }
 
-    // Método eliminado: updateCalificaciones ya no es necesario
-    // Los estados por parcial se manejan con updateEstados
+    public function updateCalificaciones()
+    {
+        header('Content-Type: application/json');
+        try {
+            if (!isset($_POST['id'])) {
+                echo json_encode(["status" => "error", "message" => "ID de inscripción requerido"]);
+                exit;
+            }
+            
+            $id = $_POST['id'];
+            $data = [
+                'cal_parcial1' => $_POST['cal_parcial1'] ?? null,
+                'cal_parcial2' => $_POST['cal_parcial2'] ?? null,
+                'cal_parcial3' => $_POST['cal_parcial3'] ?? null,
+                'cal_parcial4' => $_POST['cal_parcial4'] ?? null,
+                'cal_final' => $_POST['cal_final'] ?? null
+            ];
+            
+            if ($this->inscripcion->updateCalificaciones($id, $data)) {
+                echo json_encode(["status" => "ok", "message" => "Calificaciones actualizadas correctamente"]);
+            } else {
+                echo json_encode(["status" => "error", "message" => "Error al actualizar calificaciones"]);
+            }
+        } catch (Exception $e) {
+            echo json_encode(["status" => "error", "message" => $e->getMessage()]);
+        } catch (Error $e) {
+            echo json_encode(["status" => "error", "message" => "Error del sistema: " . $e->getMessage()]);
+        }
+        exit;
+    }
 
     public function delete()
     {

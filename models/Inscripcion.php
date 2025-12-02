@@ -11,7 +11,25 @@ class Inscripcion
 
     public function getAll()
     {
-        $sql = "SELECT * FROM " . $this->table;
+        $sql = "SELECT i.*,
+                       c.seccion, c.aula,
+                       asig.nombre as asignatura_nombre, asig.clave as asignatura_clave,
+                       u.nombre as docente_nombre, u.apellido_paterno as docente_apellido,
+                       p.nombre as periodo_nombre,
+                       m.nombre as modalidad_nombre,
+                       a.nombre as alumno_nombre, 
+                       a.apellido_paterno as alumno_apellido,
+                       a.apellido_materno as alumno_apellido_materno,
+                       a.matricula,
+                       i.estado_parcial1, i.estado_parcial2, i.estado_parcial3, i.estado_parcial4
+                FROM " . $this->table . " i
+                LEFT JOIN clases c ON i.clase_id = c.id
+                LEFT JOIN asignaturas asig ON c.asignatura_id = asig.id
+                LEFT JOIN usuarios u ON c.docente_usuario_id = u.id_usuario
+                LEFT JOIN periodos_escolares p ON c.periodo_id = p.id
+                LEFT JOIN modalidades m ON c.modalidad_id = m.id_modalidad
+                LEFT JOIN alumnos a ON i.alumno_id = a.id_alumno
+                ORDER BY i.fecha_alta DESC";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -19,7 +37,26 @@ class Inscripcion
 
     public function getByClase($clase_id)
     {
-        $sql = "SELECT * FROM " . $this->table . " WHERE clase_id = :clase_id";
+        $sql = "SELECT i.*,
+                       c.seccion, c.aula,
+                       asig.nombre as asignatura_nombre, asig.clave as asignatura_clave,
+                       u.nombre as docente_nombre, u.apellido_paterno as docente_apellido,
+                       p.nombre as periodo_nombre,
+                       m.nombre as modalidad_nombre,
+                       a.nombre as alumno_nombre, 
+                       a.apellido_paterno as alumno_apellido,
+                       a.apellido_materno as alumno_apellido_materno,
+                       a.matricula,
+                       i.estado_parcial1, i.estado_parcial2, i.estado_parcial3, i.estado_parcial4
+                FROM " . $this->table . " i
+                LEFT JOIN clases c ON i.clase_id = c.id
+                LEFT JOIN asignaturas asig ON c.asignatura_id = asig.id
+                LEFT JOIN usuarios u ON c.docente_usuario_id = u.id_usuario
+                LEFT JOIN periodos_escolares p ON c.periodo_id = p.id
+                LEFT JOIN modalidades m ON c.modalidad_id = m.id_modalidad
+                LEFT JOIN alumnos a ON i.alumno_id = a.id_alumno
+                WHERE i.clase_id = :clase_id
+                ORDER BY i.fecha_alta DESC";
         $stmt = $this->conn->prepare($sql);
         $stmt->bindParam(":clase_id", $clase_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -43,6 +80,10 @@ class Inscripcion
                        u.nombre as docente_nombre, u.apellido_paterno as docente_apellido,
                        p.nombre as periodo_nombre,
                        m.nombre as modalidad_nombre,
+                       a.nombre as alumno_nombre, 
+                       a.apellido_paterno as alumno_apellido,
+                       a.apellido_materno as alumno_apellido_materno,
+                       a.matricula,
                        i.estado_parcial1, i.estado_parcial2, i.estado_parcial3, i.estado_parcial4
                 FROM " . $this->table . " i
                 LEFT JOIN clases c ON i.clase_id = c.id
@@ -50,6 +91,7 @@ class Inscripcion
                 LEFT JOIN usuarios u ON c.docente_usuario_id = u.id_usuario
                 LEFT JOIN periodos_escolares p ON c.periodo_id = p.id
                 LEFT JOIN modalidades m ON c.modalidad_id = m.id_modalidad
+                LEFT JOIN alumnos a ON i.alumno_id = a.id_alumno
                 WHERE i.alumno_id = :alumno_id
                 ORDER BY i.fecha_alta DESC";
         $stmt = $this->conn->prepare($sql);
@@ -139,8 +181,24 @@ class Inscripcion
         }
     }
 
-    // Método eliminado: updateCalificaciones ya no es necesario
-    // Los estados por parcial se manejan con updateEstadosMasivo
+    public function updateCalificaciones($id, $data)
+    {
+        $sql = "UPDATE " . $this->table . " 
+                SET cal_parcial1 = :cal_parcial1,
+                    cal_parcial2 = :cal_parcial2,
+                    cal_parcial3 = :cal_parcial3,
+                    cal_parcial4 = :cal_parcial4,
+                    cal_final = :cal_final
+                WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->bindValue(":cal_parcial1", !empty($data['cal_parcial1']) ? $data['cal_parcial1'] : null);
+        $stmt->bindValue(":cal_parcial2", !empty($data['cal_parcial2']) ? $data['cal_parcial2'] : null);
+        $stmt->bindValue(":cal_parcial3", !empty($data['cal_parcial3']) ? $data['cal_parcial3'] : null);
+        $stmt->bindValue(":cal_parcial4", !empty($data['cal_parcial4']) ? $data['cal_parcial4'] : null);
+        $stmt->bindValue(":cal_final", !empty($data['cal_final']) ? $data['cal_final'] : null);
+        return $stmt->execute();
+    }
 
     public function delete($id)
     {
